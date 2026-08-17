@@ -1,0 +1,4 @@
+# 用于 dsh plugin add：插件安装后作为组合层插入的 preset 行（id = 插件名）
+- insert:
+    - id: dsh-plugin-template
+      name: dsh-plugin-template
