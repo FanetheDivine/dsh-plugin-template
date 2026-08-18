@@ -1,16 +1,16 @@
 ---
-name: coding-steps
-description: 需求，缺陷，worktree
-whenToUse: 需求，缺陷，worktree
+name: dsh-plugin-coding
+description: 需求，缺陷，worktree，dsh，plugin
+whenToUse: 需求，缺陷，worktree，dsh，plugin
 ---
 
-# coding-steps
+# dsh-plugin-coding
 
 接到需求或缺陷任务后，按以下步骤执行，不要跳过、合并或随意更改顺序。
 
 ## 1. 创建 worktree
 
-- 在**项目文件夹的上级（平行）位置**创建 git worktree，分支名用 kebab-case 概括需求/缺陷，基于最新基线（如 `origin/main`）。
+- 在**项目文件夹的上级（平行）位置**创建 git worktree，分支名形如 <feat,fix,etc.>/<kebab-case>，基于最新基线（如 `origin/main`）。
 - 以 --no-track 方式创建新分支
 - 原工作区保持干净；后续的探索、确认、编码全部在 worktree 内进行。
 
