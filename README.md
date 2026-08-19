@@ -62,6 +62,12 @@ dsh plugin --profile <profile> add dsh-plugin-template
 - **开发走本地挂载**：同一份 dist/index.mjs 被宿主直接加载，改 src 触发重打包即可热重载
 - **依赖策略**：cordis / dsh-tools / zod 等 dsh 宿主自带依赖直接复用（放 devDependencies、打包时保持 external），插件不重复安装运行时依赖，避免与宿主实例分叉
 
+### 关于 dsh 依赖包
+
+- 插件运行时的 cordis / dsh-tools / zod 由 dsh 宿主提供（同一份实例），devDependencies 里的声明只用于类型检查与测试，打包时保持 external
+- `@deepseek-ai/dsh-*` 为 rc 版本，pnpm 默认的 minimum release age 策略会拒绝安装发布年龄不足的包；新增此类依赖时必须同步把「包名 + 版本」加入 [pnpm-workspace.yaml](./pnpm-workspace.yaml) 的 `minimumReleaseAgeExclude` 列表
+- 模板刻意只保留 `@deepseek-ai/dsh-agent` / `@deepseek-ai/dsh-tools` 两个 dsh-* 依赖（覆盖 inject 声明与工具注册所需的宿主类型），其余能力直接复用宿主实例，避免依赖膨胀与实例分叉
+
 ## 一个插件是如何构造的
 
 dsh 插件是一个 npm 包，宿主（dsh 进程）通过约定的入口把它加载进运行时。构造一个插件共 6 步：
