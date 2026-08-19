@@ -47,7 +47,7 @@ export function resolveConfig(raw?: unknown): Readonly<PluginConfig> {
     }
     config.demoEnabled = demoEnabled;
   }
-  // prefix：非空字符串（缺省 / null / 空串回退默认值）
+  // prefix：非空字符串（缺省 / null 回退默认值；空串视为非法值，报错）
   const prefix = input.prefix;
   if (prefix !== undefined && prefix !== null) {
     if (typeof prefix !== 'string' || prefix.trim() === '') {
