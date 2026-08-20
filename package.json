@@ -36,8 +36,10 @@
   "scripts": {
     "dev": "tsdown --watch",
     "build": "tsdown && tsc -p tsconfig.build.json",
-    "check": "pnpm run typecheck && pnpm run lint && pnpm run build",
+    "check": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run build",
+    "release": "pnpm check && pnpm format && npm version patch && node scripts/release-archive.mjs && git push && git push --tags",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "build:types": "tsc -p tsconfig.build.json",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
@@ -50,6 +52,8 @@
     "@deepseek-ai/dsh-tools": "^0.1.0-rc.6",
     "@types/node": "^22.20.0",
     "tsdown": "^0.22.14",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10",
+    "zod": "4.4.3"
   }
 }

@@ -8,7 +8,7 @@ on:
 
 jobs:
   check:
-    name: Check (typecheck + lint + build)
+    name: Check (typecheck + lint + test + build)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
