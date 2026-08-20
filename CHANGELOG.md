@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- 升级宿主依赖 `@deepseek-ai/dsh-agent` / `@deepseek-ai/dsh-tools` 至 `0.1.0-rc.8`
+
 ### Added
 
 - 完整插件工程骨架（对齐 dsh-plugin-om，具体实现为 demo）：
