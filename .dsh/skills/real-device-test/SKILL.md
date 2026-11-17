@@ -1,7 +1,6 @@
 ---
 name: real-device-test
-description: 在真实 DSH 宿主上端到端测试本插件，覆盖单元测试测不到的宿主装载、真实对话链路、配置热更新与 GUI 展示。版本验收、宿主升级后回归、或需要验证插件在 DSH 中的实际表现时使用。
-disable-model-invocation: true
+description: 在真实 DSH 宿主上端到端测试本插件，验证插件在 DSH 中的实际表现时使用。
 ---
 
 # real-device-test
