@@ -69,6 +69,61 @@ export function apply(ctx: Context, config?: unknown): void {
 
 事件载荷都带有 `agent`，可按 agent 过滤。
 
+## 前端部分
+
+同一个包可以同时带宿主机部分与浏览器部分。宿主按 `package.json` 的声明加载前端：
+
+| 声明 | 作用 |
+| --- | --- |
+| `dsh.client.platform` | 只在该平台加载，当前为 `web` |
+| `dsh.client.inject` | 先到达的客户端包，同时参与插件组合 |
+| `exports["./client"]` | 浏览器产物路径 |
+
+产物按闭包工厂格式注册：
+
+```js
+window.__ModuleLoader__.load({
+  id: 'dsh-plugin-template',
+  factory(require) {
+    // 模块体
+    return { inject: ['slots', 'locale'], apply(ctx) { /* ... */ } };
+  },
+});
+```
+
+| 阶段 | 行为 |
+| --- | --- |
+| 执行产物 | 只注册工厂，不渲染 |
+| 首次加载插件 | 调用 `factory(require)`，`require` 从宿主冻结模块表解析平台种子 |
+| 其余模块 | 内联进产物，用户环境不需要安装插件的开发依赖 |
+
+### 前端入口
+
+`src/client/index.ts` 导出 `inject` 与 `apply`。`apply` 完成两件事：
+
+1. 用 `ctx.locale.register` 注册 `dsh-plugin-template` 命名空间的中英文字典。
+2. 用 `ctx.slots.inject` 等待槽位就绪，再用 `ctx.slots.register` 注册示例行。
+
+| 文件 | 职责 |
+| --- | --- |
+| `src/client/index.ts` | 注册字典与槽位 |
+| `src/client/demo-dock.tsx` | 示例行组件与计数按钮 |
+| `src/client/locales.ts` | 中英文字典与命名空间 |
+
+### 槽位与文案
+
+- `conversation.composer.dock` 是 `list` 槽位，作用域为 `session`，渲染在输入卡下方。
+- 注册参数含 `id`、`order` 与 `locale`；`locale` 让宿主生成绑定命名空间的 `t` 座。
+- 语言切换时宿主重建 `t` 座，界面文案随之更新。
+- 文案键由 `LocaleNamespaceMap` 合并约束，中文字典是键集事实源。
+
+### 样式
+
+示例行使用 `--dsw-*` 主题令牌与行内样式。
+
+- 跟随宿主明暗主题。
+- 不注入全局样式表，不覆盖宿主根节点。
+
 ## 依赖复用
 
 宿主自带 cordis、dsh-tools 与 zod。

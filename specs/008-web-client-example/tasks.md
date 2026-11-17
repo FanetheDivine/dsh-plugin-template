@@ -48,10 +48,10 @@
 
 **Independent Test**: 按文件地图找到前端文件，改文案后重建，页面显示新文案。
 
-- [ ] T010 [P] [US2] 在 `docs/how-it-works.md` 增加前端部分：清单发现、闭包工厂产物、槽位注册、字典座位、主题令牌
-- [ ] T011 [P] [US2] 在 `docs/development.md` 增加前端构建与验证步骤，更新文件地图与测试表
-- [ ] T012 [P] [US2] 在 `docs/known-risks.md` 增加前端风险：产物格式随宿主约定、平台种子变化、无独立页面
-- [ ] T013 [US2] 在 `README.md` 说明示例行出现的位置与交互
+- [X] T010 [P] [US2] 在 `docs/how-it-works.md` 增加前端部分：清单发现、闭包工厂产物、槽位注册、字典座位、主题令牌
+- [X] T011 [P] [US2] 在 `docs/development.md` 增加前端构建与验证步骤，更新文件地图与测试表
+- [X] T012 [P] [US2] 在 `docs/known-risks.md` 增加前端风险：产物格式随宿主约定、平台种子变化、无独立页面
+- [X] T013 [US2] 在 `README.md` 说明示例行出现的位置与交互
 
 **Checkpoint**: 文档与实现一致，读者可按图索骥。
 
