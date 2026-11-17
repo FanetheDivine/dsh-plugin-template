@@ -22,7 +22,7 @@
 
 **Project Type**: 插件模板仓库的流程与脚本
 
-**Performance Goals**: 单次状态查询在数秒内返回；等待以轮询实现
+**Performance Goals**: 单次状态查询在数秒内返回；等待以后台任务实现，完成时唤醒会话
 
 **Constraints**: 轮询不得阻塞会话无限期；合并由用户或上游维护者完成
 

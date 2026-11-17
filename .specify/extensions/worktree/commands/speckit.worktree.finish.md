@@ -47,14 +47,15 @@ Run inside `WORKTREE_PATH`:
 
    Record the PR number. If `gh` is unavailable, give the user the compare URL from the push
    output and stop, leaving the worktree and both branches in place.
-5. Wait for CI to pass:
+5. Wait for CI to pass as a background job:
 
    ```bash
-   gh pr checks "<PR>" --watch --fail-fast --interval 30
+   timeout 3600 gh pr checks "<PR>" --watch --fail-fast --interval 30
    ```
 
-   A non-zero exit means failing or unfinished checks. Read the details with
-   `gh pr checks "<PR>"`, fix the failures, commit, push, and repeat this step.
+   Exit 0 means every check passed. Any other code means a failing check; exit 124 means the
+   deadline expired with checks still pending. On failure, read `gh pr checks "<PR>"`, fix, commit,
+   push, and start a new wait. On timeout, report and start a new wait.
 6. Confirm the PR has no conflicts:
 
    ```bash
@@ -64,25 +65,54 @@ Run inside `WORKTREE_PATH`:
    Continue on `MERGEABLE`. On `CONFLICTING`, run `git fetch origin && git merge origin/main`,
    resolve the conflicts, commit, push, and repeat step 5. On `UNKNOWN`, refresh with
    `git fetch origin` and query again.
-7. Wait for review comments:
+7. Wait for review feedback as a background job:
 
    ```bash
-   gh pr view "<PR>" --json reviews,comments,reviewDecision
+   deadline=$((SECONDS + 3600))
+   base=$(gh pr view "<PR>" --json reviews,comments --jq '(.reviews | length) + (.comments | length)')
+   while (( SECONDS < deadline )); do
+     [[ "$(gh pr view "<PR>" --json reviewDecision --jq .reviewDecision)" == "CHANGES_REQUESTED" ]] &&
+       { echo REVIEW_REQUESTED; exit 0; }
+     now=$(gh pr view "<PR>" --json reviews,comments --jq '(.reviews | length) + (.comments | length)')
+     (( now > base )) && { echo NEW_FEEDBACK; exit 0; }
+     sleep 60
+   done
+   echo STILL_WAITING
+   exit 3
    ```
 
-   Apply the requested changes, commit, push, and repeat steps 5 and 6. Keep polling while the
-   session is active.
-8. Wait for the merge:
+   `REVIEW_REQUESTED` and `NEW_FEEDBACK` mean there is feedback to read with
+   `gh pr view "<PR>" --json reviews,comments`. Apply it, commit, push, and repeat steps 5 and 6.
+   `STILL_WAITING` means the deadline expired; report and start a new wait.
+8. Wait for the merge as a background job:
 
    ```bash
-   gh pr view "<PR>" --json state,mergedAt
+   deadline=$((SECONDS + 3600))
+   while (( SECONDS < deadline )); do
+     state=$(gh pr view "<PR>" --json state,mergedAt --jq '.state + " " + (.mergedAt // "none")')
+     case "$state" in
+       "MERGED "*) echo MERGED; exit 0 ;;
+       "CLOSED "*) echo "$state"; exit 1 ;;
+     esac
+     sleep 60
+   done
+   echo STILL_OPEN
+   exit 3
    ```
 
-   Poll until `state` is `MERGED`. If `state` is `CLOSED` without `mergedAt`, stop without cleanup
-   and report that the PR was closed without merging.
+   `MERGED` continues to cleanup. `CLOSED ...` stops without cleanup: the PR was closed without
+   merging; report it. `STILL_OPEN` means the deadline expired; report and start a new wait.
 9. Clean up (see below).
 
-Between polls, wait 30–60 seconds and report the current state. Do not merge the PR yourself.
+### Waits run in the background
+
+Steps 5, 7 and 8 are waits. Start each as a managed background job and continue when it reports
+completion; keep its identifier to read the result and to stop it when it no longer matters. Keep
+at most one wait of each kind running: stop the old job before starting a replacement.
+
+The loop and its interval live inside the job. Do not wrap a wait in repeated foreground `sleep`
+calls: a long foreground command is moved to the background, and its output arrives too late to act
+on. Do not merge the PR yourself.
 
 ## Abandon mode
 
@@ -91,8 +121,8 @@ then clean up with `--abandon`. A branch already pushed to the remote is left th
 
 ## Clean up
 
-1. Call the `working_directory` tool with `cd` = `MAIN_WORKTREE` (a worktree cannot be removed
-   while the session is inside it). Verify with `pwd`.
+1. Change the session working directory to `MAIN_WORKTREE` (a worktree cannot be removed while the
+   session is inside it). Verify with `pwd`.
 2. Run:
 
    ```bash
