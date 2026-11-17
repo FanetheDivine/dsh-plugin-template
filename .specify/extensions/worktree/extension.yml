@@ -22,7 +22,7 @@ provides:
       description: "Create a <type>/<NNN>-<short-name> branch in a nested worktree at worktrees/<NNN>-<name>"
     - name: speckit.worktree.finish
       file: commands/speckit.worktree.finish.md
-      description: "Push the feature branch and open a PR (or abandon it), then remove the worktree"
+      description: "Merge the latest base, push the feature branch and open a PR (or abandon it), wait without deadlines, then remove the worktree"
 
   config:
     - name: "worktree-config.yml"

@@ -6,8 +6,8 @@ description: "Push the feature branch, open a PR, wait for CI, reviews and the m
 
 Close out the feature developed in the current worktree: after the user accepts the result, merge
 the latest base into the branch, push it, open a pull request, and stay with the PR until it is
-merged; then remove the worktree, the local branch and the remote branch. If the user abandons the feature, discard it and leave a
-pushed branch on the remote.
+merged; then remove the worktree, the local branch and the remote branch. If the user abandons the
+feature, discard it and leave a pushed branch on the remote.
 
 ## User Input
 
@@ -65,74 +65,65 @@ Run inside `WORKTREE_PATH`:
 
    Record the PR number. If `gh` is unavailable, give the user the compare URL from the push
    output and stop, leaving the worktree and both branches in place.
-6. Wait for CI to pass as a background job:
+6. Wait for CI as a background job:
 
    ```bash
-   timeout 3600 gh pr checks "<PR>" --watch --fail-fast --interval 30
+   gh pr checks "<PR>" --watch --fail-fast --interval 30
    ```
 
-   Exit 0 means every check passed. Any other code means a failing check; exit 124 means the
-   deadline expired with checks still pending. On failure, read `gh pr checks "<PR>"`, fix, commit,
-   push, and start a new wait. On timeout, report and start a new wait.
-7. Confirm the PR has no conflicts:
+   Exit 0 means every check passed. Any other code means a failing check: read
+   `gh pr checks "<PR>"`, fix, then go back to step 3 to sync the base, commit, push and start a
+   new wait.
+7. Wait for feedback, conflicts and the merge as one background job:
 
    ```bash
-   gh pr view "<PR>" --json mergeable,mergeStateStatus
-   ```
-
-   Continue on `MERGEABLE`. On `CONFLICTING`, run `git fetch origin && git merge origin/main`,
-   resolve the conflicts, commit, push, and repeat step 5. On `UNKNOWN`, refresh with
-   `git fetch origin` and query again.
-8. Wait for review feedback as a background job:
-
-   ```bash
-   deadline=$((SECONDS + 3600))
-   base=$(gh pr view "<PR>" --json reviews,comments --jq '(.reviews | length) + (.comments | length)')
-   while (( SECONDS < deadline )); do
-     [[ "$(gh pr view "<PR>" --json reviewDecision --jq .reviewDecision)" == "CHANGES_REQUESTED" ]] &&
-       { echo REVIEW_REQUESTED; exit 0; }
-     now=$(gh pr view "<PR>" --json reviews,comments --jq '(.reviews | length) + (.comments | length)')
-     (( now > base )) && { echo NEW_FEEDBACK; exit 0; }
-     sleep 60
-   done
-   echo STILL_WAITING
-   exit 3
-   ```
-
-   `REVIEW_REQUESTED` and `NEW_FEEDBACK` mean there is feedback to read with
-   `gh pr view "<PR>" --json reviews,comments`. When it reports a defect, fix it and go back to
-   step 3 before pushing: the branch syncs the base again, so the fix lands on top of the current
-   `origin/main`. When it asks for something else, apply it, commit, push, and repeat steps 6 and 7.
-   `STILL_WAITING` means the deadline expired; report and start a new wait.
-9. Wait for the merge as a background job:
-
-   ```bash
-   deadline=$((SECONDS + 3600))
-   while (( SECONDS < deadline )); do
+   poll() {
      state=$(gh pr view "<PR>" --json state,mergedAt --jq '.state + " " + (.mergedAt // "none")')
      case "$state" in
-       "MERGED "*) echo MERGED; exit 0 ;;
-       "CLOSED "*) echo "$state"; exit 1 ;;
+       "MERGED "*) echo MERGED; return 0 ;;
+       "CLOSED "*) echo "$state"; return 0 ;;
      esac
-     sleep 60
-   done
-   echo STILL_OPEN
-   exit 3
+     if [[ "$(gh pr view "<PR>" --json mergeable --jq .mergeable)" == "CONFLICTING" ]]; then
+       echo CONFLICTING
+       return 0
+     fi
+     [[ "$(gh pr view "<PR>" --json reviewDecision --jq .reviewDecision)" == "CHANGES_REQUESTED" ]] &&
+       { echo FEEDBACK; return 0; }
+     now=$(gh pr view "<PR>" --json reviews,comments --jq '(.reviews | length) + (.comments | length)')
+     (( now > base )) && { echo FEEDBACK; return 0; }
+     return 1
+   }
+   base=$(gh pr view "<PR>" --json reviews,comments --jq '(.reviews | length) + (.comments | length)')
+   while ! poll; do sleep 60; done
    ```
 
-   `MERGED` continues to cleanup. `CLOSED ...` stops without cleanup: the PR was closed without
-   merging; report it. `STILL_OPEN` means the deadline expired; report and start a new wait.
-10. Clean up (see below).
+   The loop has no deadline. Each iteration checks the merge state first, then the conflict state,
+   then feedback, so a merge that lands while feedback is pending wins.
+
+   - `MERGED`: continue to cleanup.
+   - `CLOSED ...`: the PR was closed without merging; report and stop without cleanup.
+   - `CONFLICTING`: go back to step 3, sync the base, commit, push, then restart step 6 and this
+     step.
+   - `FEEDBACK`: read it with `gh pr view "<PR>" --json reviews,comments`. When it reports a defect,
+     fix it and go back to step 3 before pushing. When it asks for something else, apply it,
+     commit, push and restart step 6 and this step.
+
+8. Clean up (see below).
 
 ### Waits run in the background
 
-Steps 6, 8 and 9 are waits. Start each as a managed background job and continue when it reports
-completion; keep its identifier to read the result and to stop it when it no longer matters. Keep
-at most one wait of each kind running: stop the old job before starting a replacement.
+Steps 6 and 7 are waits, each with no deadline. Start one as a managed background job and continue
+when it reports completion; keep its identifier to stop it when it no longer matters. Run at most
+one wait at a time: stop the finished job before starting its replacement, and never reuse a job
+that already exited.
 
 The loop and its interval live inside the job. Do not wrap a wait in repeated foreground `sleep`
 calls: a long foreground command is moved to the background, and its output arrives too late to act
-on. Do not merge the PR yourself.
+on. The waits do not block the session; keep handling other user requests while they run.
+
+Only three things in this loop need action: a failing CI check, feedback that reports a defect, and
+a conflict with the base. Whether the merge itself causes problems is the merger's concern. Do not
+merge the PR yourself.
 
 ## Abandon mode
 
