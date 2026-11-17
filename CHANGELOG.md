@@ -4,6 +4,7 @@
 
 ### Changed
 
+- `AGENTS.md` 要求在用户给出需求、缺陷或其他变更要求时立刻获取 skill `speckit-specify`；删除交互指令与 `before_specify` 钩子说明，步骤表 skill 名去除斜杠
 - 升级宿主依赖 `@deepseek-ai/dsh-agent` / `@deepseek-ai/dsh-tools` 至 `0.2.2-rc.3`，`@deepseek-ai/cordis` 至 `~4.1.0`，`zod` 至 `4.6.6`
 - `engines.node` 改为 `>=24.9.0`，`@types/node` 升到 24.x，对齐 DSH 的 Node 24 要求
 - `src/events.ts` 删除 `agent/session-start` 监听，创建来源改由 `agent/created` 记录
