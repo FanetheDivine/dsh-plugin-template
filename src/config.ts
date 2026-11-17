@@ -1,45 +1,42 @@
 /**
- * 插件配置：默认值、键校验与合并。插件 preset 行（cordis.patch.yml 中
- * 同名条目的 config 字段）可覆盖全部键，热更新即时生效。
+ * 插件配置：默认值与严格校验。
+ * 导出 PluginConfig、DEFAULT_CONFIG 与 resolveConfig。
  */
 import { DEFAULT_PREFIX, PLUGIN_LABEL } from './constants.ts';
 import { isRecord } from './utils.ts';
 
-/** 插件配置项（全部可选覆盖，未给出的键用默认值）。 */
+/** 插件配置项。 */
 export type PluginConfig = {
-  /** 示例开关：是否注册 demo 工具（false 时不注册）。 */
+  /** 是否注册 demo 工具。 */
   demoEnabled: boolean;
-  /** 示例文本：工具回显与事件日志使用的前缀。 */
+  /** 工具回显与事件日志使用的前缀。 */
   prefix: string;
 };
 
-/** 默认配置（冻结对象，resolveConfig 合并的基底）。 */
+/** 默认配置。 */
 export const DEFAULT_CONFIG: Readonly<PluginConfig> = Object.freeze({
   demoEnabled: true,
   prefix: DEFAULT_PREFIX,
 });
 
-/** 合法配置键集合（未知键直接拒绝，避免拼写错误静默失效）。 */
+/** 合法的配置键。出现其他键时报错。 */
 const CONFIG_KEYS = new Set<string>(['demoEnabled', 'prefix']);
 
-/** 归一化原始配置输入：缺省 / null 视为空对象（全部用默认值）。 */
+/** 把缺省或 null 的输入转为空对象。 */
 function normalizeConfigInput(raw: unknown): Record<string, unknown> {
   if (raw === undefined || raw === null) return {};
   if (!isRecord(raw)) throw new Error(`${PLUGIN_LABEL}: config must be an object`);
   return raw;
 }
 
-/**
- * 解析合并配置：校验未知键与类型，返回冻结的完整配置。
- * 允许所有配置留空——未给出的键回退默认值。
- */
+/** 校验配置并与默认值合并，返回冻结的完整配置。 */
 export function resolveConfig(raw?: unknown): Readonly<PluginConfig> {
   const input = normalizeConfigInput(raw);
   for (const key of Object.keys(input)) {
     if (!CONFIG_KEYS.has(key)) throw new Error(`${PLUGIN_LABEL}: unknown config key "${key}"`);
   }
   const config: PluginConfig = { ...DEFAULT_CONFIG };
-  // demoEnabled：布尔开关（缺省 / null 回退默认值）
+  // demoEnabled 必须是布尔值
   const demoEnabled = input.demoEnabled;
   if (demoEnabled !== undefined && demoEnabled !== null) {
     if (typeof demoEnabled !== 'boolean') {
@@ -47,7 +44,7 @@ export function resolveConfig(raw?: unknown): Readonly<PluginConfig> {
     }
     config.demoEnabled = demoEnabled;
   }
-  // prefix：非空字符串（缺省 / null 回退默认值；空串视为非法值，报错）
+  // prefix 必须是非空字符串
   const prefix = input.prefix;
   if (prefix !== undefined && prefix !== null) {
     if (typeof prefix !== 'string' || prefix.trim() === '') {

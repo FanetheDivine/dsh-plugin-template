@@ -1,0 +1,47 @@
+schema_version: "1.0"
+
+extension:
+  id: worktree
+  name: "DSH Worktree Workflow"
+  version: "1.0.0"
+  description: "Create a typed feature branch in a nested git worktree (worktrees/<NNN>-<name>) before specify, and push/PR/clean it up when the feature is done"
+  author: dsh-plugin-template
+  repository: https://github.com/github/spec-kit
+  license: MIT
+
+requires:
+  speckit_version: ">=1.0.0"
+  tools:
+    - name: git
+      required: true
+
+provides:
+  commands:
+    - name: speckit.worktree.create
+      file: commands/speckit.worktree.create.md
+      description: "Create a <type>/<NNN>-<short-name> branch in a nested worktree at worktrees/<NNN>-<name>"
+    - name: speckit.worktree.finish
+      file: commands/speckit.worktree.finish.md
+      description: "Push the feature branch and open a PR (or abandon it), then remove the worktree"
+
+  config:
+    - name: "worktree-config.yml"
+      template: "config-template.yml"
+      description: "Worktree workflow configuration"
+      required: false
+
+hooks:
+  before_specify:
+    command: speckit.worktree.create
+    optional: false
+    description: "Create the feature branch and worktree before specification"
+  after_implement:
+    command: speckit.worktree.finish
+    optional: true
+    prompt: "用户验收通过后，推送分支并创建 PR，然后清理 worktree？"
+    description: "Push, open PR and clean up the feature worktree"
+
+tags:
+  - git
+  - worktree
+  - dsh

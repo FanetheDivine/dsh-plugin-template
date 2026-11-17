@@ -1,0 +1,23 @@
+installed:
+- worktree
+settings:
+  auto_execute_hooks: true
+hooks:
+  before_specify:
+  - extension: worktree
+    command: speckit.worktree.create
+    enabled: true
+    optional: false
+    priority: 10
+    prompt: Execute speckit.worktree.create?
+    description: Create the feature branch and worktree before specification
+    condition: null
+  after_implement:
+  - extension: worktree
+    command: speckit.worktree.finish
+    enabled: true
+    optional: true
+    priority: 10
+    prompt: 用户验收通过后，推送分支并创建 PR，然后清理 worktree？
+    description: Push, open PR and clean up the feature worktree
+    condition: null

@@ -1,0 +1,5 @@
+# Worktree workflow configuration (flat `key: value` lines only).
+
+# Ref the feature branch starts from. A `<remote>/<branch>` ref is fetched first.
+# The ref must already contain the Spec Kit setup (.specify/ and .dsh/skills/).
+base_ref: origin/main

@@ -1,9 +1,8 @@
 import { defineConfig } from 'tsdown';
 
 /**
- * Bundles the plugin entry into a single ESM file. npm imports stay external
- * (the running harness supplies its own cordis/dsh-tools instances); declarations
- * come from 'tsc -p tsconfig.build.json' (dts: false, matching every harness package).
+ * 把插件入口打包为单个 ESM 文件。
+ * npm 依赖保持 external，类型声明由 tsc -p tsconfig.build.json 生成。
  */
 export default defineConfig({
   entry: ['src/index.ts'],
@@ -12,9 +11,9 @@ export default defineConfig({
   platform: 'node',
   target: 'es2024',
   deps: {
-    // npm imports stay external: the running harness supplies its own instances.
+    // 运行时使用宿主提供的依赖实例
     neverBundle: true,
-    // 需要打包进产物的依赖白名单（当前为空；将来如需打包某个依赖，加入此数组即可）。
+    // 需要打包进产物的依赖
     alwaysBundle: [],
   },
   fixedExtension: true,

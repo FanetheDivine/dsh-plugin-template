@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "extensions": {
+    "worktree": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:c0e6e6ca42d53af994a3603c02c9dfe4c6bfaaa9eb58e3e06f490d6f78a74fe4",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "dsh": [
+          "speckit.worktree.create",
+          "speckit.worktree.finish"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-11-17T08:11:35.851237+00:00"
+    }
+  }
+}
