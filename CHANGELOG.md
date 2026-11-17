@@ -4,6 +4,10 @@
 
 ### Changed
 
+- 升级宿主依赖 `@deepseek-ai/dsh-agent` / `@deepseek-ai/dsh-tools` 至 `0.2.2-rc.3`，`@deepseek-ai/cordis` 至 `~4.1.0`，`zod` 至 `4.6.6`
+- `engines.node` 改为 `>=24.9.0`，`@types/node` 升到 24.x，对齐 DSH 的 Node 24 要求
+- `src/events.ts` 删除 `agent/session-start` 监听，创建来源改由 `agent/created` 记录
+- `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude` 换为 `0.2.2-rc.3`
 - 宪章升到 v1.6.0：
   - 原则 V 中 `AGENTS.md` 归属为通用的信息和指令，宪章归属为变更过程中必须遵循的硬约束
   - 「开发流程」节移至 `AGENTS.md`
