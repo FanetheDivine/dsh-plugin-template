@@ -36,9 +36,9 @@
 
 **Independent Test**: quickstart 场景 3、4。
 
-- [ ] T005 [P] [US2] 把 `.dsh/skills/real-device-test/scripts/run-test.mjs` 第 16 行报错示例中的本机仓库路径改为 `<drive>:/path/to/<repo>` 占位符
-- [ ] T006 [P] [US3] 确认 `AGENTS.md` 开发流程节为「仓库内的任何变更都按照 [Spec Kit](https://github.com/github/spec-kit) 流程进行开发，从 skill `speckit-specify` 开始。」
-- [ ] T007 运行 `pnpm format && pnpm check` 与 quickstart 场景 3，提交
+- [X] T005 [P] [US2] 把 `.dsh/skills/real-device-test/scripts/run-test.mjs` 第 16 行报错示例中的本机仓库路径改为 `<drive>:/path/to/<repo>` 占位符
+- [X] T006 [P] [US3] 确认 `AGENTS.md` 开发流程节为「仓库内的任何变更都按照 [Spec Kit](https://github.com/github/spec-kit) 流程进行开发，从 skill `speckit-specify` 开始。」
+- [X] T007 运行 `pnpm format && pnpm check` 与 quickstart 场景 3，提交
 
 **Checkpoint**: quickstart 场景 1–4 全部通过。
 
