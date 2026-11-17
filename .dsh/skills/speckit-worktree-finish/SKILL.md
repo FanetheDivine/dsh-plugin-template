@@ -87,8 +87,7 @@ Run inside `WORKTREE_PATH`:
    and report that the PR was closed without merging.
 9. Clean up (see below).
 
-Between polls, wait 30–60 seconds and report the current state. Do not merge the PR yourself; a
-maintainer may own the merge.
+Between polls, wait 30–60 seconds and report the current state. Do not merge the PR yourself.
 
 ## Abandon mode
 

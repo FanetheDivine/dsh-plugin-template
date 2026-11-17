@@ -47,8 +47,8 @@
 
 ## Phase 3: Polish — 端到端校验
 
-- [ ] T009 按 [quickstart.md](./quickstart.md) 场景 1–4 全部验证；发现差异时修正并在 `CHANGELOG.md` 说明后提交
-- [ ] T010 复查 `spec.md` 的 FR-001 至 FR-009 在 skill 与脚本中都有对应行为，缺失项补到对应文件
+- [X] T009 按 [quickstart.md](./quickstart.md) 场景 1–4 全部验证；发现差异时修正并在 `CHANGELOG.md` 说明后提交
+- [X] T010 复查 `spec.md` 的 FR-001 至 FR-009 在 skill 与脚本中都有对应行为，缺失项补到对应文件
 
 ---
 
