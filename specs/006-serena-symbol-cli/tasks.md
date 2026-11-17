@@ -62,9 +62,9 @@ description: "Serena 符号查询实施任务"
 
 ### Tests for User Story 2
 
-- [ ] T007 [P] [US2] 在 `tests/serena-projects.test.ts` 移植工程成员、JSONC、extends、工程引用、缓存依赖和禁止执行项目代码测试
-- [ ] T008 [P] [US2] 在 `tests/serena-reference-lifecycle.test.py` 移植真实语言服务器临时 JS 缓冲区与工程锚点释放测试
-- [ ] T009 [US2] 扩展 `tests/serena-cli.test.ts` 的外部文件增删改、跨工程、松散 MJS、空引用和单语言服务器测试，并运行 US2 验证
+- [X] T007 [P] [US2] 在 `tests/serena-projects.test.ts` 移植工程成员、JSONC、extends、工程引用、缓存依赖和禁止执行项目代码测试
+- [X] T008 [P] [US2] 在 `tests/serena-reference-lifecycle.test.py` 移植真实语言服务器临时 JS 缓冲区与工程锚点释放测试
+- [X] T009 [US2] 扩展 `tests/serena-cli.test.ts` 的外部文件增删改、跨工程、松散 MJS、空引用和单语言服务器测试，并运行 US2 验证
 
 **Checkpoint**: 提交 Phase 4；US2 独立通过，引用完整性和文件同步可重复验证。
 

@@ -17,6 +17,7 @@ for (const name of readdirSync(FIXTURES_DIR)) {
 }
 const LIVE_DIR = mkdtempSync(path.join(ROOT, 'tests/fixtures/serena-live-'));
 const LIVE_REL = path.relative(ROOT, LIVE_DIR).replaceAll('\\', '/');
+writeFileSync(path.join(LIVE_DIR, 'tsconfig.json'), '{"include":["**/*"]}\n');
 writeFileSync(
   path.join(LIVE_DIR, 'a.ts'),
   'export function serenaLiveGreet(): string { return "hello"; }\n',
