@@ -41,6 +41,7 @@
 
 ### Added
 
+- Serena 2.1.0 开发期符号查询 CLI：定义、引用、文档、项目实例管理、CI 环境与真实行为测试
 - `docs/how-it-works.md`、`docs/known-risks.md`、`docs/development.md` 三个开发者文档
 - AGENTS.md 写作规范：简洁优先、不自造术语、长内容用列表或表格、少用括号、优先肯定句、禁用堆叠否定
 - 项目 skill `real-device-test`：在真实宿主上验证插件装载、真实对话链路、配置热更新与 GUI 展示
