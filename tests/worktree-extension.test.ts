@@ -77,6 +77,14 @@ describe('worktree 扩展脚本', { timeout: 30_000 }, () => {
     rmSync(base, { recursive: true, force: true });
   });
 
+  /** 在 repo 的 main 上提交一个文件并推送，模拟基线前进。 */
+  function advanceMain(name: string, content: string): void {
+    writeFileSync(path.join(repo, name), content);
+    git(repo, 'add', '-A');
+    git(repo, 'commit', '--quiet', '-m', `main: ${name}`);
+    git(repo, 'push', '--quiet', 'origin', 'main');
+  }
+
   it('在 worktrees/ 下创建 <type>/<NNN>-<slug> 分支的 worktree，主工作区 HEAD 不变', () => {
     const out = json(
       script(repo, 'create-worktree.sh', '--json', '--type', 'fix', '--short-name', 'User Auth'),
@@ -256,5 +264,66 @@ describe('worktree 扩展脚本', { timeout: 30_000 }, () => {
     expect(out.ABANDONED).toBe(true);
     expect(existsSync(wt)).toBe(false);
     expect(git(repo, 'branch', '--list', 'feat/002-deep-nm')).toBe('');
+  });
+
+  it('sync：基线已包含时不产生合入提交且不安装依赖', () => {
+    json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'synced'));
+    const wt = path.join(repo, 'worktrees', '002-synced');
+    writeFileSync(path.join(wt, 'feature.txt'), 'done\n');
+    git(wt, 'add', '-A');
+    git(wt, 'commit', '--quiet', '-m', 'feat: work');
+    const head = git(wt, 'rev-parse', 'HEAD');
+
+    const out = json(script(wt, 'sync-baseline.sh', '--json', '--no-install'));
+    expect(out.MERGED).toBe(false);
+    expect(out.INSTALLED).toBe(false);
+    expect(out.SYNCED).toBe(true);
+    expect(out.BASE_REF).toBe('origin/main');
+    expect(git(wt, 'rev-parse', 'HEAD')).toBe(head);
+  });
+
+  it('sync：基线前进时产生合入提交', () => {
+    json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'behind'));
+    const wt = path.join(repo, 'worktrees', '002-behind');
+    writeFileSync(path.join(wt, 'feature.txt'), 'done\n');
+    git(wt, 'add', '-A');
+    git(wt, 'commit', '--quiet', '-m', 'feat: work');
+    advanceMain('main.txt', 'base\n');
+    const baseCommit = git(repo, 'rev-parse', 'HEAD');
+
+    const out = json(script(wt, 'sync-baseline.sh', '--json', '--no-install'));
+    expect(out.MERGED).toBe(true);
+    expect(out.SYNCED).toBe(true);
+    expect(out.BASE_COMMIT).toBe(baseCommit);
+    expect(git(wt, 'rev-parse', 'origin/main')).toBe(baseCommit);
+    expect(git(wt, 'rev-list', '--parents', '-n', '1', 'HEAD').split(' ')).toHaveLength(3);
+    expect(existsSync(path.join(wt, 'main.txt'))).toBe(true);
+  });
+
+  it('sync：合入冲突时退出码 3 并保留冲突现场', () => {
+    json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'clash'));
+    const wt = path.join(repo, 'worktrees', '002-clash');
+    writeFileSync(path.join(wt, 'shared.txt'), 'feature\n');
+    git(wt, 'add', '-A');
+    git(wt, 'commit', '--quiet', '-m', 'feat: shared');
+    advanceMain('shared.txt', 'main\n');
+
+    const res = script(wt, 'sync-baseline.sh', '--json', '--no-install');
+    expect(res.status).toBe(3);
+    expect(res.stderr).toContain('CONFLICT');
+    expect(git(wt, 'diff', '--name-only', '--diff-filter=U')).toBe('shared.txt');
+  });
+
+  it('sync：工作区有未提交改动时拒绝同步', () => {
+    json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'dirty'));
+    const wt = path.join(repo, 'worktrees', '002-dirty');
+    writeFileSync(path.join(wt, 'feature.txt'), 'done\n');
+    git(wt, 'add', '-A');
+    git(wt, 'commit', '--quiet', '-m', 'feat: work');
+    writeFileSync(path.join(wt, 'feature.txt'), 'dirty\n');
+
+    const res = script(wt, 'sync-baseline.sh', '--json', '--no-install');
+    expect(res.status).not.toBe(0);
+    expect(res.stderr).toContain('uncommitted changes');
   });
 });

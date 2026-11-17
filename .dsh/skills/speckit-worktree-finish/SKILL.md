@@ -1,6 +1,6 @@
 ---
 name: speckit-worktree-finish
-description: Push the feature branch, open a PR, wait for CI, reviews and the merge, then clean up
+description: Push the feature branch, open a PR, wait for CI, reviews and the merge without deadlines, then clean up
 compatibility: Requires spec-kit project structure with .specify/ directory
 metadata:
   author: dsh-plugin-template
@@ -9,9 +9,9 @@ metadata:
 
 # Finish Feature Worktree
 
-Close out the feature developed in the current worktree: after the user accepts the result, push
-the branch, open a pull request, and stay with the PR until it is merged; then remove the worktree,
-the local branch and the remote branch. If the user abandons the feature, discard it and leave a
+Close out the feature developed in the current worktree: after the user accepts the result, merge
+the latest base into the branch, push it, open a pull request, and stay with the PR until it is
+merged; then remove the worktree, the local branch and the remote branch. If the user abandons the feature, discard it and leave a
 pushed branch on the remote.
 
 ## User Input
@@ -42,8 +42,26 @@ Run inside `WORKTREE_PATH`:
 2. CHANGELOG: per principle V of `.specify/memory/constitution.md`, branches other than `main`
    add their `CHANGELOG.md` entry when pushing. Add an entry under `## Unreleased` describing the
    feature, if not already present.
-3. Commit any remaining changes (Conventional Commit message, e.g. `feat: <summary>`).
-4. Push and open the PR:
+3. Sync the base branch:
+
+   ```bash
+   .specify/extensions/worktree/scripts/bash/sync-baseline.sh --json
+   ```
+
+   The script fetches `origin`, merges `origin/main` into the current branch and runs `pnpm install`.
+   It reports `MERGED`, `INSTALLED`, `BASE_COMMIT` and `SYNCED` in the JSON output.
+
+   - Exit 0 with `MERGED=false`: the branch already contains the base; continue.
+   - Exit 0 with `MERGED=true`: the merge and the dependency install are done; run the quality
+     gates again before committing.
+   - Exit 3: the merge left conflicts. Resolve them under the Spec Kit process — update the
+     artifacts the conflict touches and record the work as its own commit — then rerun the script
+     until it exits 0.
+   - Exit 1: report the error and stop.
+
+4. Commit any remaining changes, including the merge and lock file updates (Conventional Commit
+   message, e.g. `feat: <summary>` or `chore: merge origin/main`).
+5. Push and open the PR:
 
    ```bash
    git push -u origin "<BRANCH_NAME>"
@@ -52,7 +70,7 @@ Run inside `WORKTREE_PATH`:
 
    Record the PR number. If `gh` is unavailable, give the user the compare URL from the push
    output and stop, leaving the worktree and both branches in place.
-5. Wait for CI to pass as a background job:
+6. Wait for CI to pass as a background job:
 
    ```bash
    timeout 3600 gh pr checks "<PR>" --watch --fail-fast --interval 30
@@ -61,7 +79,7 @@ Run inside `WORKTREE_PATH`:
    Exit 0 means every check passed. Any other code means a failing check; exit 124 means the
    deadline expired with checks still pending. On failure, read `gh pr checks "<PR>"`, fix, commit,
    push, and start a new wait. On timeout, report and start a new wait.
-6. Confirm the PR has no conflicts:
+7. Confirm the PR has no conflicts:
 
    ```bash
    gh pr view "<PR>" --json mergeable,mergeStateStatus
@@ -70,7 +88,7 @@ Run inside `WORKTREE_PATH`:
    Continue on `MERGEABLE`. On `CONFLICTING`, run `git fetch origin && git merge origin/main`,
    resolve the conflicts, commit, push, and repeat step 5. On `UNKNOWN`, refresh with
    `git fetch origin` and query again.
-7. Wait for review feedback as a background job:
+8. Wait for review feedback as a background job:
 
    ```bash
    deadline=$((SECONDS + 3600))
@@ -89,7 +107,7 @@ Run inside `WORKTREE_PATH`:
    `REVIEW_REQUESTED` and `NEW_FEEDBACK` mean there is feedback to read with
    `gh pr view "<PR>" --json reviews,comments`. Apply it, commit, push, and repeat steps 5 and 6.
    `STILL_WAITING` means the deadline expired; report and start a new wait.
-8. Wait for the merge as a background job:
+9. Wait for the merge as a background job:
 
    ```bash
    deadline=$((SECONDS + 3600))
@@ -107,11 +125,11 @@ Run inside `WORKTREE_PATH`:
 
    `MERGED` continues to cleanup. `CLOSED ...` stops without cleanup: the PR was closed without
    merging; report it. `STILL_OPEN` means the deadline expired; report and start a new wait.
-9. Clean up (see below).
+10. Clean up (see below).
 
 ### Waits run in the background
 
-Steps 5, 7 and 8 are waits. Start each as a managed background job and continue when it reports
+Steps 6, 8 and 9 are waits. Start each as a managed background job and continue when it reports
 completion; keep its identifier to read the result and to stop it when it no longer matters. Keep
 at most one wait of each kind running: stop the old job before starting a replacement.
 
