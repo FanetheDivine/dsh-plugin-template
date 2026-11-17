@@ -69,7 +69,10 @@
 
 ## Spec Kit 流程
 
-DSH 从 `.dsh/skills/` 加载 `speckit-*` skill，在对话框输入 `/` 调用。执行条件、分支与 worktree 规则见[宪章](../.specify/memory/constitution.md#开发流程)的开发流程节。
+DSH 从 `.dsh/skills/` 加载 `speckit-*` skill，在对话框输入 `/` 调用。
+
+- 执行条件见 [AGENTS.md](../AGENTS.md#开发流程) 的开发流程节。
+- 分支与 worktree 规则见 `/speckit-worktree-create`。
 
 | 步骤 | 命令 | 产出 |
 | --- | --- | --- |

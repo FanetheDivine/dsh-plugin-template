@@ -1,12 +1,12 @@
 <!--
 Sync Impact Report
-- Version change: 1.4.0 → 1.5.0
+- Version change: 1.5.0 → 1.6.0
 - Modified principles:
-  - VII. 模板定位：模板转化在发布设置之前向用户确认是否升级 dsh 依赖
-- Added principles:
-  - VIII. 公开引用：提交内容只能引用公网 URL 或仓库内路径
+  - V. 文档结构：AGENTS.md 归属改为通用的信息和指令，宪章归属改为变更过程中必须遵循的硬约束
+- Added principles: 无
 - Modified sections: 无
-- Removed sections: 无
+- Removed sections:
+  - 开发流程：移至 AGENTS.md
 - Templates requiring updates: 无，plan、spec、tasks 模板在运行时读取本文件
 - Follow-up TODOs: 无
 -->
@@ -66,8 +66,8 @@ Sync Impact Report
 | 文档 | 读者 | 归属内容 |
 | --- | --- | --- |
 | `README.md` | 插件用户 | 功能、安装、配置、工具 |
-| `AGENTS.md` | 每个会话的 Agent | 交互指令、写作规范、流程入口、文档索引 |
-| 本宪章 | 执行 Spec Kit 流程的 Agent 与维护者 | 原则、技术约束、开发流程、治理 |
+| `AGENTS.md` | 每个会话的 Agent | 通用的信息和指令 |
+| 本宪章 | 执行 Spec Kit 流程的 Agent 与维护者 | 变更过程中必须遵循的硬约束 |
 | `docs/` | 开发者 | 工作机制、已知风险、开发说明 |
 | 代码注释 | 读代码的人 | 文件职责、函数与常量用途 |
 
@@ -144,47 +144,6 @@ Sync Impact Report
 
 理由：其他用户克隆仓库后，每个链接、路径与依赖都必须能在其环境中解析。
 
-## 开发流程
-
-需求与缺陷 MUST 走 [Spec Kit](https://github.com/github/spec-kit) 流程。
-
-步骤：
-
-| 步骤 | 命令 | 执行条件与要求 |
-| --- | --- | --- |
-| 1 | `/speckit-specify <需求描述>` | 必做。`before_specify` 钩子先运行 `/speckit-worktree-create` 创建分支与 worktree |
-| 2 | `/speckit-clarify` | 存在不确定项时执行，确认行为预期、边界、影响范围与验收标准 |
-| 3 | `/speckit-plan` | 必做。Constitution Check MUST 逐条通过 |
-| 4 | `/speckit-tasks` | 必做 |
-| 5 | `/speckit-analyze` | 按需 |
-| 6 | `/speckit-implement` | 必做 |
-| 7 | `/speckit-worktree-finish` | 用户验收或放弃后执行 |
-
-分支与 worktree：
-
-- 分支 MUST 命名为 `<type>/<NNN>-<short-name>`。
-- `<type>` MUST 取 `feat`、`fix`、`refactor`、`docs`、`test`、`chore` 之一。
-- 分支 MUST 从 `.specify/extensions/worktree/worktree-config.yml` 的 `base_ref` 创建，并使用 `--no-track`。
-- worktree MUST 位于 `worktrees/<NNN>-<short-name>`。
-- 后续步骤 MUST 在该 worktree 内进行，原工作区保持干净。
-
-澄清：
-
-- 不确定项 MUST 在 plan 之前通过 clarify 或询问用户消除。
-
-实施：
-
-- `tasks.md` 的每个阶段 MUST 对应一个 commit。
-- 阶段内标记 `[P]` 的任务可交给子代理并行。
-
-收尾：
-
-1. 按原则 VI 自测通过后，MUST 请用户验收。
-2. 运行 `/speckit-worktree-finish`：
-   - 验收通过：推送分支，用 `gh pr create` 创建 PR，把链接交给用户。
-   - 用户放弃：以 `abandon` 运行。
-3. 两种结局都删除 worktree 与本地分支。
-
 ## Governance
 
 优先级从高到低：
@@ -209,4 +168,4 @@ Sync Impact Report
   - PATCH：措辞澄清。
 - `/speckit-plan` 的 Constitution Check 与 `/speckit-analyze` MUST 逐条核对本宪章。
 
-**Version**: 1.5.0 | **Ratified**: 2026-11-17 | **Last Amended**: 2026-11-17
+**Version**: 1.6.0 | **Ratified**: 2026-11-17 | **Last Amended**: 2026-11-17

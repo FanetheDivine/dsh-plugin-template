@@ -24,4 +24,19 @@
 
 # 开发流程
 
-仓库内的任何变更都按照 [Spec Kit](https://github.com/github/spec-kit) 流程进行，首先读 skill `speckit-specify` 并再后续流程。
+仓库内的任何变更都按照 [Spec Kit](https://github.com/github/spec-kit) 流程进行。
+
+| 步骤 | skill | 执行条件与要求 |
+| --- | --- | --- |
+| 1 | `/speckit-specify` | 必做。`before_specify` 钩子先运行 `/speckit-worktree-create` 创建分支与 worktree |
+| 2 | `/speckit-clarify` | 存在不确定项时执行，确认行为预期、边界、影响范围与验收标准 |
+| 3 | `/speckit-plan` | 必做。Constitution Check MUST 逐条通过 |
+| 4 | `/speckit-tasks` | 必做 |
+| 5 | `/speckit-analyze` | 按需 |
+| 6 | `/speckit-implement` | 必做 |
+| 7 | `/speckit-worktree-finish` | 用户验收或放弃后执行 |
+
+实施：
+
+- `tasks.md` 的每个阶段 MUST 对应一个 commit。
+- 阶段内标记 `[P]` 的任务可交给子代理并行。
