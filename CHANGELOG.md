@@ -4,6 +4,7 @@
 
 ### Changed
 
+- `speckit-worktree-finish` 交付流程推送前用 `sync-baseline.sh` 合入 `origin/main` 并更新锁文件；全部等待改为无上限后台任务，评论、冲突与合并由一个轮询处理，合并即清理
 - `README.md` 补齐功能、安装、配置与工具
 - `docs/` 增加前端加载、构建、验证与风险说明
 - `speckit-worktree-finish` 交付流程改为创建 PR 后等待 CI、冲突与评审，合并后删除远程分支、本地分支与 worktree；清理脚本新增 `--merged` 与 `REMOTE_DELETED`
