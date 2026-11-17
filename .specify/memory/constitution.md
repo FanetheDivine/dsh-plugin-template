@@ -1,13 +1,11 @@
 <!--
 Sync Impact Report
-- Version change: 1.3.0 → 1.4.0
+- Version change: 1.4.0 → 1.5.0
 - Modified principles:
-  - V. 文档分级 → V. 文档结构：五类文档的读者与归属内容，禁止相互复述
-  - VI. 质量门禁：删除对 `pnpm check` 步骤的复述
-- Added principles: 无
-- Modified sections:
-  - 开发流程：承载全部流程规则，clarify 改为存在不确定项时执行，基线取 `base_ref`
-  - Governance：新增优先级与冲突提示，偏离记录覆盖用户要求
+  - VII. 模板定位：模板转化在发布设置之前向用户确认是否升级 dsh 依赖
+- Added principles:
+  - VIII. 公开引用：提交内容只能引用公网 URL 或仓库内路径
+- Modified sections: 无
 - Removed sections: 无
 - Templates requiring updates: 无，plan、spec、tasks 模板在运行时读取本文件
 - Follow-up TODOs: 无
@@ -117,6 +115,9 @@ Sync Impact Report
   - 删除示例相关原则与约定。
   - 更新项目名、包名、README 与 `cordis.patch.yml`。
   - 版本号按语义化规则递增，并记录修订理由。
+- 模板转化 MUST 在发布设置之前向用户确认是否把全部 `@deepseek-ai/dsh-*` 依赖升级到 npm 上的最新版本：
+  - 用户确认：升级依赖，同步 `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude` 版本号，并按原则 IV 提醒实机测试。
+  - 用户拒绝：依赖版本保持不变。
 - 模板转化 MUST 按顺序完成发布设置：
   - 清空 `package.json` 的 `version`，由具体插件填入自己的首个版本号。
   - 恢复 `.github/workflows/ci.yml` 中 `publish` job 被注释的 `if: startsWith(github.ref, 'refs/tags/')`，并删除 `if: false`。
@@ -124,6 +125,24 @@ Sync Impact Report
 - 无法归类时 MUST 在 clarify 阶段向用户确认类别。
 
 理由：模板与插件的约束不同。混用会让模板示例与真实插件相互拖累。
+
+### VIII. 公开引用
+
+提交到 git 的全部跟踪文件 MUST 只引用公网 URL 或仓库内路径。范围包括代码、配置、文档、skill 与 `specs/`。
+
+禁止：
+
+- 本机绝对路径，例如盘符路径或用户主目录。
+- 指向仓库外的相对路径。
+- `package.json` 中指向仓库外的 `file:` 或 `link:` 依赖。
+- 其他用户无权访问的 URL。
+
+允许：
+
+- 占位符路径，例如 `<repo>`、`file:///<repo>/dist/index.mjs`。
+- 本地回环地址的运行时说明，例如 `http://127.0.0.1:<port>`。
+
+理由：其他用户克隆仓库后，每个链接、路径与依赖都必须能在其环境中解析。
 
 ## 开发流程
 
@@ -190,4 +209,4 @@ Sync Impact Report
   - PATCH：措辞澄清。
 - `/speckit-plan` 的 Constitution Check 与 `/speckit-analyze` MUST 逐条核对本宪章。
 
-**Version**: 1.4.0 | **Ratified**: 2026-11-17 | **Last Amended**: 2026-11-17
+**Version**: 1.5.0 | **Ratified**: 2026-11-17 | **Last Amended**: 2026-11-17
