@@ -100,7 +100,9 @@ Run inside `WORKTREE_PATH`:
    ```
 
    `REVIEW_REQUESTED` and `NEW_FEEDBACK` mean there is feedback to read with
-   `gh pr view "<PR>" --json reviews,comments`. Apply it, commit, push, and repeat steps 5 and 6.
+   `gh pr view "<PR>" --json reviews,comments`. When it reports a defect, fix it and go back to
+   step 3 before pushing: the branch syncs the base again, so the fix lands on top of the current
+   `origin/main`. When it asks for something else, apply it, commit, push, and repeat steps 6 and 7.
    `STILL_WAITING` means the deadline expired; report and start a new wait.
 9. Wait for the merge as a background job:
 
