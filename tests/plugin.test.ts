@@ -105,7 +105,6 @@ describe('apply 接线', () => {
       'agent/created',
       'agent/disposed',
       'agent/status',
-      'agent/session-start',
       'agent/pre-step',
       'agent/turn-stopping',
     ]) {
@@ -113,6 +112,18 @@ describe('apply 接线', () => {
     }
     const infos = ctx._loggerCalls.filter((c) => c.level === 'info').map((c) => String(c.args[0]));
     expect(infos.some((s) => s.includes('apply: demoEnabled=true'))).toBe(true);
+  });
+
+  it('agent/created 监听：日志带 agent id 与创建来源', () => {
+    const ctx = makeCtx();
+    apply(ctx, {});
+    const listener = ctx._onCallbacks.get('agent/created')?.[0];
+    expect(listener).toBeTypeOf('function');
+    listener?.({ agent: { id: 'a1' }, source: 'fresh' });
+    listener?.({ agent: { id: 'a2' }, source: 'resume' });
+    const infos = ctx._loggerCalls.filter((c) => c.level === 'info').map((c) => String(c.args[0]));
+    expect(infos).toContain('[demo] agent created: a1 (fresh)');
+    expect(infos).toContain('[demo] agent created: a2 (resume)');
   });
 
   it('demoEnabled=false：不注册工具，但事件监听照常', () => {

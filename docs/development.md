@@ -27,6 +27,11 @@
 - 插件行指向新路径时同时修改 `id`，确保宿主加载新路径的模块。
 - 仓库路径含 `.dsh` 等点目录时，去掉默认的 `**/.*` 忽略规则。
 
+## 环境要求
+
+- Node.js 24.9 及以上，与 DSH 的运行要求一致；CI 使用 Node 24。
+- pnpm 11。
+
 ## Serena
 
 Serena 符号查询需要 uv、Node.js 和 Python 3.11–3.14。安装依赖时自动准备 Serena，也可运行 `pnpm serena:setup` 手动准备。

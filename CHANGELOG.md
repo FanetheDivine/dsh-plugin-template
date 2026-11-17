@@ -4,6 +4,12 @@
 
 ### Changed
 
+- `AGENTS.md` 要求在用户给出需求、缺陷或其他变更要求时立刻获取 skill `speckit-specify`；删除交互指令与 `before_specify` 钩子说明，步骤表 skill 名去除斜杠
+- 升级宿主依赖 `@deepseek-ai/dsh-agent` / `@deepseek-ai/dsh-tools` 至 `0.2.2-rc.3`，`@deepseek-ai/cordis` 至 `~4.1.0`，`zod` 至 `4.6.6`
+- `engines.node` 改为 `>=24.9.0`，`@types/node` 升到 24.x，对齐 DSH 的 Node 24 要求
+- `src/events.ts` 删除 `agent/session-start` 监听，创建来源改由 `agent/created` 记录
+- `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude` 换为 `0.2.2-rc.3`
+- 宪章升到 v1.7.0：原则 I 新增模板定位与宿主依赖版本规则——版本以 `@deepseek-ai/dsh` 的最新发布为准，没有对应版本的 `@deepseek-ai/*` 依赖从模板移除
 - 宪章升到 v1.6.0：
   - 原则 V 中 `AGENTS.md` 归属为通用的信息和指令，宪章归属为变更过程中必须遵循的硬约束
   - 「开发流程」节移至 `AGENTS.md`
