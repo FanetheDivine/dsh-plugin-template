@@ -177,7 +177,7 @@ describe('Serena CLI 工程结果', () => {
     );
     expectSuccess(probe);
     const tree = JSON.parse(probe.stdout) as { typescript_servers: number[] };
-    expect(tree.typescript_servers).toHaveLength(1);
+    expect(tree.typescript_servers, JSON.stringify(tree)).toHaveLength(1);
   }, 90_000);
 
   it('外部修改定义、增加和删除文件立即更新查询结果', () => {

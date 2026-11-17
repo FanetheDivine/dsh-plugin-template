@@ -111,13 +111,18 @@ if __name__ == "__main__":
 
         processes = psutil.Process(int(sys.argv[2])).children(recursive=True)
         servers = []
+        children = []
         for process in processes:
             try:
                 command = process.cmdline()
-                if process.name().lower() in {"node", "node.exe"} and any("typescript-language-server" in arg for arg in command):
+                children.append({"pid": process.pid, "name": process.name(), "command": command})
+                if any(
+                    arg.replace("\\", "/").endswith("typescript-language-server/lib/cli.mjs")
+                    for arg in command
+                ):
                     servers.append(process.pid)
             except psutil.Error:
                 pass
-        print(json.dumps({"typescript_servers": servers, "children": [p.pid for p in processes]}))
+        print(json.dumps({"typescript_servers": servers, "children": children}))
     else:
         unittest.main()
