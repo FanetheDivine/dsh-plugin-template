@@ -17,9 +17,9 @@
 
 **Purpose**: 让模板具备浏览器侧类型检查与构建输入，提交时 `pnpm check` 保持通过。
 
-- [ ] T001 在 `package.json` 增加开发依赖：`react`、`react-dom`、`@types/react`、`@types/react-dom`、`@deepseek-ai/dsh-client-locale`、`@deepseek-ai/dsh-client-ui-conversation`、`@deepseek-ai/dsh-client-ui-renderer`、`@deepseek-ai/dsh-client-ui-slots`，版本与宿主发布 `0.2.2-rc.3` 一致
-- [ ] T002 在 `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude` 加入 T001 新增的 `@deepseek-ai/dsh-*` 版本
-- [ ] T003 在 `tsconfig.json` 开启 `jsx: "react-jsx"`，`lib` 加入 `dom` 与 `dom.iterable`
+- [X] T001 在 `package.json` 增加开发依赖：`react`、`react-dom`、`@types/react`、`@types/react-dom`、`@deepseek-ai/dsh-client-locale`、`@deepseek-ai/dsh-client-ui-conversation`、`@deepseek-ai/dsh-client-ui-renderer`、`@deepseek-ai/dsh-client-ui-slots`，版本与宿主发布 `0.2.2-rc.3` 一致
+- [X] T002 在 `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude` 加入 T001 新增的 `@deepseek-ai/dsh-*` 版本
+- [X] T003 在 `tsconfig.json` 开启 `jsx: "react-jsx"`，`lib` 加入 `dom` 与 `dom.iterable`
 
 **Checkpoint**: `pnpm check` 通过，源码尚未引用前端文件。
 
@@ -31,12 +31,12 @@
 
 **Independent Test**: 加载插件后进入会话，示例行出现；点击按钮计数递增；切换语言文案切换。
 
-- [ ] T004 [US1] 在 `tsdown.config.ts` 增加浏览器构建组：入口 `src/client/index.ts`，`format: 'cjs'`、`platform: 'browser'`、`clean: false`，平台种子保持 external，用 banner/footer/intro 包成闭包工厂，产物 `dist/client.js`
-- [ ] T005 [US1] 在 `package.json` 增加 `./client` 导出与 `dsh.client`（`platform: "web"`，`inject` 为 locale、conversation、renderer）
-- [ ] T006 [US1] 编写 `src/client/locales.ts`：命名空间 `dsh-plugin-template`，中文字典为键集事实源，英文字典同键集，并用 `declare module '@deepseek-ai/dsh-client-ui-slots'` 合并 `LocaleNamespaceMap`；键与文案见 data-model.md
-- [ ] T007 [P] [US1] 编写 `src/client/demo-dock.tsx`：函数组件，props 为 `{ t: TranslateNS<'dsh-plugin-template'> }`，渲染 `data-dsh-template-demo` 行、`dock.label` 文案、`dock.action` 按钮与 `dock.counter` 计数；样式只用 `--dsw-*` 令牌与行内样式
-- [ ] T008 [US1] 编写 `src/client/index.ts`：导出 `inject = ['slots', 'locale']` 与 `apply`，`ctx.effect` 注册字典，`ctx.slots.inject('conversation.composer.dock', …)` 注册 `{ name, id: 'demo', order: 5, locale: NS }` 与 `DemoDock`
-- [ ] T009 [US1] 运行 `pnpm build`，确认 `dist/client.js` 以 `window.__ModuleLoader__.load` 注册、`dist/index.mjs` 仍正常产出
+- [X] T004 [US1] 在 `tsdown.config.ts` 增加浏览器构建组：入口 `src/client/index.ts`，`format: 'cjs'`、`platform: 'browser'`、`clean: false`，平台种子保持 external，用 banner/footer/intro 包成闭包工厂，产物 `dist/client.js`
+- [X] T005 [US1] 在 `package.json` 增加 `./client` 导出与 `dsh.client`（`platform: "web"`，`inject` 为 locale、conversation、renderer）
+- [X] T006 [US1] 编写 `src/client/locales.ts`：命名空间 `dsh-plugin-template`，中文字典为键集事实源，英文字典同键集，并用 `declare module '@deepseek-ai/dsh-client-ui-slots'` 合并 `LocaleNamespaceMap`；键与文案见 data-model.md
+- [X] T007 [P] [US1] 编写 `src/client/demo-dock.tsx`：函数组件，props 为 `{ t: TranslateNS<'dsh-plugin-template'> }`，渲染 `data-dsh-template-demo` 行、`dock.label` 文案、`dock.action` 按钮与 `dock.counter` 计数；样式只用 `--dsw-*` 令牌与行内样式
+- [X] T008 [US1] 编写 `src/client/index.ts`：导出 `inject = ['slots', 'locale']` 与 `apply`，`ctx.effect` 注册字典，`ctx.slots.inject('conversation.composer.dock', …)` 注册 `{ name, id: 'demo', order: 5, locale: NS }` 与 `DemoDock`
+- [X] T009 [US1] 运行 `pnpm build`，确认 `dist/client.js` 以 `window.__ModuleLoader__.load` 注册、`dist/index.mjs` 仍正常产出
 
 **Checkpoint**: 示例功能可本地加载并展示。
 
