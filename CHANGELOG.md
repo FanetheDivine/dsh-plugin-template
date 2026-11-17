@@ -4,6 +4,11 @@
 
 ### Changed
 
+- 宪章升到 v1.5.0：
+  - 原则 VII 要求模板转化在发布设置之前向用户确认是否把全部 `@deepseek-ai/dsh-*` 依赖升级到最新版本
+  - 新增原则 VIII「公开引用」：提交内容只能引用公网 URL 或仓库内路径
+- `AGENTS.md` 写明仓库内的任何变更都按 Spec Kit 流程开发
+- 实机测试脚本 `run-test.mjs` 报错信息中的示例路径改为占位符
 - `docs/how-it-works.md` 与 `docs/known-risks.md` 中复述宪章原则 II、III 的规则改为链接
 - `speckit-worktree-finish` 的 CHANGELOG 规则来源改为宪章原则 V
 - `docs/development.md` 的 Spec Kit 流程节只保留命令与产物表，测试要求与流程规则改为链接宪章

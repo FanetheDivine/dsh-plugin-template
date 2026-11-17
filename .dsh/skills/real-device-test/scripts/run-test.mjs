@@ -13,7 +13,7 @@ import { plain, TOOL_NAME } from './mock-provider.mjs';
 
 const root = process.env.RDT_PROFILE_DIR ?? dirname(fileURLToPath(import.meta.url));
 const REPO = process.env.RDT_REPO;
-if (!REPO) throw new Error('RDT_REPO 必填：插件仓库绝对路径，例如 D:/Git/self/dsh-plugin-template');
+if (!REPO) throw new Error('RDT_REPO 必填：插件仓库绝对路径，例如 <drive>:/path/to/<repo>');
 const PLUGIN = JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf8')).name;
 const dshPkg =
   process.env.RDT_DSH_PKG ??
