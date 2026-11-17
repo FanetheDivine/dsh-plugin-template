@@ -78,9 +78,9 @@ description: "Serena 符号查询实施任务"
 
 ### Tests for User Story 3
 
-- [ ] T010 [P] [US3] 在 `tests/serena-daemon.test.ts` 适配实例复用、认证、Host/Origin、防护请求上限、并发启动、项目隔离、停止、空闲和目录删除测试
-- [ ] T011 [P] [US3] 在 `tests/serena-runtime.test.py` 移植启动失败回退、提交后不重放、初始化屏障、崩溃、超时、缓存失效、路径行号和进程探针测试
-- [ ] T012 [US3] 运行 `tests/serena-daemon.test.ts` 与 `tests/serena-runtime.test.py`，修复 `scripts/serena-cli.py` 的 Windows 或模板集成问题并确认实例清理
+- [X] T010 [P] [US3] 在 `tests/serena-daemon.test.ts` 适配实例复用、认证、Host/Origin、防护请求上限、并发启动、项目隔离、停止、空闲和目录删除测试
+- [X] T011 [P] [US3] 在 `tests/serena-runtime.test.py` 移植启动失败回退、提交后不重放、初始化屏障、崩溃、超时、缓存失效、路径行号和进程探针测试
+- [X] T012 [US3] 运行 `tests/serena-daemon.test.ts` 与 `tests/serena-runtime.test.py`，修复 `scripts/serena-cli.py` 的 Windows 或模板集成问题并确认实例清理
 
 **Checkpoint**: 提交 Phase 5；US3 独立通过，测试后无残留实例。
 
