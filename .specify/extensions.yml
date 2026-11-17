@@ -18,6 +18,6 @@ hooks:
     enabled: true
     optional: true
     priority: 10
-    prompt: 用户验收通过后，推送分支并创建 PR，然后清理 worktree？
-    description: Push, open PR and clean up the feature worktree
+    prompt: 用户验收通过后，推送分支并创建 PR，等待 CI 与合并，合并后清理 worktree？
+    description: Push, open a PR, wait for CI and the merge, then clean up the feature worktree
     condition: null

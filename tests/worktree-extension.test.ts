@@ -41,6 +41,12 @@ function script(cwd: string, name: string, ...args: string[]): RunResult {
   return run('bash', [`.specify/extensions/worktree/scripts/bash/${name}`, ...args], cwd);
 }
 
+/** 在临时仓库把特性分支合入 main 并推送，模拟 PR 合并后的状态。 */
+function mergeIntoMain(cwd: string, branch: string): void {
+  git(cwd, 'merge', '--quiet', '--no-ff', '--no-edit', branch);
+  git(cwd, 'push', '--quiet', 'origin', 'main');
+}
+
 function json(res: RunResult): Record<string, string | boolean> {
   if (res.status !== 0) throw new Error(`脚本失败：${res.stderr}`);
   return JSON.parse(res.stdout.trim().split('\n').pop() ?? '{}');
@@ -131,33 +137,85 @@ describe('worktree 扩展脚本', { timeout: 30_000 }, () => {
     expect(res.stderr).toContain('no Spec Kit setup');
   });
 
-  it('finish：未推送时拒绝；推送后清理 worktree 与本地分支', () => {
+  it('finish：未传 --merged 时拒绝清理', () => {
+    json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'no-merge'));
+    const wt = path.join(repo, 'worktrees', '002-no-merge');
+    writeFileSync(path.join(wt, 'feature.txt'), 'done\n');
+    git(wt, 'add', '-A');
+    git(wt, 'commit', '--quiet', '-m', 'feat: no merge');
+    git(wt, 'push', '--quiet', '-u', 'origin', 'feat/002-no-merge');
+
+    const refused = script(repo, 'finish-worktree.sh', '--json', '--path', wt);
+    expect(refused.status).not.toBe(0);
+    expect(refused.stderr).toContain('pass --merged');
+    expect(existsSync(wt)).toBe(true);
+    expect(git(repo, 'branch', '--list', 'feat/002-no-merge')).not.toBe('');
+  });
+
+  it('finish --merged：合并后删除远程分支、本地分支与 worktree', () => {
     json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'ship-it'));
     const wt = path.join(repo, 'worktrees', '002-ship-it');
     writeFileSync(path.join(wt, 'feature.txt'), 'done\n');
     git(wt, 'add', '-A');
     git(wt, 'commit', '--quiet', '-m', 'feat: ship');
-
-    const refused = script(repo, 'finish-worktree.sh', '--json', '--path', wt);
-    expect(refused.status).not.toBe(0);
-    expect(refused.stderr).toContain('no upstream');
-
     git(wt, 'push', '--quiet', '-u', 'origin', 'feat/002-ship-it');
-    const out = json(script(repo, 'finish-worktree.sh', '--json', '--path', wt));
+    mergeIntoMain(repo, 'feat/002-ship-it');
+
+    const out = json(script(repo, 'finish-worktree.sh', '--json', '--merged', '--path', wt));
     expect(out.BRANCH_NAME).toBe('feat/002-ship-it');
     expect(out.ABANDONED).toBe(false);
+    expect(out.REMOTE_DELETED).toBe(true);
     expect(existsSync(wt)).toBe(false);
     expect(git(repo, 'branch', '--list', 'feat/002-ship-it')).toBe('');
+    expect(git(repo, 'ls-remote', '--heads', 'origin', 'feat/002-ship-it')).toBe('');
   });
 
-  it('finish --abandon：丢弃未提交改动并清理', () => {
+  it('finish --merged：远程分支已被删除时仍清理成功', () => {
+    json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'auto-deleted'));
+    const wt = path.join(repo, 'worktrees', '002-auto-deleted');
+    writeFileSync(path.join(wt, 'feature.txt'), 'done\n');
+    git(wt, 'add', '-A');
+    git(wt, 'commit', '--quiet', '-m', 'feat: auto');
+    git(wt, 'push', '--quiet', '-u', 'origin', 'feat/002-auto-deleted');
+    mergeIntoMain(repo, 'feat/002-auto-deleted');
+    git(repo, 'push', '--quiet', 'origin', '--delete', 'feat/002-auto-deleted');
+
+    const out = json(script(repo, 'finish-worktree.sh', '--json', '--merged', '--path', wt));
+    expect(out.REMOTE_DELETED).toBe(false);
+    expect(existsSync(wt)).toBe(false);
+    expect(git(repo, 'branch', '--list', 'feat/002-auto-deleted')).toBe('');
+  });
+
+  it('finish --merged：有未推送提交时拒绝清理', () => {
+    json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'unpushed'));
+    const wt = path.join(repo, 'worktrees', '002-unpushed');
+    writeFileSync(path.join(wt, 'feature.txt'), 'done\n');
+    git(wt, 'add', '-A');
+    git(wt, 'commit', '--quiet', '-m', 'feat: pushed');
+    git(wt, 'push', '--quiet', '-u', 'origin', 'feat/002-unpushed');
+    mergeIntoMain(repo, 'feat/002-unpushed');
+    writeFileSync(path.join(wt, 'late.txt'), 'late\n');
+    git(wt, 'add', '-A');
+    git(wt, 'commit', '--quiet', '-m', 'feat: late');
+
+    const refused = script(repo, 'finish-worktree.sh', '--json', '--merged', '--path', wt);
+    expect(refused.status).not.toBe(0);
+    expect(refused.stderr).toContain('unpushed commits');
+    expect(existsSync(wt)).toBe(true);
+    expect(git(repo, 'branch', '--list', 'feat/002-unpushed')).not.toBe('');
+  });
+
+  it('finish --abandon：丢弃未提交改动并保留远程分支', () => {
     json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'drop-it'));
     const wt = path.join(repo, 'worktrees', '002-drop-it');
+    git(wt, 'push', '--quiet', '-u', 'origin', 'feat/002-drop-it');
     writeFileSync(path.join(wt, 'wip.txt'), 'wip\n');
     const out = json(script(repo, 'finish-worktree.sh', '--json', '--abandon', '--path', wt));
     expect(out.ABANDONED).toBe(true);
+    expect(out.REMOTE_DELETED).toBe(false);
     expect(existsSync(wt)).toBe(false);
     expect(git(repo, 'branch', '--list', 'feat/002-drop-it')).toBe('');
+    expect(git(repo, 'ls-remote', '--heads', 'origin', 'feat/002-drop-it')).not.toBe('');
   });
 
   it('finish 拒绝在 worktree 内部运行', () => {
