@@ -82,28 +82,33 @@ Run inside `WORKTREE_PATH`:
 7. Wait for feedback, conflicts and the merge as one background job:
 
    ```bash
-   poll() {
+   base=$(gh pr view "<PR>" --json reviews,comments --jq '(.reviews | length) + (.comments | length)')
+   while :; do
      state=$(gh pr view "<PR>" --json state,mergedAt --jq '.state + " " + (.mergedAt // "none")')
      case "$state" in
-       "MERGED "*) echo MERGED; return 0 ;;
-       "CLOSED "*) echo "$state"; return 0 ;;
+       "MERGED "*) echo MERGED; break ;;
+       "CLOSED "*) echo "$state"; break ;;
      esac
      if [[ "$(gh pr view "<PR>" --json mergeable --jq .mergeable)" == "CONFLICTING" ]]; then
        echo CONFLICTING
-       return 0
+       break
      fi
-     [[ "$(gh pr view "<PR>" --json reviewDecision --jq .reviewDecision)" == "CHANGES_REQUESTED" ]] &&
-       { echo FEEDBACK; return 0; }
+     if [[ "$(gh pr view "<PR>" --json reviewDecision --jq .reviewDecision)" == "CHANGES_REQUESTED" ]]; then
+       echo FEEDBACK
+       break
+     fi
      now=$(gh pr view "<PR>" --json reviews,comments --jq '(.reviews | length) + (.comments | length)')
-     (( now > base )) && { echo FEEDBACK; return 0; }
-     return 1
-   }
-   base=$(gh pr view "<PR>" --json reviews,comments --jq '(.reviews | length) + (.comments | length)')
-   while ! poll; do sleep 60; done
+     if (( now > base )); then
+       echo FEEDBACK
+       break
+     fi
+     sleep 60
+   done
    ```
 
    The loop has no deadline. Each iteration checks the merge state first, then the conflict state,
-   then feedback, so a merge that lands while feedback is pending wins.
+   then feedback, so a merge that lands while feedback is pending wins. As with the other snippets,
+   substitute the recorded PR number for `"<PR>"`.
 
    - `MERGED`: continue to cleanup.
    - `CLOSED ...`: the PR was closed without merging; report and stop without cleanup.
