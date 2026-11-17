@@ -17,6 +17,7 @@
 - Q: 「最新」取 `@deepseek-ai/dsh` 的哪个版本？ → A: 取最新发布的 `0.2.2-rc.3`，与运行中的宿主一致；`latest` 标签停在更旧的版本，不作为依据。
 - Q: 与宿主版本不对齐的依赖如何处理？ → A: 从模板移除；本次三个宿主依赖都有对应版本，实际不触发移除。
 - Q: `engines.node` 是否跟随 DSH 的 Node 24 要求？ → A: 跟随，改为 `>=24.9.0`。
+- Q: 版本依据规则写在哪里？ → A: 写入宪章原则 I 宿主契约，宪章升到 1.7.0。
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -101,6 +102,11 @@
 - **FR-013**: `docs/development.md` MUST 写明 Node 24.9 及以上的运行要求。
 - **FR-014**: 收尾时 MUST 提醒用户按宪章原则 IV 执行实机测试，并说明新版本号。
 
+**宪章**
+
+- **FR-015**: 宪章原则 I MUST 写明模板定位与宿主依赖版本规则：版本以 `@deepseek-ai/dsh` 的最新发布为准，没有对应版本的 `@deepseek-ai/*` 依赖移除。
+- **FR-016**: 宪章修订 MUST 经 `/speckit-constitution` 进行，版本按 MINOR 升到 `1.7.0`，并更新 Sync Impact Report。
+
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
@@ -109,6 +115,7 @@
 - **SC-002**: `pnpm typecheck` 的类型错误数为 0，`src/` 中引用不存在事件的次数为 0。
 - **SC-003**: `pnpm format && pnpm check` 通过。
 - **SC-004**: CHANGELOG 的 Unreleased 节包含本次升级条目。
+- **SC-005**: 宪章版本行与 Sync Impact Report 都显示 `1.7.0`，原则 I 含版本规则。
 
 ## Assumptions
 

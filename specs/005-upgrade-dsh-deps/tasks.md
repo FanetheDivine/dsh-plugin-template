@@ -48,13 +48,28 @@
 
 ---
 
+## Phase 3: 宪章 1.7.0 (US1、US2)
+
+**Goal**: 版本依据规则写进宪章原则 I，后续升级按该约束执行。
+
+**Independent Test**: 宪章版本行为 `1.7.0`，原则 I 含版本规则。
+
+- [X] T012 经 `/speckit-constitution` 在原则 I 宿主契约中新增模板定位与宿主依赖版本规则
+- [X] T013 在同一次修订中把版本升到 1.7.0，更新 Sync Impact Report 与 Last Amended
+- [X] T014 更新 spec、plan、CHANGELOG，运行 `pnpm format && pnpm check`，提交
+
+**Checkpoint**: 宪章 1.7.0 生效，版本依据只有一个归属。
+
+---
+
 ## Dependencies & Execution Order
 
-- Phase 1 → Phase 2。
+- Phase 1 → Phase 2 → Phase 3。
 - T006 与 T007 文件不同，可并行；T001–T005 顺序执行。
 
 ## Implementation Strategy
 
 1. 完成 Phase 1，依赖、事件与测试一致。
 2. 完成 Phase 2，记录与文档同步。
-3. 请用户验收并运行实机测试，再运行 `/speckit-worktree-finish`。
+3. 完成 Phase 3，版本依据写入宪章。
+4. 请用户验收并运行实机测试，再运行 `/speckit-worktree-finish`。
