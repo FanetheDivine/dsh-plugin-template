@@ -21,14 +21,14 @@
 
 **Independent Test**: quickstart 场景 1–4。
 
-- [ ] T001 [US1] `package.json`：`@deepseek-ai/dsh-agent`、`@deepseek-ai/dsh-tools` 改为 `0.2.2-rc.3`，`@deepseek-ai/cordis` 改为 `~4.1.0`
-- [ ] T002 [US2] `package.json`：`zod` 改为 `4.6.6`，`@types/node` 改为 24.x
-- [ ] T003 [US1] `package.json`：`engines.node` 改为 `>=24.9.0`
-- [ ] T004 [US1] `pnpm-workspace.yaml`：`minimumReleaseAgeExclude` 换为 `@deepseek-ai/dsh-agent@0.2.2-rc.3` 与 `@deepseek-ai/dsh-tools@0.2.2-rc.3`
-- [ ] T005 [US1] 运行 `pnpm install --no-frozen-lockfile` 更新 `pnpm-lock.yaml`。见 research R1、R2
-- [ ] T006 [P] [US3] `src/events.ts`：删除 `agent/session-start` 监听，`agent/created` 记录 `source`。见 research R3
-- [ ] T007 [P] [US3] `tests/plugin.test.ts`：事件集合去掉 `agent/session-start`，新增来源日志断言
-- [ ] T008 运行 `pnpm format && pnpm check`，提交
+- [X] T001 [US1] `package.json`：`@deepseek-ai/dsh-agent`、`@deepseek-ai/dsh-tools` 改为 `0.2.2-rc.3`，`@deepseek-ai/cordis` 改为 `~4.1.0`
+- [X] T002 [US2] `package.json`：`zod` 改为 `4.6.6`，`@types/node` 改为 24.x
+- [X] T003 [US1] `package.json`：`engines.node` 改为 `>=24.9.0`
+- [X] T004 [US1] `pnpm-workspace.yaml`：`minimumReleaseAgeExclude` 换为 `@deepseek-ai/dsh-agent@0.2.2-rc.3` 与 `@deepseek-ai/dsh-tools@0.2.2-rc.3`
+- [X] T005 [US1] 运行 `pnpm install --no-frozen-lockfile` 更新 `pnpm-lock.yaml`。见 research R1、R2
+- [X] T006 [P] [US3] `src/events.ts`：删除 `agent/session-start` 监听，`agent/created` 记录 `source`。见 research R3
+- [X] T007 [P] [US3] `tests/plugin.test.ts`：事件集合去掉 `agent/session-start`，新增来源日志断言
+- [X] T008 运行 `pnpm format && pnpm check`，提交
 
 **Checkpoint**: quickstart 场景 1–4 通过。
 
@@ -40,9 +40,9 @@
 
 **Independent Test**: quickstart 场景 4 与 CHANGELOG 条目核对。
 
-- [ ] T009 [P] [US1] `CHANGELOG.md` Unreleased 节记录依赖升级、事件迁移与 Node 要求
-- [ ] T010 [P] [US2] `docs/development.md` 写明 Node 24.9 及以上的运行要求
-- [ ] T011 运行 `pnpm format && pnpm check`，提交
+- [X] T009 [P] [US1] `CHANGELOG.md` Unreleased 节记录依赖升级、事件迁移与 Node 要求
+- [X] T010 [P] [US2] `docs/development.md` 写明 Node 24.9 及以上的运行要求
+- [X] T011 运行 `pnpm format && pnpm check`，提交
 
 **Checkpoint**: CHANGELOG 含本次升级条目，文档写明 Node 要求。
 
