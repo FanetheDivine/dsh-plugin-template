@@ -115,6 +115,19 @@ try {
     return { reply: true, toolCard: 'demo_echo' };
   });
 
+  await check('C3 前端示例：输入区上方出现示例行且可交互', async () => {
+    const row = page.locator('[data-dsh-template-demo]');
+    await row.waitFor({ state: 'visible', timeout: 30000 });
+    const counter = row.locator('[data-dsh-template-demo-count]');
+    const before = (await counter.innerText()).trim();
+    await row.getByRole('button').first().click();
+    await page.waitForTimeout(500);
+    const after = (await counter.innerText()).trim();
+    if (before === after) throw new Error(`点击后计数未变化：${before}`);
+    await page.screenshot({ path: join(shots, 'c3-demo-dock.png'), fullPage: true });
+    return { before, after };
+  });
+
   await check('C2 插件页：被测插件已安装且启用', async () => {
     const repo = process.env.RDT_REPO;
     if (!repo) throw new Error('RDT_REPO 必填');
@@ -129,7 +142,9 @@ try {
       }
     }
     if (!opened) throw new Error('找不到插件页入口');
-    await page.waitForTimeout(2500);
+    // 插件清单首次加载要读取整个宿主包树，可能超过 10 秒；等到已安装区出现再断言
+    await page.getByText(LABELS.installed[0], { exact: false }).first().waitFor({ timeout: 60000 });
+    await page.getByText(plugin, { exact: false }).first().waitFor({ timeout: 60000 });
     const text = await page.locator('body').innerText();
     if (!text.includes(plugin)) throw new Error(`插件页未列出 ${plugin}`);
     // 宿主用 role=switch 的控件承载启用状态，aria-label 为「启用 <插件名>」

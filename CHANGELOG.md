@@ -4,6 +4,8 @@
 
 ### Changed
 
+- `README.md` 补齐功能、安装、配置与工具
+- `docs/` 增加前端加载、构建、验证与风险说明
 - `speckit-worktree-finish` 交付流程改为创建 PR 后等待 CI、冲突与评审，合并后删除远程分支、本地分支与 worktree；清理脚本新增 `--merged` 与 `REMOTE_DELETED`
 - `AGENTS.md` 要求在用户给出需求、缺陷或其他变更要求时立刻获取 skill `speckit-specify`；删除交互指令与 `before_specify` 钩子说明，步骤表 skill 名去除斜杠
 - 升级宿主依赖 `@deepseek-ai/dsh-agent` / `@deepseek-ai/dsh-tools` 至 `0.2.2-rc.3`，`@deepseek-ai/cordis` 至 `~4.1.0`，`zod` 至 `4.6.6`
@@ -48,6 +50,10 @@
 
 ### Added
 
+- 前端示例：浏览器入口在 Web GUI 会话输入区上方注册示例行，含中英文字典与计数按钮
+- 浏览器构建组：`tsdown.config.ts` 以闭包工厂产出 `dist/client.js`，平台种子保持 external
+- `package.json` 的 `./client` 导出与 `dsh.client` 声明，新增 React 与客户端宿主包开发依赖
+- 测试 `tests/client.test.ts`、`tests/client-bundle.test.ts`；打包测试覆盖前端产物；实机浏览器用例 C3
 - `docs/how-it-works.md`、`docs/known-risks.md`、`docs/development.md` 三个开发者文档
 - AGENTS.md 写作规范：简洁优先、不自造术语、长内容用列表或表格、少用括号、优先肯定句、禁用堆叠否定
 - 项目 skill `real-device-test`：在真实宿主上验证插件装载、真实对话链路、配置热更新与 GUI 展示

@@ -97,6 +97,7 @@ mock provider 的约定：
 | --- | --- | --- |
 | C1 对话冒烟 | 在工作区输入 `ECHO_CASE:gui` 并发送 | 回复含 `mock：工具返回 [rdt]`，展开本轮后出现 `demo_echo` 工具卡片 |
 | C2 插件页 | 打开插件页 | 已安装插件列出被测插件，启用开关为开 |
+| C3 前端示例 | 在已打开的会话中查看输入区上方 | 示例行可见，点击按钮后计数递增 |
 
 新增流程时在 `browser-test.mjs` 中加一个 `check('<编号> <名称>', fn)`。界面标签的定位依据见 [pitfalls.md](references/pitfalls.md)。
 

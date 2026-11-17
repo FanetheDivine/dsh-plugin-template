@@ -68,3 +68,62 @@ export function makeCtx() {
     _loggerCalls: Array<{ level: 'debug' | 'info' | 'warn'; args: unknown[] }>;
   };
 }
+
+/** 一条客户端字典注册记录。 */
+export interface ClientLocaleRegistration {
+  ns: string;
+  dicts: Record<string, Record<string, string>>;
+}
+
+/** 一条客户端槽位注册记录。 */
+export interface ClientSlotRegistration {
+  options: Record<string, unknown>;
+  component: unknown;
+}
+
+/** 客户端 ctx 模拟的观测字段。 */
+export interface ClientMockState {
+  _localeRegistrations: ClientLocaleRegistration[];
+  _slotInjections: string[];
+  _slotRegistrations: ClientSlotRegistration[];
+  _effects: string[];
+}
+
+/**
+ * 可编程客户端 ctx 模拟：记录 locale.register、slots.inject、slots.register 与 effect。
+ * 测试据此断言前端入口的注册接线。
+ */
+export function makeClientCtx() {
+  const state: ClientMockState = {
+    _localeRegistrations: [],
+    _slotInjections: [],
+    _slotRegistrations: [],
+    _effects: [],
+  };
+  const noop = () => true;
+  const ctx = {
+    effect(fn: () => unknown, label?: string) {
+      state._effects.push(label ?? '');
+      const disposer = fn();
+      return typeof disposer === 'function' ? disposer : noop;
+    },
+    locale: {
+      register(ns: string, dicts: Record<string, Record<string, string>>) {
+        state._localeRegistrations.push({ ns, dicts });
+        return noop;
+      },
+    },
+    slots: {
+      inject(name: string, fn: () => unknown) {
+        state._slotInjections.push(name);
+        const disposer = fn();
+        return typeof disposer === 'function' ? disposer : noop;
+      },
+      register(options: Record<string, unknown>, component: unknown) {
+        state._slotRegistrations.push({ options, component });
+        return noop;
+      },
+    },
+  };
+  return Object.assign(ctx, state) as unknown as Context & ClientMockState & typeof ctx;
+}
