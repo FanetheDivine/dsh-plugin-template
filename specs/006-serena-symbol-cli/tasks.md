@@ -32,8 +32,8 @@ description: "Serena 符号查询实施任务"
 
 **⚠️ CRITICAL**: 两个脚本必须作为同一版本移植，避免查询与工程补全协议不一致。
 
-- [ ] T003 将参考实现完整移植到 `scripts/serena-cli.py` 与 `scripts/serena-projects.cjs`，固定 Serena 2.1.0，保留只读查询、项目锁、认证实例和受信任编译器边界
-- [ ] T004 [P] 新增 `tests/fixtures/serena-multi.ts`，提供同一声明行的 `serenaFirst` 与 `serenaSecond` 歧义符号
+- [X] T003 将参考实现完整移植到 `scripts/serena-cli.py` 与 `scripts/serena-projects.cjs`，固定 Serena 2.1.0，保留只读查询、项目锁、认证实例和受信任编译器边界
+- [X] T004 [P] 新增 `tests/fixtures/serena-multi.ts`，提供同一声明行的 `serenaFirst` 与 `serenaSecond` 歧义符号
 
 **Checkpoint**: 提交 Phase 2；脚本语法与帮助命令可用，三个用户故事均可开始适配测试。
 
