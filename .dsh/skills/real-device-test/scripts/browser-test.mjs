@@ -115,6 +115,19 @@ try {
     return { reply: true, toolCard: 'demo_echo' };
   });
 
+  await check('C3 前端示例：输入区上方出现示例行且可交互', async () => {
+    const row = page.locator('[data-dsh-template-demo]');
+    await row.waitFor({ state: 'visible', timeout: 30000 });
+    const counter = row.locator('[data-dsh-template-demo-count]');
+    const before = (await counter.innerText()).trim();
+    await row.getByRole('button').first().click();
+    await page.waitForTimeout(500);
+    const after = (await counter.innerText()).trim();
+    if (before === after) throw new Error(`点击后计数未变化：${before}`);
+    await page.screenshot({ path: join(shots, 'c3-demo-dock.png'), fullPage: true });
+    return { before, after };
+  });
+
   await check('C2 插件页：被测插件已安装且启用', async () => {
     const repo = process.env.RDT_REPO;
     if (!repo) throw new Error('RDT_REPO 必填');

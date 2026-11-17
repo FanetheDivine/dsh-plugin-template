@@ -63,11 +63,11 @@
 
 **Independent Test**: `pnpm check` 通过；发布包含 `dist/client.js`；实机浏览器用例通过。
 
-- [ ] T014 [P] [US3] 在 `tests/helpers.ts` 增加客户端 ctx 模拟：记录 `locale.register`、`slots.inject`、`slots.register` 与 `effect`
-- [ ] T015 [P] [US3] 新建 `tests/client.test.ts`：断言 `inject` 列表、字典注册参数、槽位注册参数、中英字典键集一致，并用 `react-dom/server` 渲染中英文两版
-- [ ] T016 [US3] 新建 `tests/client-bundle.test.ts`：构建缺失时先 `pnpm build`；用 `vm` 与桩 `window.__ModuleLoader__.load` 执行 `dist/client.js`，断言注册 id、导出 `inject`/`apply`、`apply` 调用注册槽位
-- [ ] T017 [P] [US3] 在 `tests/package-pack.test.ts` 断言 `dist/client.js` 进包且产物格式标记存在
-- [ ] T018 [US3] 在 `.dsh/skills/real-device-test/scripts/browser-test.mjs` 增加 C3：示例行出现、点击计数递增并截图
+- [X] T014 [P] [US3] 在 `tests/helpers.ts` 增加客户端 ctx 模拟：记录 `locale.register`、`slots.inject`、`slots.register` 与 `effect`
+- [X] T015 [P] [US3] 新建 `tests/client.test.ts`：断言 `inject` 列表、字典注册参数、槽位注册参数、中英字典键集一致，并用 `react-dom/server` 渲染中英文两版
+- [X] T016 [US3] 新建 `tests/client-bundle.test.ts`：构建缺失时先 `pnpm build`；用 `vm` 与桩 `window.__ModuleLoader__.load` 执行 `dist/client.js`，断言注册 id、导出 `inject`/`apply`、`apply` 调用注册槽位
+- [X] T017 [P] [US3] 在 `tests/package-pack.test.ts` 断言 `dist/client.js` 进包且产物格式标记存在
+- [X] T018 [US3] 在 `.dsh/skills/real-device-test/scripts/browser-test.mjs` 增加 C3：示例行出现、点击计数递增并截图
 - [ ] T019 [US3] 运行实机回归：`setup-env.sh`、`run-test.mjs`、`gui-up.sh` 与 `browser-test.mjs`，记录结果
 
 **Checkpoint**: 自动化与实机证据齐全。
