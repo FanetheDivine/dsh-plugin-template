@@ -47,8 +47,8 @@ description: "Serena 符号查询实施任务"
 
 ### Tests for User Story 1
 
-- [ ] T005 [US1] 在 `tests/serena-cli.test.ts` 适配参数互斥、名称与声明行定义、文件候选、引用、文档、长度限制、无匹配和歧义测试，使用模板真实路径与语义断言
-- [ ] T006 [US1] 运行 `tests/serena-cli.test.ts` 中 US1 用例并修复 `scripts/serena-cli.py` 或测试中的模板集成问题，确认 UTF-8 和位置格式
+- [X] T005 [US1] 在 `tests/serena-cli.test.ts` 适配参数互斥、名称与声明行定义、文件候选、引用、文档、长度限制、无匹配和歧义测试，使用模板真实路径与语义断言
+- [X] T006 [US1] 运行 `tests/serena-cli.test.ts` 中 US1 用例并修复 `scripts/serena-cli.py` 或测试中的模板集成问题，确认 UTF-8 和位置格式
 
 **Checkpoint**: 提交 Phase 3；US1 独立通过，三类只读查询可演示。
 
