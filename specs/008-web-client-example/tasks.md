@@ -68,7 +68,7 @@
 - [X] T016 [US3] 新建 `tests/client-bundle.test.ts`：构建缺失时先 `pnpm build`；用 `vm` 与桩 `window.__ModuleLoader__.load` 执行 `dist/client.js`，断言注册 id、导出 `inject`/`apply`、`apply` 调用注册槽位
 - [X] T017 [P] [US3] 在 `tests/package-pack.test.ts` 断言 `dist/client.js` 进包且产物格式标记存在
 - [X] T018 [US3] 在 `.dsh/skills/real-device-test/scripts/browser-test.mjs` 增加 C3：示例行出现、点击计数递增并截图
-- [ ] T019 [US3] 运行实机回归：`setup-env.sh`、`run-test.mjs`、`gui-up.sh` 与 `browser-test.mjs`，记录结果
+- [X] T019 [US3] 运行实机回归：`setup-env.sh`、`run-test.mjs`、`gui-up.sh` 与 `browser-test.mjs`，记录结果
 
 **Checkpoint**: 自动化与实机证据齐全。
 
@@ -76,9 +76,9 @@
 
 ## Phase 5: Polish & Cross-Cutting Concerns
 
-- [ ] T020 在 `CHANGELOG.md` 增加本分支条目
-- [ ] T021 运行 `pnpm format && pnpm check`，修复发现的问题
-- [ ] T022 核对 spec 的 FR 与 SC，记录未覆盖项与实机结论
+- [X] T020 在 `CHANGELOG.md` 增加本分支条目
+- [X] T021 运行 `pnpm format && pnpm check`，修复发现的问题
+- [X] T022 核对 spec 的 FR 与 SC，记录未覆盖项与实机结论
 
 ---
 
@@ -101,3 +101,13 @@
 - MVP 是 US1：Phase 1 + Phase 2 完成后即可在 GUI 看到示例行。
 - 每个 phase 一个 commit，遵循宪章原则 VI 的质量门禁。
 - 实机用例失败时先区分插件缺陷与驱动假设过时，修复后重跑。
+
+---
+
+## Verification Results
+
+2026-11-17，宿主 `0.2.2-rc.3`，profile `rdt-008-webclient`：
+
+- 后端用例 A1、B1、B2、B3、B4 通过。
+- 浏览器用例 C1、C2、C3 通过；C3 断言计数从「点击次数：0」变为「点击次数：1」。
+- 中英文切换未在实机执行；两种语言的渲染由 `tests/client.test.ts` 覆盖。

@@ -28,7 +28,8 @@ else
   # 依赖按宿主发布时间解析，避免 caret 范围拉到之后发布的不兼容版本；.rdt-pinned 标记已按此方式安装
   if [ "$("$LOCAL_U/node_modules/.bin/dsh" --version 2>/dev/null)" != "$WANT" ] || [ ! -f "$LOCAL_U/.rdt-pinned" ]; then
     echo "全局 dsh 为 ${HAVE:-未安装}，插件需要 $WANT，安装到 $LOCAL_U"
-    BEFORE=$(npm view "@deepseek-ai/dsh@$WANT" time --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(JSON.parse(s)[process.argv[1]]))" "$WANT")
+    # 依赖包与本包可能分批发版，留 15 分钟余量，避免 --before 截断稍后发布同版本依赖
+    BEFORE=$(npm view "@deepseek-ai/dsh@$WANT" time --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const at=new Date(JSON.parse(s)[process.argv[1]]);process.stdout.write(new Date(at.getTime()+15*60000).toISOString())})" "$WANT")
     rm -rf "$LOCAL_U"
     mkdir -p "$LOCAL_U"
     (cd "$LOCAL_U" && npm init -y >/dev/null && npm i --no-audit --no-fund --before="$BEFORE" "@deepseek-ai/dsh@$WANT")

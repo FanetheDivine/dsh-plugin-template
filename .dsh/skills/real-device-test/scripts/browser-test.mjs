@@ -142,7 +142,9 @@ try {
       }
     }
     if (!opened) throw new Error('找不到插件页入口');
-    await page.waitForTimeout(2500);
+    // 插件清单首次加载要读取整个宿主包树，可能超过 10 秒；等到已安装区出现再断言
+    await page.getByText(LABELS.installed[0], { exact: false }).first().waitFor({ timeout: 60000 });
+    await page.getByText(plugin, { exact: false }).first().waitFor({ timeout: 60000 });
     const text = await page.locator('body').innerText();
     if (!text.includes(plugin)) throw new Error(`插件页未列出 ${plugin}`);
     // 宿主用 role=switch 的控件承载启用状态，aria-label 为「启用 <插件名>」
