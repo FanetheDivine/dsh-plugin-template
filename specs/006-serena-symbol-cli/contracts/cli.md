@@ -25,7 +25,8 @@ pnpm serena [--no-daemon] doc --at <file_path>[:<line>] [--max-chars <positive-i
 - `file_path` 是当前项目内相对路径；`line` 是 1 起始正整数。
 - 省略 `line` 时只返回文件符号候选及声明行。
 - 默认 `max_chars` 为 20000。
-- 无匹配、多个匹配、无效声明行和越界文件均返回可读错误。
+- `references` 名称模式对无匹配和多个匹配返回候选错误；`definition` 与 `doc` 名称模式返回 Serena 匹配结果。
+- 指定声明行时，无匹配或多个匹配返回可读错误；越界文件同样返回错误。
 - 成功输出为 Serena JSON，可带长度截断说明；路径使用 `/`，行号从 1 开始。
 - `--no-daemon` 对查询使用单进程。
 

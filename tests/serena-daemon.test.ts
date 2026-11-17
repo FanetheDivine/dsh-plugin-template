@@ -281,7 +281,7 @@ describe('Serena 项目常驻实例', () => {
       token: state.token,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        root: 'C:/',
+        root: '<ignored>',
         command: 'definition',
         name_path: 'parseEchoArgs',
         relative_path: null,

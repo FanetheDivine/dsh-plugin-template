@@ -22,6 +22,22 @@
   - 「不是 A，而是 B」。直接写 B。
 - 只描述当前状态，不写新旧对比或变更过程。
 
+# LSP 能力
+
+本项目提供 `pnpm serena` 命令，以使用 Serena 的 LSP 能力。
+
+**优先使用此能力，而不是 `grep` 或其他文本搜索能力。**
+
+- `pnpm install` 会自动准备 Serena。若安装脚本被跳过，运行 `pnpm serena:setup`。
+- 优先使用三个只读命令：
+  - `pnpm serena definition <name_path>`：寻找定义。
+  - `pnpm serena references <name_path>`：寻找引用。
+  - `pnpm serena doc <name_path>`：查看签名和注释。
+- 三个命令支持 `--at <file_path>[:<line>]`，与 `name_path` 二选一。省略行号时返回带 `line` 的文件符号候选，提供行号时只解析该行声明的符号。
+- 删除 worktree 前在目标目录运行 `pnpm serena stop`，确认停止后离开目录再删除。
+- 输入和输出中的行号均为 1 起始，输出路径使用 `/`。
+- 使用 `pnpm serena --help` 或 `pnpm serena <命令> --help` 查看参数。
+
 # 开发流程
 
 仓库内的任何变更都按照 [Spec Kit](https://github.com/github/spec-kit) 流程进行。

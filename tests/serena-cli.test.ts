@@ -134,7 +134,9 @@ describe('Serena CLI 符号查询', () => {
     expectSuccess(result);
     const symbols = parseOutput(result.stdout);
     expect(symbols).toHaveLength(1);
-    expect(symbols[0]?.info).toContain('function parseEchoArgs(args: unknown): EchoArgsParseResult');
+    expect(symbols[0]?.info).toContain(
+      'function parseEchoArgs(args: unknown): EchoArgsParseResult',
+    );
     expect(symbols[0]?.info).toContain('校验工具参数');
     expect(result.stdout).not.toContain('�');
   }, 180_000);

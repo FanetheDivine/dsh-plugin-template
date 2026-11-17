@@ -27,6 +27,13 @@ pnpm 的 minimum release age 策略会拒绝发布时间过短的包。
 - 用户在 `cordis.patch.yml` 写错键名会导致插件停用。
 - 用 `dsh --profile <profile> --dump-config` 检查最终配置。
 
+## Serena 开发环境
+
+- `pnpm install` 的 `prepare` 需要 uv、Python 3.11–3.14，首次准备需要获取 Python 依赖。环境未满足时安装失败，可按[开发说明](./development.md#serena)手动准备。
+- CLI 使用 Serena 和 SolidLSP 的私有接口。固定版本为 Serena 2.1.0，升级时必须运行全部 Serena 测试。
+- 冷启动和工程索引可能耗时数分钟。测试需要创建子进程、临时目录和回环端口。
+- 每个 worktree 使用独立后台实例。删除前执行 `pnpm serena stop`，避免进程继续持有已删除目录。
+
 ## Windows 长路径
 
 `node_modules` 嵌套很深，路径可能超过 Windows 的 260 字符上限。

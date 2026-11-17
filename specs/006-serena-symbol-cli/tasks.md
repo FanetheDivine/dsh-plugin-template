@@ -90,11 +90,11 @@ description: "Serena 符号查询实施任务"
 
 **Purpose**: 完整文档、风险说明和全量质量门禁。
 
-- [ ] T013 [P] 在 `AGENTS.md` 增加优先使用 Serena 定义、引用和文档查询的指引，以及 1 起始行号和 worktree 停止规则
-- [ ] T014 [P] 在 `docs/development.md` 增加 Serena 前置要求、实例行为、命令表、测试说明和文件地图
-- [ ] T015 [P] 在 `docs/known-risks.md` 记录 uv/Python 准备要求、Serena 私有 API 版本耦合、查询耗时和 worktree 实例清理风险
-- [ ] T016 按 `specs/006-serena-symbol-cli/quickstart.md` 运行手工 CLI 验证，并执行 `pnpm format && pnpm check` 与现有 `tests/package-pack.test.ts` 发布边界回归
-- [ ] T017 检查 `git diff`、所有任务完成状态和实例状态，提交 Phase 6，保留 worktree 供用户验收
+- [X] T013 [P] 在 `AGENTS.md` 增加优先使用 Serena 定义、引用和文档查询的指引，以及 1 起始行号和 worktree 停止规则
+- [X] T014 [P] 在 `docs/development.md` 增加 Serena 前置要求、实例行为、命令表、测试说明和文件地图
+- [X] T015 [P] 在 `docs/known-risks.md` 记录 uv/Python 准备要求、Serena 私有 API 版本耦合、查询耗时和 worktree 实例清理风险
+- [X] T016 按 `specs/006-serena-symbol-cli/quickstart.md` 运行手工 CLI 验证，并执行 `pnpm format && pnpm check` 与现有 `tests/package-pack.test.ts` 发布边界回归
+- [X] T017 检查 `git diff`、所有任务完成状态和实例状态，提交 Phase 6，保留 worktree 供用户验收
 
 **Checkpoint**: 全部测试通过，开发脚本未进入发布包，现有 `demo_echo` 行为无回归。
 

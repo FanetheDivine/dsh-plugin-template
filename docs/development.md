@@ -27,18 +27,37 @@
 - 插件行指向新路径时同时修改 `id`，确保宿主加载新路径的模块。
 - 仓库路径含 `.dsh` 等点目录时，去掉默认的 `**/.*` 忽略规则。
 
+## Serena
+
+Serena 符号查询需要 uv、Node.js 和 Python 3.11–3.14。安装依赖时自动准备 Serena，也可运行 `pnpm serena:setup` 手动准备。
+
+- 查询复用当前项目的独立后台实例。Windows 启动不弹出控制台。
+- 实例默认空闲 15 分钟退出。`SERENA_CLI_IDLE_TIMEOUT` 可设置空闲秒数。
+- `references` 激活 TS 工程并补全松散 JS/MJS 引用。空结果直接返回，初始化失败或超时直接报错。
+- 查询前同步外部文件改动。输出行号从 1 开始，路径使用 `/`。
+- `--no-daemon` 或 `SERENA_CLI_DAEMON=0` 使用单进程。实例启动失败会提示并回退，已提交的查询不重复执行。
+- `SERENA_CLI_START_TIMEOUT` 设置启动等待秒数，`SERENA_CLI_STATE_DIR` 隔离实例状态目录。
+- 删除 worktree 前在目标目录执行 `pnpm serena stop`，确认停止后离开目录再删除。
+
 ## 命令
 
 | 命令 | 作用 |
 | --- | --- |
 | `pnpm dev` | 监听并构建 |
 | `pnpm build` | 打包并生成类型声明 |
-| `pnpm check` | 依次运行类型检查、lint、测试和构建 |
+| `pnpm check` | 依次运行类型检查、lint 和测试 |
+| `pnpm run full-check` | 运行 `check` 并构建 |
 | `pnpm typecheck` | 类型检查 |
 | `pnpm lint` | biome 检查 |
 | `pnpm lint:fix` | biome 检查并自动修复 |
 | `pnpm format` | biome 格式化 |
 | `pnpm test` | 运行 vitest |
+| `pnpm serena definition <name_path>` | 寻找符号定义 |
+| `pnpm serena references <name_path>` | 寻找符号引用 |
+| `pnpm serena doc <name_path>` | 查看符号签名和注释 |
+| `pnpm serena status` | 查看当前项目实例状态 |
+| `pnpm serena stop` | 停止当前项目实例 |
+| `pnpm serena:setup` | 准备 Serena Python 依赖 |
 | `pnpm run release` | 检查并发布新版本 |
 
 ## CI
@@ -47,8 +66,8 @@
 
 | Job | 触发 | 内容 |
 | --- | --- | --- |
-| `check` | PR、打 tag | Node 24 上运行 `pnpm run full-check` |
-| `publish` | 默认禁用 | 打 tag 时发布 npm，用 OIDC 换取发布令牌 |
+| `check` | PR、打 tag | Node 24、Python 3.12 与 uv 环境运行 `pnpm run full-check` |
+| `publish` | 默认禁用 | Node 24、Python 3.12 与 uv 环境构建并发布 npm，用 OIDC 换取发布令牌 |
 
 - `publish` 由 `if: false` 禁用，原触发条件以注释保留；`pnpm run release` 推送的 tag 不会在 npm 产生新版本。
 - 模板转化时解禁，步骤见[宪章](../.specify/memory/constitution.md)原则 VII。
@@ -61,9 +80,18 @@
 | `tests/release-archive.test.mjs` | CHANGELOG 归档计划 |
 | `tests/package-pack.test.ts` | npm 包只含发布所需文件 |
 | `tests/worktree-extension.test.ts` | worktree 扩展的创建、复用与清理 |
+| `tests/serena-cli.test.ts` | 真实符号查询、工程引用与外部文件同步 |
+| `tests/serena-daemon.test.ts` | 项目实例复用、安全、并发与生命周期 |
+| `tests/serena-projects.test.ts` | TypeScript 工程成员与配置依赖解析 |
+| `tests/serena-runtime.test.py` | 查询错误边界、缓存与语言服务器进程探针 |
+| `tests/serena-reference-lifecycle.test.py` | 临时 JS 缓冲区与工程锚点释放 |
 | `tests/helpers.ts` | 模拟 `ctx`，记录工具注册、事件监听与日志 |
 
 测试要求见[宪章](../.specify/memory/constitution.md)原则 IV。
+
+- `pnpm test` 运行 TypeScript 测试，并间接调用两个 Python 探针。
+- `uv run --script tests/serena-runtime.test.py` 单独运行 Python 单元测试。
+- Serena 测试通过 `SERENA_CLI_STATE_DIR` 隔离实例状态，并在结束后清理实例与动态夹具。
 
 浏览器用例由仓库内的 `playwright` 驱动无头 Chrome。
 
@@ -110,8 +138,11 @@ src/
 ├── events.ts               # agent 事件监听示例
 ├── types.ts                # 宿主类型再导出
 └── utils.ts                # 零依赖工具函数
-scripts/release-archive.mjs # 发布时归档 CHANGELOG
-tests/                      # vitest 单元测试
+scripts/
+├── release-archive.mjs       # 发布时归档 CHANGELOG
+├── serena-cli.py             # Serena 只读查询与项目实例管理
+└── serena-projects.cjs       # TypeScript 工程成员与配置依赖解析
+tests/                      # vitest 单元测试与 Serena 集成测试
 changelogs/                 # 各版本的 CHANGELOG 归档
 docs/                       # 开发者文档
 specs/<NNN>-<name>/         # 每个需求的 spec、plan、tasks
