@@ -1,5 +1,9 @@
 node_modules/
 dist/
+.serena/
+.venv/
+__pycache__/
+*.py[cod]
 *.tsbuildinfo
 *.log
 *.zip
