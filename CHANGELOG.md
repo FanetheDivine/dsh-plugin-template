@@ -4,6 +4,7 @@
 
 ### Changed
 
+- `AGENTS.md` 要求在用户给出需求、缺陷或其他变更要求时立刻获取 skill `speckit-specify`；删除交互指令与 `before_specify` 钩子说明，步骤表 skill 名去除斜杠
 - 宪章升到 v1.6.0：
   - 原则 V 中 `AGENTS.md` 归属为通用的信息和指令，宪章归属为变更过程中必须遵循的硬约束
   - 「开发流程」节移至 `AGENTS.md`
