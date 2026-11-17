@@ -36,9 +36,9 @@
 
 **Independent Test**: quickstart 场景 2、4。
 
-- [ ] T005 [P] [US1] 删除 `AGENTS.md` 开发流程节中的「分支与 worktree」「澄清」「收尾」三段，保留步骤表与「实施」两条规则。见 research R1
-- [ ] T006 [P] [US2] 把 `docs/development.md` Spec Kit 流程节的宪章开发流程链接改为指向 `AGENTS.md` 的开发流程节，分支与 worktree 规则说明改为由 `/speckit-worktree-create` 提供。见 research R4
-- [ ] T007 运行 `pnpm format && pnpm check` 与 quickstart 场景 1–4，提交
+- [X] T005 [P] [US1] 删除 `AGENTS.md` 开发流程节中的「分支与 worktree」「澄清」「收尾」三段，保留步骤表与「实施」两条规则。见 research R1
+- [X] T006 [P] [US2] 把 `docs/development.md` Spec Kit 流程节的宪章开发流程链接改为指向 `AGENTS.md` 的开发流程节，分支与 worktree 规则说明改为由 `/speckit-worktree-create` 提供。见 research R4
+- [X] T007 运行 `pnpm format && pnpm check` 与 quickstart 场景 1–4，提交
 
 **Checkpoint**: quickstart 场景 1–4 全部通过。
 
