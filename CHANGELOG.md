@@ -4,6 +4,11 @@
 
 ### Changed
 
+- 宪章升到 v1.6.0：
+  - 原则 V 中 `AGENTS.md` 归属为通用的信息和指令，宪章归属为变更过程中必须遵循的硬约束
+  - 「开发流程」节移至 `AGENTS.md`
+- `AGENTS.md` 开发流程节只保留步骤表与实施规则，分支、worktree、澄清与收尾规则由对应 skill 提供
+- `docs/development.md` 的开发流程链接指向 `AGENTS.md`
 - 宪章升到 v1.5.0：
   - 原则 VII 要求模板转化在发布设置之前向用户确认是否把全部 `@deepseek-ai/dsh-*` 依赖升级到最新版本
   - 新增原则 VIII「公开引用」：提交内容只能引用公网 URL 或仓库内路径
