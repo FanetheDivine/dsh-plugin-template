@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
-# Remove a feature worktree and its local branch after the feature is finished.
+# Remove a feature worktree and its branches after the feature is finished.
 #
-# Usage: finish-worktree.sh [--json] [--abandon] --path WORKTREE_PATH
+# Usage: finish-worktree.sh [--json] (--merged | --abandon) --path WORKTREE_PATH
 #
 # Run it from the primary checkout (the session must not be inside the worktree
-# being removed). Without --abandon the worktree must be clean and its branch
-# fully pushed to its upstream; --abandon discards everything.
+# being removed). --merged cleans up after the PR merged and deletes the remote
+# branch; --abandon discards everything and keeps a pushed remote branch.
 set -euo pipefail
 
 JSON=false
 ABANDON=false
+MERGED=false
 WT_PATH=""
 
 die() {
@@ -21,6 +22,7 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --json) JSON=true ;;
     --abandon) ABANDON=true ;;
+    --merged) MERGED=true ;;
     --path)
       [[ $# -ge 2 ]] || die "--path requires a value"
       WT_PATH="$2"
@@ -47,13 +49,24 @@ case "$(pwd)/" in
 esac
 
 BRANCH_NAME="$(git -C "$WT_PATH" rev-parse --abbrev-ref HEAD)"
+REMOTE_DELETED=false
 
 if ! $ABANDON; then
+  $MERGED || die "deliver cleanup runs after the PR is merged; pass --merged"
   [[ -z "$(git -C "$WT_PATH" status --porcelain)" ]] || die "worktree has uncommitted changes"
-  upstream="$(git -C "$WT_PATH" rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null)" ||
-    die "branch '$BRANCH_NAME' has no upstream; push it first"
-  [[ "$(git -C "$WT_PATH" rev-list --count "$upstream..HEAD")" == "0" ]] ||
-    die "branch '$BRANCH_NAME' has unpushed commits"
+  if upstream="$(git -C "$WT_PATH" rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null)"; then
+    [[ "$(git -C "$WT_PATH" rev-list --count "$upstream..HEAD")" == "0" ]] ||
+      die "branch '$BRANCH_NAME' has unpushed commits"
+  fi
+  remote_heads="$(git -C "$MAIN_WORKTREE" ls-remote --heads origin "$BRANCH_NAME")" ||
+    die "failed to query remote 'origin'"
+  if [[ -n "$remote_heads" ]]; then
+    git -C "$MAIN_WORKTREE" push --quiet origin --delete "$BRANCH_NAME" ||
+      die "failed to delete remote branch '$BRANCH_NAME'"
+    REMOTE_DELETED=true
+    [[ -z "$(git -C "$MAIN_WORKTREE" ls-remote --heads origin "$BRANCH_NAME")" ]] ||
+      die "remote branch '$BRANCH_NAME' still exists"
+  fi
 fi
 
 if ! git -C "$MAIN_WORKTREE" worktree remove --force "$WT_PATH" 2>/dev/null; then
@@ -67,11 +80,12 @@ fi
 git -C "$MAIN_WORKTREE" branch -D "$BRANCH_NAME" >/dev/null
 
 if $JSON; then
-  printf '{"BRANCH_NAME":"%s","WORKTREE_PATH":"%s","MAIN_WORKTREE":"%s","ABANDONED":%s}\n' \
-    "$BRANCH_NAME" "$WT_PATH" "$MAIN_WORKTREE" "$ABANDON"
+  printf '{"BRANCH_NAME":"%s","WORKTREE_PATH":"%s","MAIN_WORKTREE":"%s","ABANDONED":%s,"REMOTE_DELETED":%s}\n' \
+    "$BRANCH_NAME" "$WT_PATH" "$MAIN_WORKTREE" "$ABANDON" "$REMOTE_DELETED"
 else
   echo "BRANCH_NAME=$BRANCH_NAME"
   echo "WORKTREE_PATH=$WT_PATH"
   echo "MAIN_WORKTREE=$MAIN_WORKTREE"
   echo "ABANDONED=$ABANDON"
+  echo "REMOTE_DELETED=$REMOTE_DELETED"
 fi

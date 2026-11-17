@@ -21,10 +21,10 @@
 
 **Independent Test**: quickstart 场景 5 的等待阶段，或对 `spec.md` 的验收场景 1–4 逐条核对 skill 文本。
 
-- [ ] T001 [US1] 重写 `.specify/extensions/worktree/commands/speckit.worktree.finish.md` 的 Deliver mode：质量门禁、CHANGELOG、提交、推送并 `gh pr create`；随后等待 CI（`gh pr checks <PR> --watch --fail-fast`）、确认无冲突（`gh pr view <PR> --json mergeable,mergeStateStatus`，`CONFLICTING` 时合入 `origin/main` 并重推）、轮询评审意见并按意见修改（`gh pr view <PR> --json reviews,comments`）、等待合并（`state` 为 `MERGED` 才继续，`CLOSED` 且未合并则停止），每次推送后重新执行 CI 与冲突检查
-- [ ] T002 [US1] 同步 `.dsh/skills/speckit-worktree-finish/SKILL.md` 的 description 与正文，正文须与 T001 的命令源一致（research R6）
-- [ ] T003 [US1] 更新 `.specify/extensions.yml` 中 `after_implement` 的 description 与 prompt，说明推送、等待 CI 与合并、合并后清理
-- [ ] T004 按 [quickstart.md](./quickstart.md) 场景 4 确认正文一致，运行 `pnpm format && pnpm check`，提交
+- [X] T001 [US1] 重写 `.specify/extensions/worktree/commands/speckit.worktree.finish.md` 的 Deliver mode：质量门禁、CHANGELOG、提交、推送并 `gh pr create`；随后等待 CI（`gh pr checks <PR> --watch --fail-fast`）、确认无冲突（`gh pr view <PR> --json mergeable,mergeStateStatus`，`CONFLICTING` 时合入 `origin/main` 并重推）、轮询评审意见并按意见修改（`gh pr view <PR> --json reviews,comments`）、等待合并（`state` 为 `MERGED` 才继续，`CLOSED` 且未合并则停止），每次推送后重新执行 CI 与冲突检查
+- [X] T002 [US1] 同步 `.dsh/skills/speckit-worktree-finish/SKILL.md` 的 description 与正文，正文须与 T001 的命令源一致（research R6）
+- [X] T003 [US1] 更新 `.specify/extensions.yml` 中 `after_implement` 的 description 与 prompt，说明推送、等待 CI 与合并、合并后清理
+- [X] T004 按 [quickstart.md](./quickstart.md) 场景 4 确认正文一致，运行 `pnpm format && pnpm check`，提交
 
 **Checkpoint**: skill 文本覆盖 spec 验收场景 1–4。
 
@@ -36,10 +36,10 @@
 
 **Independent Test**: quickstart 场景 1–3。
 
-- [ ] T005 [US2] 在 `.specify/extensions/worktree/scripts/bash/finish-worktree.sh` 增加 `--merged` 交付路径：要求工作区干净；上游存在时要求无未推送提交；上游缺失时视为平台已删除分支；用 `git push origin --delete` 删除远程分支，远程已缺失时跳过；`--json` 输出新增 `REMOTE_DELETED`；更新帮助文本范围
-- [ ] T006 [US2] 更新 `tests/worktree-extension.test.ts`：交付用例先合并再清理并断言远程分支删除；新增「远程分支已不存在仍成功」「未传 `--merged` 时拒绝」；保留 abandon 用例并断言远程分支未删除
-- [ ] T007 [US2] 把 `docs/development.md` 流程表第 7 步的产出改为合并后的清理，或以 `abandon` 放弃
-- [ ] T008 运行 `pnpm format && pnpm check`，按 quickstart 场景 1–3 验证脚本，提交
+- [X] T005 [US2] 在 `.specify/extensions/worktree/scripts/bash/finish-worktree.sh` 增加 `--merged` 交付路径：要求工作区干净；上游存在时要求无未推送提交；上游缺失时视为平台已删除分支；用 `git push origin --delete` 删除远程分支，远程已缺失时跳过；`--json` 输出新增 `REMOTE_DELETED`；更新帮助文本范围
+- [X] T006 [US2] 更新 `tests/worktree-extension.test.ts`：交付用例先合并再清理并断言远程分支删除；新增「远程分支已不存在仍成功」「未传 `--merged` 时拒绝」；保留 abandon 用例并断言远程分支未删除
+- [X] T007 [US2] 把 `docs/development.md` 流程表第 7 步的产出改为合并后的清理，或以 `abandon` 放弃
+- [X] T008 运行 `pnpm format && pnpm check`，按 quickstart 场景 1–3 验证脚本，提交
 
 **Checkpoint**: 脚本在合并后删除远程分支，abandon 行为不变。
 

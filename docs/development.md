@@ -87,7 +87,7 @@ DSH 从 `.dsh/skills/` 加载 `speckit-*` skill，在对话框输入 `/` 调用�
 | 4 | `/speckit-tasks` | `tasks.md` |
 | 5 | `/speckit-analyze` | 跨产物一致性报告 |
 | 6 | `/speckit-implement` | 按阶段提交的实现 |
-| 7 | `/speckit-worktree-finish` | PR 链接，或以 `abandon` 放弃 |
+| 7 | `/speckit-worktree-finish` | 合并后的清理，或以 `abandon` 放弃 |
 
 - `base_ref` 默认为 `origin/main`，必须已包含 `.specify/` 与 `.dsh/skills/`。
 - `worktrees/` 已加入 `.gitignore`，biome 与 vitest 也会跳过它。
