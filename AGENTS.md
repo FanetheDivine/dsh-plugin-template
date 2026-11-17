@@ -24,4 +24,4 @@
 
 # 开发流程
 
-仓库内的任何变更都按照 [Spec Kit](https://github.com/github/spec-kit) 流程进行开发，从 skill `speckit-specify` 开始。
+仓库内的任何变更都按照 [Spec Kit](https://github.com/github/spec-kit) 流程进行，首先读 skill `speckit-specify` 并再后续流程。
