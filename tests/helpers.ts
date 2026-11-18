@@ -127,34 +127,134 @@ export interface ClientSlotRegistration {
   component: unknown;
 }
 
+/** 客户端服务名。 */
+export type ClientServiceName = 'slots' | 'locale' | 'configForms';
+
+/** 全部客户端服务名。 */
+const CLIENT_SERVICES: ClientServiceName[] = ['slots', 'locale', 'configForms'];
+
 /** 客户端 ctx 模拟的观测字段。 */
 export interface ClientMockState {
   _localeRegistrations: ClientLocaleRegistration[];
   _slotInjections: string[];
   _slotRegistrations: ClientSlotRegistration[];
+  /** 当前未被清理的字典注册。 */
+  _activeLocales: Set<ClientLocaleRegistration>;
+  /** 当前未被清理的槽位注册。 */
+  _activeSlots: Set<ClientSlotRegistration>;
   _effects: string[];
   _configFormRequests: string[];
   /** `configForms.get` 返回过的表单。 */
   _configFormScopes: FakeConfigFormScope<Record<string, unknown>>[];
   /** 客户端 ctx 模拟的槽位与字典注册，以及 effect 清理。 */
   _effectDisposers: Array<() => void>;
+  /** `ctx.inject` 声明过的依赖组，按调用顺序。 */
+  _injectGroups: string[][];
+}
+
+/** 一个 `ctx.inject` 依赖组的运行态。 */
+interface InjectGroup {
+  deps: string[];
+  callback: (ctx: unknown) => unknown;
+  disposers: Array<() => void>;
+  active: boolean;
 }
 
 /**
  * 可编程客户端 ctx 模拟：记录 locale.register、slots.inject、slots.register 与 effect。
- * 测试据此断言前端入口的注册接线。
+ * 服务可用性可变：`ctx.inject` 在依赖全部可用时执行回调，服务撤掉时清理该组，
+ * 重新就绪时再次执行。不可用服务的直接访问抛错，与 cordis 一致。
+ * @param options.services - 初始可用的服务，默认全部可用。
  */
-export function makeClientCtx() {
+export function makeClientCtx(options: { services?: ClientServiceName[] } = {}) {
+  const available = new Set<string>(options.services ?? CLIENT_SERVICES);
+  const groups: InjectGroup[] = [];
   const state: ClientMockState = {
     _localeRegistrations: [],
     _slotInjections: [],
     _slotRegistrations: [],
+    _activeLocales: new Set(),
+    _activeSlots: new Set(),
     _effects: [],
     _configFormRequests: [],
     _configFormScopes: [],
     _effectDisposers: [],
+    _injectGroups: [],
   };
   const noop = () => true;
+  /** 访问不可用服务时抛错。 */
+  const require = <T>(name: ClientServiceName, value: T): T => {
+    if (!available.has(name)) throw new Error(`cannot get required service "${name}"`);
+    return value;
+  };
+  const localeService = {
+    register(ns: string, dicts: Record<string, Record<string, string>>) {
+      const entry = { ns, dicts };
+      state._localeRegistrations.push(entry);
+      state._activeLocales.add(entry);
+      return () => state._activeLocales.delete(entry);
+    },
+  };
+  const configFormsService = {
+    get(entryId: string) {
+      state._configFormRequests.push(entryId);
+      const fake = makeConfigFormScope<Record<string, unknown>>({
+        status: 'ready',
+        value: { demoEnabled: true, prefix: 'demo' },
+      });
+      state._configFormScopes.push(fake);
+      return fake.scope;
+    },
+  };
+  const slotsService = {
+    inject(name: string, fn: () => unknown) {
+      state._slotInjections.push(name);
+      const disposer = fn();
+      return typeof disposer === 'function' ? disposer : noop;
+    },
+    register(opts: Record<string, unknown>, component: unknown) {
+      const entry = { options: opts, component };
+      state._slotRegistrations.push(entry);
+      state._activeSlots.add(entry);
+      return () => state._activeSlots.delete(entry);
+    },
+  };
+
+  /** 依赖全部可用且尚未加载的组加载一次。 */
+  const load = (group: InjectGroup) => {
+    if (group.active || !group.deps.every((dep) => available.has(dep))) return;
+    group.active = true;
+    // 子 ctx：effect 与槽位注入的清理归入该组，随组卸载
+    const child = Object.create(ctx) as typeof ctx;
+    Object.defineProperties(child, {
+      effect: {
+        value(fn: () => unknown, label?: string) {
+          state._effects.push(label ?? '');
+          const disposer = fn();
+          if (typeof disposer === 'function') group.disposers.push(disposer as () => void);
+          return typeof disposer === 'function' ? disposer : noop;
+        },
+      },
+      slots: {
+        value: {
+          ...slotsService,
+          inject(name: string, fn: () => unknown) {
+            const disposer = slotsService.inject(name, fn);
+            group.disposers.push(disposer as () => void);
+            return disposer;
+          },
+        },
+      },
+    });
+    group.callback(child);
+  };
+  /** 卸载一组并执行其清理。 */
+  const unload = (group: InjectGroup) => {
+    if (!group.active) return;
+    group.active = false;
+    for (const disposer of group.disposers.splice(0).reverse()) disposer();
+  };
+
   const ctx = {
     effect(fn: () => unknown, label?: string) {
       state._effects.push(label ?? '');
@@ -162,33 +262,34 @@ export function makeClientCtx() {
       if (typeof disposer === 'function') state._effectDisposers.push(disposer as () => void);
       return typeof disposer === 'function' ? disposer : noop;
     },
-    locale: {
-      register(ns: string, dicts: Record<string, Record<string, string>>) {
-        state._localeRegistrations.push({ ns, dicts });
-        return noop;
-      },
+    inject(deps: string[], callback: (ctx: unknown) => unknown) {
+      state._injectGroups.push([...deps]);
+      const group: InjectGroup = { deps: [...deps], callback, disposers: [], active: false };
+      groups.push(group);
+      state._effectDisposers.push(() => unload(group));
+      load(group);
+      return noop;
     },
-    configForms: {
-      get(entryId: string) {
-        state._configFormRequests.push(entryId);
-        const fake = makeConfigFormScope<Record<string, unknown>>({
-          status: 'ready',
-          value: { demoEnabled: true, prefix: 'demo' },
-        });
-        state._configFormScopes.push(fake);
-        return fake.scope;
-      },
+    get locale() {
+      return require('locale', localeService);
     },
-    slots: {
-      inject(name: string, fn: () => unknown) {
-        state._slotInjections.push(name);
-        const disposer = fn();
-        return typeof disposer === 'function' ? disposer : noop;
-      },
-      register(options: Record<string, unknown>, component: unknown) {
-        state._slotRegistrations.push({ options, component });
-        return noop;
-      },
+    get configForms() {
+      return require('configForms', configFormsService);
+    },
+    get slots() {
+      return require('slots', slotsService);
+    },
+    /** 让服务变为可用，并加载依赖已齐的组。 */
+    _grant(...names: ClientServiceName[]) {
+      for (const name of names) available.add(name);
+      for (const group of groups) load(group);
+    },
+    /** 撤掉服务，并卸载依赖它的组。 */
+    _revoke(...names: ClientServiceName[]) {
+      for (const name of names) available.delete(name);
+      for (const group of groups) {
+        if (group.deps.some((dep) => !available.has(dep))) unload(group);
+      }
     },
     /** 模拟前端插件卸载：执行全部 effect 清理函数。 */
     _dispose() {

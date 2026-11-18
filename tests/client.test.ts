@@ -12,9 +12,12 @@ import { describe, expect, it, vi } from 'vitest';
 import { type ConfigFormState, ROW_ID, ROW_KEY } from '../src/client/config-form.ts';
 import { ConfigPage } from '../src/client/config-page.tsx';
 import { DemoDock } from '../src/client/demo-dock.tsx';
-import { apply, inject } from '../src/client/index.ts';
+import * as clientEntry from '../src/client/index.ts';
 import { en, NS, zh } from '../src/client/locales.ts';
-import { makeClientCtx } from './helpers.ts';
+import { type ClientServiceName, makeClientCtx } from './helpers.ts';
+
+const { apply } = clientEntry;
+const ALL_SERVICES: ClientServiceName[] = ['slots', 'locale', 'configForms'];
 
 /** 用字典与 `{name}` 模板参数构造翻译函数，行为与宿主 locale 座一致。 */
 function translate(dict: Record<string, string>): TranslateNS<typeof NS> {
@@ -58,8 +61,15 @@ function renderConfigPage(
 }
 
 describe('前端入口', () => {
-  it('声明实际使用的客户端服务', () => {
-    expect(inject).toEqual(['slots', 'locale', 'configForms']);
+  it('不声明必需服务，按功能分三组等待各自用到的服务', () => {
+    expect('inject' in clientEntry).toBe(false);
+    const ctx = makeClientCtx();
+    apply(ctx);
+    expect(ctx._injectGroups).toEqual([
+      ['locale'],
+      ['slots', 'locale'],
+      ['slots', 'locale', 'configForms'],
+    ]);
   });
 
   it('注册双语字典、输入区上方的示例行与面板配置页', () => {
@@ -102,6 +112,87 @@ describe('前端入口', () => {
 
     ctx._dispose();
     expect(scope?.subscriberCount()).toBe(0);
+  });
+});
+
+/** 某组服务可用时应注册的内容。 */
+function expectedRegistrations(services: ClientServiceName[]) {
+  const has = (...names: ClientServiceName[]) => names.every((name) => services.includes(name));
+  return {
+    dictionary: has('locale'),
+    dock: has('slots', 'locale'),
+    configPage: has('slots', 'locale', 'configForms'),
+  };
+}
+
+/** 读取当前生效的注册内容。 */
+function activeRegistrations(ctx: ReturnType<typeof makeClientCtx>) {
+  const slotNames = [...ctx._activeSlots].map((entry) => entry.options.name);
+  return {
+    dictionary: ctx._activeLocales.size === 1,
+    dock: slotNames.includes('conversation.composer.dock'),
+    configPage: slotNames.includes('plugins.row.config'),
+  };
+}
+
+/** 三个服务各有或无的全部 8 种组合。 */
+const COMBINATIONS: ClientServiceName[][] = Array.from({ length: 8 }, (_, mask) =>
+  ALL_SERVICES.filter((_name, index) => (mask >> index) & 1),
+);
+
+describe('前端服务可选', () => {
+  it.each(COMBINATIONS.map((services) => [services]))(
+    '服务 %j 可用时启用成功，注册内容与可用性一一对应',
+    (services) => {
+      const ctx = makeClientCtx({ services });
+      expect(() => apply(ctx)).not.toThrow();
+      expect(activeRegistrations(ctx)).toEqual(expectedRegistrations(services));
+    },
+  );
+
+  it('configForms 缺失时不请求配置表单', () => {
+    const ctx = makeClientCtx({ services: ['slots', 'locale'] });
+    apply(ctx);
+    expect(ctx._configFormRequests).toEqual([]);
+  });
+
+  it('configForms 晚就绪后配置页自动注册', () => {
+    const ctx = makeClientCtx({ services: ['slots', 'locale'] });
+    apply(ctx);
+    expect(activeRegistrations(ctx).configPage).toBe(false);
+
+    ctx._grant('configForms');
+    expect(activeRegistrations(ctx)).toEqual({ dictionary: true, dock: true, configPage: true });
+    expect(ctx._configFormRequests).toEqual([ROW_ID]);
+  });
+
+  it('服务撤掉后只清理依赖它的功能，重新就绪后重新注册且不重复', () => {
+    const ctx = makeClientCtx();
+    apply(ctx);
+    const scope = ctx._configFormScopes[0];
+    expect(scope?.subscriberCount()).toBe(1);
+
+    ctx._revoke('configForms');
+    expect(activeRegistrations(ctx)).toEqual({ dictionary: true, dock: true, configPage: false });
+    expect(scope?.subscriberCount()).toBe(0);
+
+    ctx._grant('configForms');
+    expect(activeRegistrations(ctx)).toEqual({ dictionary: true, dock: true, configPage: true });
+    expect(ctx._activeSlots.size).toBe(2);
+    expect(ctx._activeLocales.size).toBe(1);
+    expect(ctx._configFormScopes[1]?.subscriberCount()).toBe(1);
+  });
+
+  it('locale 撤掉后三项功能都被清理', () => {
+    const ctx = makeClientCtx();
+    apply(ctx);
+    ctx._revoke('locale');
+    expect(activeRegistrations(ctx)).toEqual({
+      dictionary: false,
+      dock: false,
+      configPage: false,
+    });
+    expect(ctx._configFormScopes[0]?.subscriberCount()).toBe(0);
   });
 });
 

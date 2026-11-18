@@ -102,7 +102,7 @@ window.__ModuleLoader__.load({
   id: 'dsh-plugin-template',
   factory(require) {
     // 模块体
-    return { inject: ['slots', 'locale'], apply(ctx) { /* ... */ } };
+    return { apply(ctx) { /* ... */ } };
   },
 });
 ```
@@ -115,11 +115,19 @@ window.__ModuleLoader__.load({
 
 ### 前端入口
 
-`src/client/index.ts` 导出 `inject` 与 `apply`。`apply` 完成三件事：
+`src/client/index.ts` 只导出 `apply`，不声明必需服务。宿主的 `inject` 把列出的服务一律视为必需，任一缺失时整个入口不加载。模板改为按功能调用 `ctx.inject(服务列表, 回调)`，每个功能只等待自己用到的服务：
 
-1. 用 `ctx.locale.register` 注册 `dsh-plugin-template` 命名空间的中英文字典。
-2. 用 `ctx.slots.inject` 等待槽位就绪，再用 `ctx.slots.register` 注册示例行。
-3. 用 `ctx.configForms.get` 取得该行的配置表单，向 `plugins.row.config` 注册配置页。
+| 功能 | 等待的服务 | 注册内容 |
+| --- | --- | --- |
+| 字典 | `locale` | `ctx.locale.register` 注册 `dsh-plugin-template` 命名空间的中英文字典 |
+| 示例行 | `slots`、`locale` | `ctx.slots.inject` 等待槽位就绪，再用 `ctx.slots.register` 注册示例行 |
+| 配置页 | `slots`、`locale`、`configForms` | `ctx.configForms.get` 取得该行的配置表单，向 `plugins.row.config` 注册配置页 |
+
+- 服务缺失时对应功能不加载，其余功能照常。
+- 服务晚于插件就绪时，对应功能在服务就绪后加载。
+- 服务被撤掉时，对应功能卸载；重新就绪后再次加载。
+- 回调内的资源 MUST 经 `ctx.effect` 或 `ctx.slots.inject` 登记，卸载时才会清理。
+- 把另一个服务改为可选：从入口的 `inject` 移除，在用到它的功能外包一层 `ctx.inject`。
 
 | 文件 | 职责 |
 | --- | --- |
