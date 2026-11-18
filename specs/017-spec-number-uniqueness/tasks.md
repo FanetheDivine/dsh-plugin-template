@@ -54,7 +54,7 @@
   - 写明执行顺序：同步、算号、占号、建 worktree；占号失败时停止。
   - Output 增加 `CLAIMED`。
   - 把正文同步到 `.dsh/skills/speckit-worktree-create/SKILL.md`，保留 front matter。
-- [ ] T008 [US1] 运行 `pnpm format && pnpm check`，提交
+- [X] T008 [US1] 运行 `pnpm format && pnpm check`，提交
 
 **Checkpoint**: 创建流程结束时远程已有占号分支。
 
@@ -111,12 +111,12 @@
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T017 [P] 更新 `docs/development.md`：
+- [X] T017 [P] 更新 `docs/development.md`：
   - Spec Kit 流程节写明创建时占号、编号来自远程、交付前校验。
   - 维护 worktree 扩展节补充 `check-spec-number.sh` 与测试覆盖。
-- [ ] T018 [P] 更新 `CHANGELOG.md` 的 `## Unreleased`，记录占号、自动改号与交付前校验。
-- [ ] T019 按 [quickstart.md](./quickstart.md) 在两个真实克隆上验证场景 1–5。
-- [ ] T020 运行 `pnpm format && pnpm check`，提交
+- [X] T018 [P] 更新 `CHANGELOG.md` 的 `## Unreleased`，记录占号、自动改号与交付前校验。
+- [X] T019 按 [quickstart.md](./quickstart.md) 在两个真实克隆上验证场景 1–5。
+- [X] T020 运行 `pnpm format && pnpm check`，提交
 
 ---
 
