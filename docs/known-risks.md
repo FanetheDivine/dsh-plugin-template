@@ -11,14 +11,14 @@
 pnpm 的 minimum release age 策略会拒绝发布时间过短的包。
 
 - `@deepseek-ai/dsh-*` 依赖未列入 `minimumReleaseAgeExclude` 时，`pnpm install` 失败。
-- 列入规则见[宪章](../.specify/memory/constitution.md)原则 II。
+- 列入规则见[宪章](../.specify/memory/constitution.md)原则 I。
 
 ## 共享宿主实例
 
 插件运行时使用宿主提供的 cordis、dsh-tools 与 zod。
 
 - 这些包被打进 bundle 时会产生第二份实例，类型判断和服务注入随之失效。
-- 保持 external 的规则见[宪章](../.specify/memory/constitution.md)原则 II。
+- 保持 external 的规则见 [how-it-works.md](./how-it-works.md#依赖复用)。
 
 ## 前端产物
 

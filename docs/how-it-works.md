@@ -22,6 +22,10 @@ DSH 插件是一个 npm 包。宿主按约定的入口加载它。
 | `apply(ctx, config)` | 插件启用时调用，`config` 来自插件行的 `config` 字段 |
 | `Config` | 配置 schema，宿主据此校验配置并提供热重载与面板表单 |
 
+- `inject` 列出 `apply` 用到的全部宿主服务。
+- 需要热重载的 `Config` 字段用 `.volatile()` 标记。
+- 宿主类型经 `src/types.ts` 以 type-only 方式导入。
+
 ```ts
 export const name = 'dsh-plugin-template';
 export const inject = ['tools', 'llm', 'tokenMeter', 'sessions'];
@@ -41,7 +45,14 @@ export function apply(ctx: Context, config?: unknown): void {
 
 ### 配置解析
 
-`readConfig` 先把 `.volatile()` 引用展开为普通值，再交给 `resolveConfig` 做严格校验，规则见[宪章](../.specify/memory/constitution.md)原则 III。
+`readConfig` 先把 `.volatile()` 引用展开为普通值，再交给 `resolveConfig` 做严格校验：
+
+- 配置解析是 `apply` 的第一步。
+- 缺省或 `null` 的键使用默认值。
+- 未知键与非法值抛错，插件加载失败。
+- 解析结果冻结后返回。
+
+配置错误在加载时暴露，最容易排查。
 
 ### 配置与热重载
 
@@ -169,10 +180,14 @@ window.__ModuleLoader__.load({
 
 ## 依赖复用
 
-宿主自带 cordis、dsh-tools 与 zod。
+宿主自带 cordis、dsh-tools 与 zod，插件运行时使用宿主的同一份实例。依赖分为两类，新增依赖时在 plan 中声明归属：
 
-- 插件运行时使用宿主的同一份实例。
-- 依赖归属规则见[宪章](../.specify/memory/constitution.md)原则 II。
+| 归属 | 放在 | 打包 |
+| --- | --- | --- |
+| 宿主提供 | `devDependencies` | 由 `tsdown.config.ts` 的 `neverBundle` 保持 external |
+| 插件自备 | `dependencies` | 列入 `tsdown.config.ts` 的 `alwaysBundle`，打进 `dist`，由 `tests/package-pack.test.ts` 回归发布内容 |
+
+- 宿主依赖的版本规则见[宪章](../.specify/memory/constitution.md)原则 I。
 
 ## 打包与发布
 

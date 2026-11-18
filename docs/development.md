@@ -95,7 +95,7 @@
 | `tests/helpers.ts` | 模拟宿主与客户端 `ctx`，记录注册、事件监听与日志 |
 | `tests/support/primitives.ts` | 把平台组件包解析到源码，避开已发布产物内联的依赖 |
 
-测试要求见[宪章](../.specify/memory/constitution.md)原则 IV。文案与元数据的规范见 [i18n.md](./i18n.md)。
+测试要求见[宪章](../.specify/memory/constitution.md)原则 II。文案与元数据的规范见 [i18n.md](./i18n.md)。
 
 vitest 拆成 `code` 与 `dist` 两个 project。产物测试读取 `dist`，由 `build` 末尾的 `test:dist` 执行；`test:code` 不读取 `dist`。产物缺失或早于构建输入时，产物测试失败并提示运行 `pnpm build`。
 

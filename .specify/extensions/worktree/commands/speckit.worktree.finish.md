@@ -34,7 +34,7 @@ You **MUST** consider the user input before proceeding (if not empty). Input con
 Run inside `WORKTREE_PATH`:
 
 1. Quality gates: `pnpm format && pnpm check` (typecheck → lint → test → build). Fix failures before continuing.
-2. CHANGELOG: per principle V of `.specify/memory/constitution.md`, branches other than `main`
+2. CHANGELOG: per principle III of `.specify/memory/constitution.md`, branches other than `main`
    add their `CHANGELOG.md` entry when pushing. Add an entry under `## Unreleased` describing the
    feature, if not already present.
 3. Sync the base branch:

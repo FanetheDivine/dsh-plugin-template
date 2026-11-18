@@ -53,15 +53,15 @@
 
 **Independent Test**: 按 [data-model.md](./data-model.md) 迁移表逐行核对；运行 [quickstart.md](./quickstart.md) 第 2 步。
 
-- [ ] T008 [P] [US3] 修改 `docs/how-it-works.md`：
+- [X] T008 [P] [US3] 修改 `docs/how-it-works.md`：
   - 「入口契约」补充：`inject` 列出 `apply` 用到的全部宿主服务；需要热重载的 `Config` 字段用 `.volatile()` 标记；宿主类型经 `src/types.ts` 以 type-only 方式导入。
   - 「配置解析」写入四条规则：解析是 `apply` 的第一步；缺省或 `null` 的键用默认值；未知键与非法值抛错使插件加载失败；解析结果冻结后返回。删除宪章链接。
   - 「依赖复用」写入依赖归属：新增依赖在 plan 中声明归属；宿主自带的放 `devDependencies` 并由 `tsdown.config.ts` 的 `neverBundle` 保持 external；宿主未提供的放 `dependencies`、列入 `alwaysBundle`、由 `tests/package-pack.test.ts` 回归。版本规则链接宪章原则 I。
-- [ ] T009 [P] [US3] 修改 `docs/i18n.md`：删除首行指向宪章原则 IX 的句子；新增「约束」节，写入原原则 IX 的全部条目，`国际化规范归属本文` 一条省略
-- [ ] T010 [P] [US3] 修改 `docs/known-risks.md`：「安装 rc 依赖」链接改为宪章原则 I；「共享宿主实例」链接改为 `docs/how-it-works.md` 的「依赖复用」节
-- [ ] T011 [P] [US3] 修改 `docs/development.md` 测试节：宪章原则 IV 改为原则 II
-- [ ] T012 [P] [US3] 在 `.specify/extensions/worktree/commands/speckit.worktree.finish.md` 与 `.dsh/skills/speckit-worktree-finish/SKILL.md` 中把 `principle V` 改为 `principle III`，核对两者正文一致
-- [ ] T013 [US3] 运行 `pnpm format && pnpm check`，提交
+- [X] T009 [P] [US3] 修改 `docs/i18n.md`：删除首行指向宪章原则 IX 的句子；新增「约束」节，写入原原则 IX 的全部条目，`国际化规范归属本文` 一条省略
+- [X] T010 [P] [US3] 修改 `docs/known-risks.md`：「安装 rc 依赖」链接改为宪章原则 I；「共享宿主实例」链接改为 `docs/how-it-works.md` 的「依赖复用」节
+- [X] T011 [P] [US3] 修改 `docs/development.md` 测试节：宪章原则 IV 改为原则 II
+- [X] T012 [P] [US3] 在 `.specify/extensions/worktree/commands/speckit.worktree.finish.md` 与 `.dsh/skills/speckit-worktree-finish/SKILL.md` 中把 `principle V` 改为 `principle III`，核对两者正文一致
+- [X] T013 [US3] 运行 `pnpm format && pnpm check`，提交
 
 ---
 
