@@ -27,7 +27,7 @@
   - `secondClone()`：在临时 origin 旁建第二个克隆。
   - `pushBranch(clone, branch)`：在克隆中建分支并推送。
   - 断言辅助：读取远程分支列表与脚本 JSON。
-- [ ] T004 运行 `pnpm format && pnpm check`，提交
+- [X] T004 运行 `pnpm format && pnpm check`，提交
 
 **Checkpoint**: 库函数与测试辅助就绪，现有用例保持通过。
 
@@ -39,17 +39,17 @@
 
 **Independent Test**: 按 [quickstart.md](./quickstart.md) 场景 1 与场景 4 核对。
 
-- [ ] T005 [US1] 修改 `.specify/extensions/worktree/scripts/bash/create-worktree.sh`：
+- [X] T005 [US1] 修改 `.specify/extensions/worktree/scripts/bash/create-worktree.sh`：
   - 先建本地分支 `git branch <BRANCH_NAME> <BASE_REF>`，再 `git push origin <BRANCH_NAME>` 占号。
   - 占号失败删除本地分支，退出码 1，stderr 说明推送失败。
   - 占号成功后 `git worktree add <WORKTREE_PATH> <BRANCH_NAME>`；worktree 创建失败时删除远程与本地分支并退出 1。
   - JSON 输出增加 `CLAIMED`：本次占号成功为 `true`，`--dry-run` 与 `IN_WORKTREE` 复用为 `false`。
   - `--dry-run` 不建分支、不推送、不建 worktree。
-- [ ] T006 [P] [US1] 在 `tests/worktree-extension.test.ts` 新增用例：
+- [X] T006 [P] [US1] 在 `tests/worktree-extension.test.ts` 新增用例：
   - 创建成功后 `git ls-remote --heads origin <BRANCH_NAME>` 非空，`CLAIMED` 为 `true`。
   - `--dry-run` 不产生远程分支与 worktree，`CLAIMED` 为 `false`。
   - 占号失败（`--no-fetch` 且 origin 指向不可达路径）时退出码非 0，`worktrees/` 无新目录，`git branch --list` 无新分支。
-- [ ] T007 [P] [US1] 修改 `.specify/extensions/worktree/commands/speckit.worktree.create.md`：
+- [X] T007 [P] [US1] 修改 `.specify/extensions/worktree/commands/speckit.worktree.create.md`：
   - 删除「Native worktree tool」分支，创建统一执行 `create-worktree.sh`。
   - 写明执行顺序：同步、算号、占号、建 worktree；占号失败时停止。
   - Output 增加 `CLAIMED`。

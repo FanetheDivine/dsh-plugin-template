@@ -141,6 +141,38 @@ describe('worktree 扩展脚本', { timeout: 30_000 }, () => {
     expect(existsSync(path.join(repo, 'worktrees', '008-next'))).toBe(false);
   });
 
+  it('创建时推送占号分支，CLAIMED 为 true', () => {
+    const out = json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'claimed'));
+    expect(out.CLAIMED).toBe(true);
+    expect(remoteBranches(repo)).toContain('feat/002-claimed');
+  });
+
+  it('--dry-run 不占号也不创建 worktree', () => {
+    const out = json(
+      script(repo, 'create-worktree.sh', '--json', '--dry-run', '--short-name', 'dry'),
+    );
+    expect(out.CLAIMED).toBe(false);
+    expect(out.CREATED).toBe(false);
+    expect(remoteBranches(repo)).not.toContain('feat/002-dry');
+    expect(existsSync(path.join(repo, 'worktrees', '002-dry'))).toBe(false);
+  });
+
+  it('占号推送失败时中止且不留下分支与 worktree', () => {
+    git(repo, 'remote', 'set-url', 'origin', path.join(base, 'missing.git'));
+    const res = script(
+      repo,
+      'create-worktree.sh',
+      '--json',
+      '--no-fetch',
+      '--short-name',
+      'offline',
+    );
+    expect(res.status).not.toBe(0);
+    expect(res.stderr).toContain('failed to push claim branch');
+    expect(git(repo, 'branch', '--list', 'feat/002-offline')).toBe('');
+    expect(existsSync(path.join(repo, 'worktrees', '002-offline'))).toBe(false);
+  });
+
   it('已在 feature worktree 内运行时复用当前 worktree', () => {
     json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'reuse-me'));
     const wt = path.join(repo, 'worktrees', '002-reuse-me');
