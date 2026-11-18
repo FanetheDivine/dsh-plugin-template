@@ -63,8 +63,8 @@
 
 **Independent Test**: 只读 `docs/how-it-works.md` 前端入口一节，能把另一个前端服务改为可选。
 
-- [ ] T011 [P] [US3] 修改 `docs/how-it-works.md` 的“前端入口”一节：说明前端入口不声明必需服务，按功能用 `ctx.inject` 分组；表格列出三组的依赖、缺失时跳过的功能；更新同文件“前端部分”示例中的 `inject` 行（FR-007）
-- [ ] T012 [P] [US3] 修改 `docs/known-risks.md` 的“前端产物”一节：记录 `ctx.inject` 回调是子 fiber，服务撤掉时重跑，回调内资源必须经 `ctx.effect` 登记；记录 `slots` 缺失时无可见效果（FR-008）
+- [x] T011 [P] [US3] 修改 `docs/how-it-works.md` 的“前端入口”一节：说明前端入口不声明必需服务，按功能用 `ctx.inject` 分组；表格列出三组的依赖、缺失时跳过的功能；更新同文件“前端部分”示例中的 `inject` 行（FR-007）
+- [x] T012 [P] [US3] 修改 `docs/known-risks.md` 的“前端产物”一节：记录 `ctx.inject` 回调是子 fiber，服务撤掉时重跑，回调内资源必须经 `ctx.effect` 登记；记录 `slots` 缺失时无可见效果（FR-008）
 
 **Checkpoint**: 文档与实现一致，且遵守宪章原则 V（单一归属、只放链接）。
 
@@ -72,9 +72,9 @@
 
 ## Phase 6: Polish
 
-- [ ] T013 在 `CHANGELOG.md` 的 `Unreleased` 下增加 `Changed` 条目：前端服务改为可选，按功能分组加载（FR-009）
-- [ ] T014 运行 `pnpm format && pnpm check`，修复问题
-- [ ] T015 运行 `pnpm build`，确认 `dist/client.js` 与产物测试通过
+- [x] T013 在 `CHANGELOG.md` 的 `Unreleased` 下增加 `Changed` 条目：前端服务改为可选，按功能分组加载（FR-009）
+- [x] T014 运行 `pnpm format && pnpm check`，修复问题
+- [x] T015 运行 `pnpm build`，确认 `dist/client.js` 与产物测试通过
 - [ ] T016 按 [quickstart.md](./quickstart.md) 核对；提醒用户在真实宿主做实机测试（宪章原则 IV）
 
 ---
