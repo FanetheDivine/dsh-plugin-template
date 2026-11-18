@@ -14,6 +14,23 @@ if (!url) throw new Error('RDT_GUI_URL 必填：先 eval $(bash gui-up.sh <profi
 const REPO = process.env.RDT_REPO;
 if (!REPO) throw new Error('RDT_REPO 必填：插件仓库绝对路径');
 const PLUGIN = JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf8')).name;
+/** 插件在界面上的显示名：宿主优先显示元数据标题，缺失时回落包名。 */
+const DISPLAY_NAMES = [
+  ...new Set([
+    ...['zh', 'en'].flatMap((lang) => {
+      try {
+        const meta = JSON.parse(readFileSync(join(REPO, 'locale', `${lang}.json`), 'utf8')).meta;
+        return typeof meta?.title === 'string' ? [meta.title] : [];
+      } catch {
+        return [];
+      }
+    }),
+    PLUGIN,
+  ]),
+];
+/** 为每个显示名拼出带前缀的按钮标签，如「查看 插件模板」。 */
+const withNames = (prefixes) =>
+  prefixes.flatMap((prefix) => DISPLAY_NAMES.map((name) => `${prefix} ${name}`));
 const shots = process.env.RDT_SHOTS ?? join(root, 'shots');
 mkdirSync(shots, { recursive: true });
 
@@ -90,20 +107,10 @@ async function openRowConfig(page) {
   await openPluginsPage(page);
   const card = page.locator(`[data-plugin-package="${PLUGIN}"]`);
   await card.waitFor({ state: 'visible', timeout: 60000 });
-  if (
-    !(await clickLabel(
-      page,
-      LABELS.view.map((prefix) => `${prefix} ${PLUGIN}`),
-    ))
-  ) {
+  if (!(await clickLabel(page, withNames(LABELS.view)))) {
     throw new Error(`找不到 ${PLUGIN} 的详情入口`);
   }
-  if (
-    !(await clickLabel(
-      page,
-      LABELS.configure.map((prefix) => `${prefix} ${PLUGIN}`),
-    ))
-  ) {
+  if (!(await clickLabel(page, withNames(LABELS.configure)))) {
     throw new Error(`找不到 ${PLUGIN} 行的配置入口`);
   }
   await page.locator('[data-plugin-config]').waitFor({ state: 'visible', timeout: 30000 });
@@ -207,11 +214,11 @@ try {
     await openPluginsPage(page);
     // 插件清单首次加载要读取整个宿主包树，可能超过 10 秒；等到已安装区出现再断言
     await page.getByText(LABELS.installed[0], { exact: false }).first().waitFor({ timeout: 60000 });
-    await page.getByText(PLUGIN, { exact: false }).first().waitFor({ timeout: 60000 });
-    const text = await page.locator('body').innerText();
-    if (!text.includes(PLUGIN)) throw new Error(`插件页未列出 ${PLUGIN}`);
-    // 宿主用 role=switch 的控件承载启用状态，aria-label 为「启用 <插件名>」
-    const toggle = page.getByRole('switch', { name: `启用 ${PLUGIN}`, exact: true });
+    // 插件卡片以包名标记，显示名随语言与元数据变化
+    const card = page.locator(`[data-plugin-package="${PLUGIN}"]`);
+    await card.waitFor({ state: 'visible', timeout: 60000 });
+    // 宿主用 role=switch 的控件承载启用状态，aria-label 为「启用 <显示名>」
+    const toggle = card.getByRole('switch');
     if (!(await toggle.count())) throw new Error(`${PLUGIN} 没有启用开关`);
     const enabled = (await toggle.first().getAttribute('aria-checked')) === 'true';
     await page.screenshot({ path: join(shots, 'c2-plugins.png'), fullPage: true });
@@ -232,8 +239,13 @@ try {
     const save = await configControl(page, LABELS.save, 'button');
     if (await save.isDisabled()) throw new Error('改前缀后保存按钮应可用');
     await save.click();
-    await page.waitForTimeout(2500);
-    const patch = readFileSync(join(root, 'cordis.patch.yml'), 'utf8');
+    // 宿主异步写盘，最多轮询 15 秒
+    let patch = '';
+    for (let waited = 0; waited < 15000; waited += 500) {
+      await page.waitForTimeout(500);
+      patch = readFileSync(join(root, 'cordis.patch.yml'), 'utf8');
+      if (patch.includes(`prefix: ${next}`)) break;
+    }
     if (!patch.includes(`prefix: ${next}`)) throw new Error(`cordis.patch.yml 未写入 ${next}`);
     await page.screenshot({ path: join(shots, 'c4-config.png'), fullPage: true });
 
