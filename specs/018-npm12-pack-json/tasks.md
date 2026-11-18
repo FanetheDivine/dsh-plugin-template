@@ -68,8 +68,8 @@
 
 ## Phase 5: Polish
 
-- [ ] T010 在 `CHANGELOG.md` 的 Unreleased 下增加修复条目：包内容测试兼容 npm 12 的 `npm pack --json` 对象输出；publish job 改用 Node 自带的 npm
-- [ ] T011 按 [quickstart.md](./quickstart.md) 全部步骤验证：npm 11 与 npm 12 各跑一次 `pnpm test:dist`，勾选本文件任务并提交
+- [X] T010 在 `CHANGELOG.md` 的 Unreleased 下增加修复条目：包内容测试兼容 npm 12 的 `npm pack --json` 对象输出；publish job 改用 Node 自带的 npm
+- [X] T011 按 [quickstart.md](./quickstart.md) 全部步骤验证：npm 11 与 npm 12 各跑一次 `pnpm test:dist`，勾选本文件任务并提交
 
 ---
 

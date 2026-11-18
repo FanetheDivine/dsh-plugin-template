@@ -14,6 +14,11 @@
 - `AGENTS.md` 新增模板说明节，链接模板转化文档
 - `AGENTS.md` 新增主工作区节：主工作区位于 `main` 且干净，只运行 `git fetch` 与 `git pull`，任何变更在 worktree 中进行
 - `/speckit-worktree-create` 在创建 worktree 前、`/speckit-worktree-finish` 在清理后，把主工作区 `main` 快进到 `origin/main`
+- `publish` job 改用 Node 24 自带的 npm，删除 `npm install -g npm@latest` 步骤
+
+### Fixed
+
+- 包内容测试解析 `npm pack --json` 的两种形状：npm 11 的数组与 npm 12 的以包名为键的对象
 
 ### Added
 
@@ -21,3 +26,5 @@
 - `tests/dependency-versions.test.ts`：回归 `dsh-*` 依赖版本一致与 `minimumReleaseAgeExclude` 条目
 - `.specify/extensions/worktree/scripts/bash/sync-main.sh`：检查主工作区并快进 `main` 到 `origin/main`
 - `tests/sync-main.test.ts`：覆盖 `sync-main.sh` 的同步与拒绝场景
+- `tests/support/pack-report.ts`：把 `npm pack --json` 的报告归一为文件路径列表
+- `tests/pack-report.test.ts`：覆盖打包报告的数组与对象形状、缺 `files` 与非法形状
