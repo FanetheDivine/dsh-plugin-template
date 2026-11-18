@@ -1,12 +1,11 @@
 // 前端产物契约测试：执行 dist/client.js，断言闭包工厂按包名注册并导出 inject 与 apply。
-import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 import { describe, expect, it } from 'vitest';
-
 import { makeClientCtx } from './helpers.ts';
+import { assertFreshDist } from './support/dist-freshness.ts';
 
 /** 仓库根目录（tests/ 的上一级）。 */
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -21,20 +20,6 @@ const CLIENT_ID = 'dsh-plugin-template';
 interface ClientRegistration {
   id: string;
   factory: (require: (id: string) => unknown) => Record<string, unknown>;
-}
-
-/** 产物缺失时先构建，保证测试独立可跑。 */
-function ensureBuild(): void {
-  if (existsSync(CLIENT_FILE) && existsSync(path.join(ROOT, 'dist', 'index.mjs'))) return;
-  const build = spawnSync('pnpm', ['build'], {
-    cwd: ROOT,
-    encoding: 'utf8',
-    // Windows 下 pnpm 是 pnpm.cmd，需经 shell 启动
-    shell: process.platform === 'win32',
-  });
-  if (build.status !== 0) {
-    throw new Error(`pnpm build 失败：${String(build.stderr ?? build.stdout ?? '未知错误')}`);
-  }
 }
 
 /** 在桩 window 中执行产物，返回注册列表。 */
@@ -55,7 +40,7 @@ function loadRegistrations(): ClientRegistration[] {
 
 describe('前端产物（dist/client.js）', () => {
   it('按包名注册闭包工厂，导出 inject 与 apply', () => {
-    ensureBuild();
+    assertFreshDist();
     const registrations = loadRegistrations();
     expect(registrations).toHaveLength(1);
     const registration = registrations[0];
