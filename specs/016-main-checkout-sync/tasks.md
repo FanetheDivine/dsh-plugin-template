@@ -57,22 +57,22 @@
 
 **Independent Test**: 按 [quickstart.md](./quickstart.md) 文档验证第 3–5 步核对。
 
-- [ ] T007 [P] [US2] 修改 `.specify/extensions/worktree/commands/speckit.worktree.create.md`：
+- [X] T007 [P] [US2] 修改 `.specify/extensions/worktree/commands/speckit.worktree.create.md`：
   - 在创建分支与 worktree 之前新增一步，运行 `.specify/extensions/worktree/scripts/bash/sync-main.sh --json`。
   - 退出 0 时继续；退出 2 或 1 时停止并报告 stderr 原因，不创建 worktree。
   - 已在 feature worktree 内时同样先运行该步。
   - Output 段增加同步后的 `MAIN_COMMIT` 与 `UPDATED`。
-- [ ] T008 [P] [US3] 修改 `.specify/extensions/worktree/commands/speckit.worktree.finish.md` 的 Clean up 段：
+- [X] T008 [P] [US3] 修改 `.specify/extensions/worktree/commands/speckit.worktree.finish.md` 的 Clean up 段：
   - `finish-worktree.sh` 成功后，在主工作区运行 `sync-main.sh --json`。
   - 交付与放弃两种模式都执行。
   - 退出 2 或 1 时报告原因，保留主工作区现状。
   - Output 段增加同步结果。
-- [ ] T009 [US2] 把 T007、T008 的命令正文同步到 `.dsh/skills/speckit-worktree-create/SKILL.md` 与 `.dsh/skills/speckit-worktree-finish/SKILL.md`，保留 front matter，按 research R4
-- [ ] T010 [US2] 更新 `docs/development.md`：
+- [X] T009 [US2] 把 T007、T008 的命令正文同步到 `.dsh/skills/speckit-worktree-create/SKILL.md` 与 `.dsh/skills/speckit-worktree-finish/SKILL.md`，保留 front matter，按 research R4
+- [X] T010 [US2] 更新 `docs/development.md`：
   - 流程表第 1 步产出加上主工作区 `main` 同步。
   - 流程表第 7 步产出加上清理后的主工作区 `main` 同步。
-  - 「维护 worktree 扩展」一节的脚本测试列表加入 `tests/sync-main.test.ts`。
-- [ ] T011 [US2] 运行 `pnpm format && pnpm check`，提交
+  - 测试表与「维护 worktree 扩展」一节加入 `tests/sync-main.test.ts`。
+- [X] T011 [US2] 运行 `pnpm format && pnpm check`，提交
 
 **Checkpoint**: 开始与结束流程都同步主工作区。
 

@@ -92,6 +92,7 @@
 | `tests/dependency-versions.test.ts` | `dsh-*` 依赖版本一致，并以同版本列入 `minimumReleaseAgeExclude` |
 | `tests/dist-freshness.test.ts` | 产物新鲜度判定的三种状态 |
 | `tests/worktree-extension.test.ts` | worktree 扩展的创建、复用与清理 |
+| `tests/sync-main.test.ts` | 主工作区 `main` 快进到 `origin/main`，不满足约束时保持原样 |
 | `tests/helpers.ts` | 模拟宿主与客户端 `ctx`，记录注册、事件监听与日志 |
 | `tests/support/primitives.ts` | 把平台组件包解析到源码，避开已发布产物内联的依赖 |
 
@@ -110,13 +111,13 @@ DSH 从 `.dsh/skills/` 加载 `speckit-*` skill，在对话框输入 `/` 调用�
 
 | 步骤 | 命令 | 产出 |
 | --- | --- | --- |
-| 1 | `/speckit-specify <需求描述>` | 分支、worktree 与 `spec.md` |
+| 1 | `/speckit-specify <需求描述>` | 主工作区 `main` 同步到 `origin/main`，分支、worktree 与 `spec.md` |
 | 2 | `/speckit-clarify` | 写回 spec 的澄清结果 |
 | 3 | `/speckit-plan` | `plan.md` 与设计产物 |
 | 4 | `/speckit-tasks` | `tasks.md` |
 | 5 | `/speckit-analyze` | 跨产物一致性报告 |
 | 6 | `/speckit-implement` | 按阶段提交的实现 |
-| 7 | `/speckit-worktree-finish` | 基线同步、PR、无上限等待合并与合并后的清理，或以 `abandon` 放弃 |
+| 7 | `/speckit-worktree-finish` | 基线同步、PR、无上限等待合并与合并后的清理，或以 `abandon` 放弃；清理后主工作区 `main` 同步到 `origin/main` |
 
 - `base_ref` 默认为 `origin/main`，必须已包含 `.specify/` 与 `.dsh/skills/`。
 - `worktrees/` 已加入 `.gitignore`，biome 与 vitest 也会跳过它。
@@ -130,7 +131,7 @@ DSH 从 `.dsh/skills/` 加载 `speckit-*` skill，在对话框输入 `/` 调用�
 1. 把扩展目录复制到仓库外的临时目录，删除其中的 `.specify-dev/`。
 2. 运行 `specify extension add --dev <临时目录> --force`。
 
-脚本行为由 `tests/worktree-extension.test.ts` 覆盖。
+脚本行为由 `tests/worktree-extension.test.ts` 与 `tests/sync-main.test.ts` 覆盖。
 
 ## 文件地图
 

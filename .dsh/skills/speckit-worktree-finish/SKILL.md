@@ -155,8 +155,20 @@ then clean up with `--abandon`. A branch already pushed to the remote is left th
    reason; do not force removal in deliver mode.
 4. `REMOTE_DELETED` in the output tells whether the remote branch was deleted; `false` means it
    was already gone.
+5. Sync the primary checkout in both modes, after `finish-worktree.sh` succeeds:
+
+   ```bash
+   .specify/extensions/worktree/scripts/bash/sync-main.sh --json
+   ```
+
+   The script fast-forwards the primary checkout's `main` to `origin/main` with `git fetch` and
+   `git pull --ff-only`. Parse `MAIN_COMMIT` and `UPDATED` from the JSON output.
+
+   - Exit 0: `main` equals `origin/main`.
+   - Exit 2 or 1: report the stderr reason and leave the primary checkout as it is.
 
 ## Output
 
 Report the outcome: PR URL, and that the worktree, local branch and remote branch were removed
-(deliver), or the discarded branch (abandon).
+(deliver), or the discarded branch (abandon). Add the primary checkout sync result: `MAIN_COMMIT`
+and `UPDATED`, or the reason the sync was skipped.

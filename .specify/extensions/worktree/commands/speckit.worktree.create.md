@@ -26,7 +26,24 @@ You **MUST** consider the user input before proceeding (if not empty). When invo
 2. **Generate a short name** (2-4 words, kebab-case, action-noun form, keep technical terms),
    e.g. "Fix payment processing timeout bug" → `payment-timeout`. Do not repeat the type in it.
 
-3. **Create the branch and worktree.** The target state is: branch `<type>/<NNN>-<short-name>`
+3. **Sync the primary checkout.** Run from the repository root or any worktree:
+
+   ```
+   .specify/extensions/worktree/scripts/bash/sync-main.sh --json
+   ```
+
+   The script fast-forwards the primary checkout's `main` to `origin/main` with `git fetch` and
+   `git pull --ff-only`. Parse `MAIN_COMMIT` and `UPDATED` from the JSON output.
+
+   - Exit 0: `main` equals `origin/main`; continue.
+   - Exit 2: the primary checkout is not on `main`, has changes, or has commits not on
+     `origin/main`. Stop, report the stderr reason and ask the user to fix the primary checkout.
+     Do not create a worktree.
+   - Exit 1: report the error and stop. Do not create a worktree.
+
+   Run this step in every case, including when the session is already inside a feature worktree.
+
+4. **Create the branch and worktree.** The target state is: branch `<type>/<NNN>-<short-name>`
    checked out in a nested worktree at `worktrees/<NNN>-<short-name>` inside the primary checkout,
    with no tracking upstream (`--no-track`), based on `origin/main` (or the `base_ref` in
    `worktree-config.yml`).
@@ -47,11 +64,11 @@ You **MUST** consider the user input before proceeding (if not empty). When invo
 
    - Do NOT pass `--base-ref` unless the user asked for a specific base.
    - If `IN_WORKTREE` is `true`, the session is already inside a feature worktree — reuse it and
-     skip to step 4.
+     skip to step 5.
    - If creation fails, stop and report the error. Do not retry by hand or continue without a
      confirmed result.
 
-4. **Hand back to `/speckit-specify`** with the following values:
+5. **Hand back to `/speckit-specify`** with the following values:
    - `SPECIFY_FEATURE_DIRECTORY = FEATURE_DIRECTORY` (`specs/<NNN>-<short-name>`) — treat as
      explicitly provided so the spec directory, feature number and branch all share one name.
    - The spec and all subsequent Spec Kit artifacts (`plan.md`, `tasks.md`) MUST be written inside
@@ -61,5 +78,5 @@ You **MUST** consider the user input before proceeding (if not empty). When invo
 
 ## Output
 
-Report `BRANCH_NAME`, `WORKTREE_PATH` and `FEATURE_DIRECTORY` in one short block, then continue
-with the calling workflow.
+Report `BRANCH_NAME`, `WORKTREE_PATH`, `FEATURE_DIRECTORY` and the primary checkout's
+`MAIN_COMMIT` and `UPDATED` in one short block, then continue with the calling workflow.
