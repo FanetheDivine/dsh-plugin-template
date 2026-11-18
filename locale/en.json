@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Plugin template",
+    "description": "Demonstrates DSH plugin host tools and front-end wiring: a demo_echo tool, agent event logs, a configuration page in the Plugins panel, and a demo row above the composer."
+  }
+}
