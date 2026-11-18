@@ -1,8 +1,8 @@
 <!--
 Sync Impact Report
-- Version change: 1.6.0 → 1.7.0
+- Version change: 1.7.0 → 1.8.0
 - Modified principles:
-  - I. 宿主契约：新增模板定位与宿主依赖版本规则
+  - I. 宿主契约：入口导出增加宿主约定的 Config
 - Added principles: 无
 - Modified sections: 无
 - Removed sections: 无
@@ -16,14 +16,15 @@ Sync Impact Report
 
 ### I. 宿主契约
 
-- `src/index.ts` MUST 只导出宿主约定的 `name`、`inject`、`apply`。
+- `src/index.ts` MUST 只导出宿主约定的 `name`、`inject`、`apply`、`Config`。
+- `Config` MUST 声明配置 schema，需要热重载的字段用 `.volatile()` 标记。
 - `name` MUST 与 `cordis.patch.yml` 中插件行的 `id` 一致。
 - `inject` MUST 列出 `apply` 用到的全部宿主服务。
 - 宿主类型 MUST 经 `src/types.ts` 以 type-only 方式导入。
 - 本仓库是 DSH 插件的模板，宿主依赖版本 MUST 以 `@deepseek-ai/dsh` 的最新发布为准；`@deepseek-ai/*` 依赖的版本 MUST 与该发布声明的版本一致。
 - `@deepseek-ai/*` 依赖在该发布中没有对应版本时 MUST 从模板移除。
 
-理由：宿主 loader 依靠这三个导出识别和启用插件。模板随宿主发布升级，子包各自维护发布线，统一以 `@deepseek-ai/dsh` 为准可避免版本错位。
+理由：宿主 loader 依靠这些导出识别和启用插件，`Config` 让宿主校验配置并向“插件”面板提供表单。模板随宿主发布升级，子包各自维护发布线，统一以 `@deepseek-ai/dsh` 为准可避免版本错位。
 
 ### II. 依赖归属
 
@@ -170,4 +171,4 @@ Sync Impact Report
   - PATCH：措辞澄清。
 - `/speckit-plan` 的 Constitution Check 与 `/speckit-analyze` MUST 逐条核对本宪章。
 
-**Version**: 1.7.0 | **Ratified**: 2026-11-17 | **Last Amended**: 2026-11-17
+**Version**: 1.8.0 | **Ratified**: 2026-11-17 | **Last Amended**: 2026-11-18

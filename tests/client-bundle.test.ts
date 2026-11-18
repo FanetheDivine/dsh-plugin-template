@@ -64,21 +64,57 @@ describe('前端产物（dist/client.js）', () => {
     const reactStub = {
       Fragment: 'Fragment',
       useState: (value: unknown) => [value, () => undefined],
+      useId: () => ':r0:',
     };
     const jsxStub = () => null;
+    /** 平台组件桩：产物只在 apply 里构造表单模型，不渲染组件。 */
+    const primitivesStub = {
+      SettingsFormModel: class {
+        bind(project: () => unknown) {
+          return { getSnapshot: project, subscribe: () => () => undefined };
+        }
+        shell() {
+          return {
+            available: true,
+            writable: true,
+            dirty: false,
+            invalid: false,
+            saving: false,
+            failed: false,
+          };
+        }
+        field() {
+          return { text: '', overridden: false, invalid: false };
+        }
+        actions() {
+          return {
+            edit: () => undefined,
+            resetField: () => undefined,
+            save: () => undefined,
+            discard: () => undefined,
+          };
+        }
+        dispose() {}
+      },
+      SettingsForm: jsxStub,
+      SettingsValueField: jsxStub,
+      Switch: jsxStub,
+    };
     const exported = registration?.factory((id) => {
       if (id === 'react') return reactStub;
+      if (id === '@deepseek-ai/dsh-client-ui-primitives') return primitivesStub;
       if (id === 'react/jsx-runtime') {
         return { Fragment: 'Fragment', jsx: jsxStub, jsxs: jsxStub };
       }
       throw new Error(`产物请求了平台种子之外的模块：${id}`);
     });
-    expect(exported?.inject).toEqual(['slots', 'locale']);
+    expect(exported?.inject).toEqual(['slots', 'locale', 'configForms']);
 
     if (exported === undefined) throw new Error('产物工厂没有返回导出对象');
     const ctx = makeClientCtx();
     (exported.apply as (target: unknown) => void)(ctx);
-    expect(ctx._slotInjections).toEqual(['conversation.composer.dock']);
+    expect(ctx._slotInjections).toEqual(['conversation.composer.dock', 'plugins.row.config']);
     expect(ctx._slotRegistrations[0]?.options.id).toBe('demo');
+    expect(ctx._slotRegistrations[1]?.options.key).toBe('dsh-plugin-template#dsh-plugin-template');
   });
 });

@@ -30,6 +30,13 @@ pnpm 的 minimum release age 策略会拒绝发布时间过短的包。
 - 前端没有独立页面入口，直接执行 `dist/client.js` 不会渲染。
 - 示例行依赖 `conversation.composer.dock` 槽位；宿主调整 UI 后槽位名或位置可能变化。
 
+## 配置面板
+
+- 只有标记 `.volatile()` 的字段出现在“插件”面板的配置页。
+- 配置被更高层覆盖时，宿主拒绝保存，表单保留草稿并提示未接受。
+- 表单命名空间是插件行在 profile 里的 id；`plugins.row.config` 的键是 `<包名>#<行 id>`。行 id 与包名不同时两处都要改。
+- 配置页依赖 `dsh-client-ui-plugin-manager` 与 `dsh-client-ui-settings` 的客户端包；宿主未加载这两个包时配置页不出现。
+
 ## 严格配置
 
 配置中出现未知键或非法值时，插件加载失败。

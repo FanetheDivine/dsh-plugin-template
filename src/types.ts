@@ -3,7 +3,9 @@
  * 全部为 type-only 导入，编译后不留运行时依赖。
  */
 
-import type { Context, Events } from '@deepseek-ai/cordis';
+import type { Context, Events, Volatile } from '@deepseek-ai/cordis';
+// Type-only：拉取 loader/volatile-update 事件声明。
+import type {} from '@deepseek-ai/cordis-plugin-loader';
 import type { Agent } from '@deepseek-ai/dsh-agent';
 import type { ToolDefinition, ToolRunContext } from '@deepseek-ai/dsh-tools';
 
@@ -11,4 +13,4 @@ import type { ToolDefinition, ToolRunContext } from '@deepseek-ai/dsh-tools';
 export type { PluginConfig } from './config.ts';
 
 /** 宿主类型。插件内统一从这里导入。 */
-export type { Agent, Context, Events, ToolDefinition, ToolRunContext };
+export type { Agent, Context, Events, ToolDefinition, ToolRunContext, Volatile };
