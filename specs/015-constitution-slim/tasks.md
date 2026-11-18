@@ -18,13 +18,13 @@
 
 **Independent Test**: 按 [quickstart.md](./quickstart.md) 第 1 步核对原则列表与版本。
 
-- [ ] T002 [US1] 经 `/speckit-constitution` 重写 `.specify/memory/constitution.md`：
+- [X] T002 [US1] 经 `/speckit-constitution` 重写 `.specify/memory/constitution.md`：
   - 原则依次为 I 宿主依赖版本、II 测试同步（不可协商）、III 文档结构、IV 质量门禁、V 公开引用。
   - 原则 II–V 的条款与原原则 IV、V、VI、VIII 一致。
   - 原则 I 写明 [research.md](./research.md) R1 的三条规则与理由，不含「最新发布」与「无对应版本时移除」。
   - Governance 保持现状。
   - 版本 `2.0.0`，Ratified `2026-11-17`，Last Amended `2026-11-18`，更新 Sync Impact Report。
-- [ ] T003 [US1] 运行 `pnpm format && pnpm check`，提交
+- [X] T003 [US1] 运行 `pnpm format && pnpm check`，提交
 
 **Checkpoint**: 宪章 2.0.0 生效；其他文档中的编号引用在 Phase 4 同步。
 
