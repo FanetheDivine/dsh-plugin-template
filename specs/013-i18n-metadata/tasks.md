@@ -25,7 +25,7 @@
 
 **Independent Test**: 按 `docs/i18n.md` 新增一种语言的元数据与字典，`pnpm check` 通过。
 
-- [ ] T007 [US2] 新增 `docs/i18n.md`：元数据资源（文件位置、`meta` 字段、回退链、`meta.detail` 规则）、前端字典（命名空间注册、基线 `zh` 与 `en`、槽位 `locale` 选项、`t` 座）、新增语言的步骤、占位符与禁用字符、打包声明、校验命令
+- [ ] T007 [US2] 新增 `docs/i18n.md`：元数据资源（文件位置、`meta` 字段、回退链、`meta.detail` 规则）、前端字典（命名空间注册、槽位 `locale` 选项、`t` 座）、新增语言的步骤、打包声明、校验命令；约束条目指向宪章原则 IX
 - [ ] T008 [P] [US2] 更新 `AGENTS.md` 文档索引，增加 `docs/i18n.md` 一行
 - [ ] T009 [P] [US2] 更新 `README.md`：说明插件标题与描述随宿主语言切换，中英文各一份
 - [ ] T010 [US2] 检查 `docs/how-it-works.md` 与 `docs/development.md`，只补指向 `docs/i18n.md` 的链接，不复制规则；运行 `pnpm format && pnpm check`，提交阶段 2
