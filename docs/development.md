@@ -53,13 +53,15 @@
 | 命令 | 作用 |
 | --- | --- |
 | `pnpm dev` | 监听并构建 |
-| `pnpm build` | 打包并生成类型声明 |
-| `pnpm check` | 依次运行类型检查、lint、测试和构建 |
+| `pnpm build` | 打包、生成类型声明并运行 `test:dist` |
+| `pnpm check` | 依次运行类型检查、lint 和 `test:code` |
 | `pnpm typecheck` | 类型检查 |
 | `pnpm lint` | biome 检查 |
 | `pnpm lint:fix` | biome 检查并自动修复 |
 | `pnpm format` | biome 格式化 |
-| `pnpm test` | 运行 vitest |
+| `pnpm test` | 运行全部 vitest project |
+| `pnpm test:code` | 只运行源码测试 |
+| `pnpm test:dist` | 只运行产物测试，要求 `dist` 新鲜 |
 | `pnpm run release` | 检查并发布新版本 |
 
 ## CI
@@ -71,6 +73,7 @@
 | `check` | PR、打 tag | Node 24 上运行 `pnpm run full-check` |
 | `publish` | 默认禁用 | 打 tag 时发布 npm，用 OIDC 换取发布令牌 |
 
+- `full-check` 依次运行 `check` 与 `build`：`check` 不读取 `dist`，产物测试在 `build` 末尾执行。
 - `publish` 由 `if: false` 禁用，原触发条件以注释保留；`pnpm run release` 推送的 tag 不会在 npm 产生新版本。
 - 模板转化时解禁，步骤见[宪章](../.specify/memory/constitution.md)原则 VII。
 
@@ -82,13 +85,16 @@
 | `tests/config-form.test.ts` | 配置页草稿、空白前缀拒绝、保存、恢复默认与放弃 |
 | `tests/release-archive.test.mjs` | CHANGELOG 归档计划 |
 | `tests/client.test.ts` | 前端服务声明、字典与槽位注册、示例行与配置页渲染 |
-| `tests/client-bundle.test.ts` | `dist/client.js` 的注册契约与导出 |
-| `tests/package-pack.test.ts` | npm 包只含发布所需文件，含前端产物 |
+| `tests/client-bundle.test.ts` | `dist/client.js` 的注册契约与导出（产物测试） |
+| `tests/package-pack.test.ts` | npm 包只含发布所需文件，含前端产物（产物测试） |
+| `tests/dist-freshness.test.ts` | 产物新鲜度判定的三种状态 |
 | `tests/worktree-extension.test.ts` | worktree 扩展的创建、复用与清理 |
 | `tests/helpers.ts` | 模拟宿主与客户端 `ctx`，记录注册、事件监听与日志 |
 | `tests/support/primitives.ts` | 把平台组件包解析到源码，避开已发布产物内联的依赖 |
 
 测试要求见[宪章](../.specify/memory/constitution.md)原则 IV。
+
+vitest 拆成 `code` 与 `dist` 两个 project。产物测试读取 `dist`，由 `build` 末尾的 `test:dist` 执行；`test:code` 不读取 `dist`。产物缺失或早于构建输入时，产物测试失败并提示运行 `pnpm build`。
 
 浏览器用例由仓库内的 `playwright` 驱动无头 Chrome。`vitest.config.ts` 把 `@deepseek-ai/dsh-client-ui-primitives` 指向包的源码：已发布的 `lib` 内联了 shiki、katex 等未声明的依赖，源码只依赖 react、clsx 与 `dsh-client-store`。
 

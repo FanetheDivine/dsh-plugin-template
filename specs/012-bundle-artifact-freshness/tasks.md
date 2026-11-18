@@ -70,11 +70,11 @@
 
 **Purpose**: 文档、CI 描述与 CHANGELOG 对齐新脚本。
 
-- [ ] T010 [P] 更新 `docs/development.md`：命令表增加 `test:code`、`test:dist`，修正 `check` 与 `build` 说明；测试节说明两个 project 与产物测试的新鲜度要求；CI 节说明 `full-check` 中 `test:dist` 随 `build` 执行
-- [ ] T011 [P] 更新 `.github/workflows/ci.yml` 的 `check` job 名称，体现 `test:code` 与产物测试随构建执行
-- [ ] T012 更新 `CHANGELOG.md` 的 Unreleased 节，记录脚本拆分与产物过期行为
-- [ ] T013 运行 `pnpm format && pnpm check && pnpm build`，再按 `quickstart.md` 逐条验证
-- [ ] T014 按宪法原则 VIII 检查新增与修改的跟踪文件只引用仓库内路径与公网 URL
+- [X] T010 [P] 更新 `docs/development.md`：命令表增加 `test:code`、`test:dist`，修正 `check` 与 `build` 说明；测试节说明两个 project 与产物测试的新鲜度要求；CI 节说明 `full-check` 中 `test:dist` 随 `build` 执行
+- [X] T011 [P] 更新 `.github/workflows/ci.yml` 的 `check` job 名称，体现 `test:code` 与产物测试随构建执行
+- [X] T012 更新 `CHANGELOG.md` 的 Unreleased 节，记录脚本拆分与产物过期行为
+- [X] T013 运行 `pnpm format && pnpm check && pnpm build`，再按 `quickstart.md` 逐条验证
+- [X] T014 按宪法原则 VIII 检查新增与修改的跟踪文件只引用仓库内路径与公网 URL
 
 ---
 
