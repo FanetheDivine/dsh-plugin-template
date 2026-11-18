@@ -20,11 +20,13 @@
     "./client": {
       "types": "./dist/client/index.d.ts",
       "default": "./dist/client.js"
-    }
+    },
+    "./locale/*.json": "./locale/*.json"
   },
   "files": [
     "dist",
     "cordis.patch.yml",
+    "locale/*.json",
     "README.md"
   ],
   "dsh": {

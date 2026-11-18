@@ -1,10 +1,9 @@
 <!--
 Sync Impact Report
-- Version change: 1.7.0 → 1.8.0
-- Modified principles:
-  - I. 宿主契约：入口导出增加宿主约定的 Config
-- Added principles: 无
-- Modified sections: 无
+- Version change: 1.8.0 → 1.9.0
+- Modified principles: 无
+- Added principles: IX. 国际化
+- Added sections: 无
 - Removed sections: 无
 - Templates requiring updates: 无，plan、spec、tasks 模板在运行时读取本文件
 - Follow-up TODOs: 无
@@ -147,6 +146,21 @@ Sync Impact Report
 
 理由：其他用户克隆仓库后，每个链接、路径与依赖都必须能在其环境中解析。
 
+### IX. 国际化
+
+- 用户可见文案 MUST 经前端字典或元数据资源提供：
+  - 前端字典：`src/client/locales.ts`，由 `ctx.locale.register` 注册。
+  - 元数据资源：`locale/<语言 id>.json` 的 `meta`。
+- 前端字典 MUST 同时提供 `zh` 与 `en`，两份键集 MUST 一致。
+- `meta.title` 与 `meta.description` MUST 为每种基线语言各写一份，各文件的 `meta` 键集 MUST 一致。
+- 元数据资源 MUST 在 `package.json` 的 `exports` 与 `files` 中声明。
+- 译文 MUST 保留占位符、斜杠命令与 API 字段名的原文。
+- locale 资源 MUST 不含零宽空格 U+200B 与 BOM U+FEFF。
+- 文案与元数据的变更 MUST 由测试覆盖结构、键集与打包内容。
+- 国际化规范 MUST 归属 `docs/i18n.md`。
+
+理由：宿主按语言回退链读取这两处资源。缺一份基线语言或漏掉打包声明时，用户看到英文包名或键名。规范单归属一处，作者能一次查全。
+
 ## Governance
 
 优先级从高到低：
@@ -171,4 +185,4 @@ Sync Impact Report
   - PATCH：措辞澄清。
 - `/speckit-plan` 的 Constitution Check 与 `/speckit-analyze` MUST 逐条核对本宪章。
 
-**Version**: 1.8.0 | **Ratified**: 2026-11-17 | **Last Amended**: 2026-11-18
+**Version**: 1.9.0 | **Ratified**: 2026-11-17 | **Last Amended**: 2026-11-18

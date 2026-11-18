@@ -11,6 +11,7 @@ DSH 插件模板，用 TypeScript 开发，用 tsdown 构建，用 biome 检查�
 - [how-it-works.md](./docs/how-it-works.md)：插件的构造方式与运行流程。
 - [known-risks.md](./docs/known-risks.md)：已知风险与宿主限制。
 - [development.md](./docs/development.md)：本地开发、命令、测试、Spec Kit 命令一览、worktree 扩展维护与文件地图。
+- [i18n.md](./docs/i18n.md)：插件元数据与前端字典的国际化规范。
 
 # 开发流程
 

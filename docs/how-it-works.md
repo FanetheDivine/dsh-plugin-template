@@ -150,6 +150,7 @@ window.__ModuleLoader__.load({
 - 注册参数含 `id`、`order` 与 `locale`；`locale` 让宿主生成绑定命名空间的 `t` 座。
 - 语言切换时宿主重建 `t` 座，界面文案随之更新。
 - 文案键由 `LocaleNamespaceMap` 合并约束，中文字典是键集事实源。
+- 元数据与字典的完整规范见 [i18n.md](./i18n.md)。
 
 ### 样式
 
@@ -167,7 +168,7 @@ window.__ModuleLoader__.load({
 
 ## 打包与发布
 
-- `files` 决定 npm 包内容：`dist`、`cordis.patch.yml`、`README.md`。
+- `files` 决定 npm 包内容：`dist`、`cordis.patch.yml`、`locale/*.json`、`README.md`。
 - `pnpm run release` 的步骤：
   1. 运行 `pnpm check` 与 `pnpm format`。
   2. `npm version patch` 升级版本并打 tag。
