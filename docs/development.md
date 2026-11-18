@@ -89,6 +89,7 @@
 | `tests/client-bundle.test.ts` | `dist/client.js` 的注册契约与导出（产物测试） |
 | `tests/package-pack.test.ts` | npm 包只含发布所需文件，含前端产物与元数据资源（产物测试） |
 | `tests/metadata.test.ts` | 插件元数据的结构、键集、禁用字符与清单声明 |
+| `tests/dependency-versions.test.ts` | `dsh-*` 依赖版本一致，并以同版本列入 `minimumReleaseAgeExclude` |
 | `tests/dist-freshness.test.ts` | 产物新鲜度判定的三种状态 |
 | `tests/worktree-extension.test.ts` | worktree 扩展的创建、复用与清理 |
 | `tests/helpers.ts` | 模拟宿主与客户端 `ctx`，记录注册、事件监听与日志 |

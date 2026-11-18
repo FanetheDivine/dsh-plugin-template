@@ -36,14 +36,14 @@
 
 **Independent Test**: `pnpm vitest run tests/dependency-versions.test.ts` 通过；改动任一 `dsh-*` 版本后失败。
 
-- [ ] T004 [US2] 新增 `tests/dependency-versions.test.ts`，按 research R5 校验：
+- [X] T004 [US2] 新增 `tests/dependency-versions.test.ts`，按 research R5 校验：
   - `package.json` 全部 `@deepseek-ai/dsh-*` 依赖为同一确切版本，不含范围符号。
   - 每个 `dsh-*` 依赖在 `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude` 中有 `<包名>@<版本>` 条目。
   - `minimumReleaseAgeExclude` 中的 `@deepseek-ai/dsh-*` 条目都对应一个依赖。
   - 文件顶部用一两句话说明职责。
-- [ ] T005 [US2] 临时修改一个 `dsh-*` 版本，确认测试失败后恢复
-- [ ] T006 [US2] 在 `docs/development.md` 测试表加入 `tests/dependency-versions.test.ts`
-- [ ] T007 [US2] 运行 `pnpm format && pnpm check`，提交
+- [X] T005 [US2] 临时修改一个 `dsh-*` 版本，确认测试失败后恢复
+- [X] T006 [US2] 在 `docs/development.md` 测试表加入 `tests/dependency-versions.test.ts`
+- [X] T007 [US2] 运行 `pnpm format && pnpm check`，提交
 
 ---
 
