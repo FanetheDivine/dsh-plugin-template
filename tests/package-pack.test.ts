@@ -1,6 +1,7 @@
 // package.json 打包回归测试：npm pack --dry-run 断言 tarball 只含发布所需文件。
 // files 字段（package.json）决定分发内容：dist + cordis.patch.yml + locale/*.json + README.md；
 // src / tests / scripts 等开发文件不得进包。产物由 build 生成，过期时测试失败。
+// 报告解析见 tests/support/pack-report.ts：npm 11 输出数组，npm 12 输出以包名为键的对象。
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -8,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import { assertFreshDist } from './support/dist-freshness.ts';
+import { packedFilePaths } from './support/pack-report.ts';
 
 /** 仓库根目录（tests/ 的上一级）。 */
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -29,11 +31,9 @@ function packedPaths(): Set<string> {
   if (res.status !== 0) {
     throw new Error(`npm pack --dry-run 失败：${String(res.stderr ?? res.stdout ?? '未知错误')}`);
   }
-  // npm pack --json 输出数组（单个包 = 单元素数组），取所有包的文件列表
-  const report = JSON.parse(String(res.stdout ?? '[]')) as Array<{
-    files?: Array<{ path: string }>;
-  }>;
-  cachedPaths = new Set(report.flatMap((p) => p.files ?? []).map((f) => f.path));
+  // npm pack --json 的两种形状（数组、以包名为键的对象）都由 packedFilePaths 归一
+  const report: unknown = JSON.parse(String(res.stdout ?? '[]'));
+  cachedPaths = new Set(packedFilePaths(report));
   return cachedPaths;
 }
 
