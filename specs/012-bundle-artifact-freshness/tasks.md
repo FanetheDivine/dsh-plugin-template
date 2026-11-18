@@ -39,13 +39,13 @@
 
 ### Tests for User Story 1
 
-- [ ] T004 [P] [US1] 在 `tests/client-bundle.test.ts` 删除 `ensureBuild()` 与缺失判断，改为读取产物前调用 `assertFreshDist()`，保留现有断言
+- [X] T004 [P] [US1] 在 `tests/client-bundle.test.ts` 删除 `ensureBuild()` 与缺失判断，改为读取产物前调用 `assertFreshDist()`，保留现有断言
 
 ### Implementation for User Story 1
 
-- [ ] T005 [P] [US1] 在 `vitest.config.ts` 用 `test.projects` 声明 `code`（排除两个产物测试）与 `dist`（只含 `tests/client-bundle.test.ts` 与 `tests/package-pack.test.ts`）两个 project，均 `extends: true`
-- [ ] T006 [US1] 在 `package.json` 增加 `test:code`（`vitest run --project code`）、`test:dist`（`vitest run --project dist`），`test` 保持 `vitest run`，`check` 末项改为 `test:code`，`build` 末尾追加 `&& pnpm run test:dist`
-- [ ] T007 [US1] 运行验证：删除 `dist` 后 `pnpm test:code` 通过、`pnpm test:dist` 失败并含 `pnpm build`；`pnpm build` 一次通过；`touch src/client/index.ts` 后 `pnpm test:dist` 报告过期；恢复后 `pnpm check` 在无 `dist` 时通过
+- [X] T005 [P] [US1] 在 `vitest.config.ts` 用 `test.projects` 声明 `code`（排除两个产物测试）与 `dist`（只含 `tests/client-bundle.test.ts` 与 `tests/package-pack.test.ts`）两个 project，均 `extends: true`
+- [X] T006 [US1] 在 `package.json` 增加 `test:code`（`vitest run --project code`）、`test:dist`（`vitest run --project dist`），`test` 保持 `vitest run`，`check` 末项改为 `test:code`，`build` 末尾追加 `&& pnpm run test:dist`
+- [X] T007 [US1] 运行验证：删除 `dist` 后 `pnpm test:code` 通过、`pnpm test:dist` 失败并含 `pnpm build`；`pnpm build` 一次通过；`touch src/client/index.ts` 后 `pnpm test:dist` 报告过期；恢复后 `pnpm check` 在无 `dist` 时通过
 
 **Checkpoint**: US1 完成，`build` 与 `check` 各自可独立验证
 
