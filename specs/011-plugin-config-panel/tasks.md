@@ -8,8 +8,8 @@
 
 ## Phase 1: Setup（宪章与依赖）
 
-- [ ] T001 用 `/speckit-constitution` 把 `.specify/memory/constitution.md` 原则 I 修订为入口导出 `name`、`inject`、`apply`、`Config`，版本 1.7.0 → 1.8.0，同步更新 `docs/how-it-works.md` 中“入口契约”表的引用
-- [ ] T002 把 `@deepseek-ai/dsh-client-ui-plugin-manager@0.2.2-rc.3`、`@deepseek-ai/dsh-client-ui-settings@0.2.2-rc.3`、`@deepseek-ai/dsh-client-ui-primitives@0.2.2-rc.3` 加入 `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude`，确认 `package.json` 的 `devDependencies` 已含 `@deepseek-ai/schemastery`、`@deepseek-ai/cordis-plugin-loader`
+- [x] T001 用 `/speckit-constitution` 把 `.specify/memory/constitution.md` 原则 I 修订为入口导出 `name`、`inject`、`apply`、`Config`，版本 1.7.0 → 1.8.0，同步更新 `docs/how-it-works.md` 中“入口契约”表的引用
+- [x] T002 把 `@deepseek-ai/dsh-client-ui-plugin-manager@0.2.2-rc.3`、`@deepseek-ai/dsh-client-ui-settings@0.2.2-rc.3`、`@deepseek-ai/dsh-client-ui-primitives@0.2.2-rc.3` 加入 `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude`，确认 `package.json` 的 `devDependencies` 已含 `@deepseek-ai/schemastery`、`@deepseek-ai/cordis-plugin-loader`
 
 ## Phase 2: US2 配置热重载（宿主机侧，P1）
 

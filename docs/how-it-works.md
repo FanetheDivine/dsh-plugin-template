@@ -13,13 +13,14 @@ DSH 插件是一个 npm 包。宿主按约定的入口加载它。
 
 ## 入口契约
 
-宿主 loader 只识别 `src/index.ts` 导出的三个符号。
+宿主 loader 只识别 `src/index.ts` 导出的四个符号。
 
 | 导出 | 含义 |
 | --- | --- |
 | `name` | 插件标识，与 `cordis.patch.yml` 的 `id` 一致 |
 | `inject` | 需要宿主注入的服务，例如 `tools`、`llm`、`sessions` |
 | `apply(ctx, config)` | 插件启用时调用，`config` 来自插件行的 `config` 字段 |
+| `Config` | 配置 schema，宿主据此校验配置并提供热重载与面板表单 |
 
 ```ts
 export const name = 'dsh-plugin-template';
