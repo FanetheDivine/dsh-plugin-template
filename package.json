@@ -51,8 +51,8 @@
   },
   "scripts": {
     "dev": "tsdown --watch",
-    "build": "tsdown && tsc -p tsconfig.build.json && pnpm run test:dist",
-    "check": "pnpm run typecheck && pnpm run lint && pnpm run test:code",
+    "build": "tsdown && tsc -p tsconfig.build.json && pnpm run test:dist --reporter=minimal --silent=passed-only",
+    "check": "pnpm run typecheck && pnpm run lint --diagnostic-level=error && pnpm run test:code --reporter=minimal --silent=passed-only",
     "full-check": "pnpm run check && pnpm run build",
     "release": "pnpm check && pnpm format && npm version patch && node scripts/release-archive.mjs && git push && git push --tags",
     "typecheck": "tsc --noEmit",
