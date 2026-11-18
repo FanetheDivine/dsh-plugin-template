@@ -9,7 +9,7 @@
 
 ### Changed
 
-- 测试脚本拆分为 `test:code` 与 `test:dist`；`pnpm check` 只运行源码测试
+- 测试脚本拆分为 `test:code` 与 `test:dist`，移除 `test`；`pnpm check` 只运行源码测试
 - `pnpm build` 在生成产物与类型声明后运行 `test:dist`
 - 产物缺失或过期时产物测试失败，提示运行 `pnpm build`
 - `src/config.ts` 导出 `Config` schema，`demoEnabled` 与 `prefix` 标记 `.volatile()`

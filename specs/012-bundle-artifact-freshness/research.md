@@ -50,13 +50,12 @@
 
 | 脚本 | 内容 |
 | --- | --- |
-| `test` | `vitest run`（两个 project） |
 | `test:code` | `vitest run --project code` |
 | `test:dist` | `vitest run --project dist` |
 | `check` | `typecheck && lint && test:code` |
 | `build` | `tsdown && tsc -p tsconfig.build.json && test:dist` |
 
-`full-check` 保持 `check && build`，CI 不变。
+不保留 `test` 脚本：代码质量入口是 `pnpm check`，产物验证随 `pnpm build`。`full-check` 保持 `check && build`，CI 不变。
 
 **Rationale**: `build` 末尾验证刚生成的产物；`check` 在没有 `dist` 的干净检出上也能通过；`test` 保留一次性跑完的入口。
 

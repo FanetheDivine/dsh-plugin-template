@@ -44,7 +44,7 @@
 ### Implementation for User Story 1
 
 - [X] T005 [P] [US1] 在 `vitest.config.ts` 用 `test.projects` 声明 `code`（排除两个产物测试）与 `dist`（只含 `tests/client-bundle.test.ts` 与 `tests/package-pack.test.ts`）两个 project，均 `extends: true`
-- [X] T006 [US1] 在 `package.json` 增加 `test:code`（`vitest run --project code`）、`test:dist`（`vitest run --project dist`），`test` 保持 `vitest run`，`check` 末项改为 `test:code`，`build` 末尾追加 `&& pnpm run test:dist`
+- [X] T006 [US1] 在 `package.json` 增加 `test:code`（`vitest run --project code`）、`test:dist`（`vitest run --project dist`），`check` 末项改为 `test:code`，`build` 末尾追加 `&& pnpm run test:dist`
 - [X] T007 [US1] 运行验证：删除 `dist` 后 `pnpm test:code` 通过、`pnpm test:dist` 失败并含 `pnpm build`；`pnpm build` 一次通过；`touch src/client/index.ts` 后 `pnpm test:dist` 报告过期；恢复后 `pnpm check` 在无 `dist` 时通过
 
 **Checkpoint**: US1 完成，`build` 与 `check` 各自可独立验证
@@ -70,11 +70,12 @@
 
 **Purpose**: 文档、CI 描述与 CHANGELOG 对齐新脚本。
 
-- [X] T010 [P] 更新 `docs/development.md`：命令表增加 `test:code`、`test:dist`，修正 `check` 与 `build` 说明；测试节说明两个 project 与产物测试的新鲜度要求；CI 节说明 `full-check` 中 `test:dist` 随 `build` 执行
+- [X] T010 [P] 更新 `docs/development.md`：命令表增加 `test:code`、`test:dist`，移除 `test`，修正 `check` 与 `build` 说明；测试节说明两个 project 与产物测试的新鲜度要求；CI 节说明 `full-check` 中 `test:dist` 随 `build` 执行
 - [X] T011 [P] 更新 `.github/workflows/ci.yml` 的 `check` job 名称，体现 `test:code` 与产物测试随构建执行
 - [X] T012 更新 `CHANGELOG.md` 的 Unreleased 节，记录脚本拆分与产物过期行为
 - [X] T013 运行 `pnpm format && pnpm check && pnpm build`，再按 `quickstart.md` 逐条验证
 - [X] T014 按宪法原则 VIII 检查新增与修改的跟踪文件只引用仓库内路径与公网 URL
+- [X] T015 移除 `package.json` 的 `test` 脚本，代码质量入口只保留 `pnpm check`
 
 ---
 

@@ -54,7 +54,6 @@
     "full-check": "pnpm run check && pnpm run build",
     "release": "pnpm check && pnpm format && npm version patch && node scripts/release-archive.mjs && git push && git push --tags",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
     "test:code": "vitest run --project code",
     "test:dist": "vitest run --project dist",
     "build:types": "tsc -p tsconfig.build.json",

@@ -59,10 +59,11 @@
 | `pnpm lint` | biome 检查 |
 | `pnpm lint:fix` | biome 检查并自动修复 |
 | `pnpm format` | biome 格式化 |
-| `pnpm test` | 运行全部 vitest project |
 | `pnpm test:code` | 只运行源码测试 |
 | `pnpm test:dist` | 只运行产物测试，要求 `dist` 新鲜 |
 | `pnpm run release` | 检查并发布新版本 |
+
+代码质量门禁是 `pnpm check`；`test:code` 与 `test:dist` 用于局部验证。
 
 ## CI
 
