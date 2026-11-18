@@ -57,10 +57,10 @@
 
 **Independent Test**: 只读 `docs/development.md` 的 CI 节，能回答 npm 从哪来、下限是多少。
 
-- [ ] T008 [US3] 修改 `docs/development.md`：
+- [X] T008 [US3] 修改 `docs/development.md`：
   - CI 节的 `publish` 行补充 npm 由 Node 24 自带、OIDC 下限 11.5.1。
   - 测试表加入 `tests/pack-report.test.ts` 一行，说明覆盖打包报告的两种形状。
-- [ ] T009 [US3] 运行 `pnpm format && pnpm check`，提交
+- [X] T009 [US3] 运行 `pnpm format && pnpm check`，提交
 
 **Checkpoint**: 文档能独立回答 npm 版本来源。
 

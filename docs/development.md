@@ -75,6 +75,7 @@
 | `publish` | 默认禁用 | 打 tag 时发布 npm，用 OIDC 换取发布令牌 |
 
 - `full-check` 依次运行 `check` 与 `build`：`check` 不读取 `dist`，产物测试在 `build` 末尾执行。
+- `publish` 用 Node 24 自带的 npm 发布：Trusted Publishing（OIDC）要求 npm ≥ 11.5.1，Node 24 的安装包已满足，工作流不单独安装 npm。
 - `publish` 由 `if: false` 禁用，原触发条件以注释保留；`pnpm run release` 推送的 tag 不会在 npm 产生新版本。
 - 模板转化时解禁，步骤见 [template-conversion.md](./template-conversion.md)。
 
@@ -88,6 +89,7 @@
 | `tests/client.test.ts` | 前端服务声明、字典与槽位注册、示例行与配置页渲染 |
 | `tests/client-bundle.test.ts` | `dist/client.js` 的注册契约与导出（产物测试） |
 | `tests/package-pack.test.ts` | npm 包只含发布所需文件，含前端产物与元数据资源（产物测试） |
+| `tests/pack-report.test.ts` | `npm pack --json` 的数组与对象两种报告形状都能解析 |
 | `tests/metadata.test.ts` | 插件元数据的结构、键集、禁用字符与清单声明 |
 | `tests/dependency-versions.test.ts` | `dsh-*` 依赖版本一致，并以同版本列入 `minimumReleaseAgeExclude` |
 | `tests/dist-freshness.test.ts` | 产物新鲜度判定的三种状态 |
