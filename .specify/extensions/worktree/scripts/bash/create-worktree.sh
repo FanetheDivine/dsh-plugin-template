@@ -116,7 +116,9 @@ fi
 if $FETCH; then
   remote="${BASE_REF%%/*}"
   if [[ "$remote" != "$BASE_REF" ]] && git remote | grep -qx "$remote"; then
-    git fetch --quiet "$remote" "${BASE_REF#*/}" >&2 || die "git fetch $remote ${BASE_REF#*/} failed"
+    # All heads, not just the base ref: another developer's claimed spec lives
+    # on a feature branch and only the refreshed refs make its number visible.
+    git fetch --quiet --prune "$remote" >&2 || die "git fetch $remote failed"
   fi
 fi
 

@@ -96,14 +96,14 @@
 
 **Independent Test**: 按 [quickstart.md](./quickstart.md) 场景 2 核对。
 
-- [ ] T014 [US3] 修改 `.specify/extensions/worktree/scripts/bash/create-worktree.sh`：
+- [X] T014 [US3] 修改 `.specify/extensions/worktree/scripts/bash/create-worktree.sh`：
   - 算号前执行 `git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'`。
   - `--no-fetch` 跳过该步，仍占号并校验。
   - base ref 不含远程前缀时跳过该步，沿用现有错误路径。
-- [ ] T015 [P] [US3] 在 `tests/worktree-extension.test.ts` 新增用例：
+- [X] T015 [P] [US3] 在 `tests/worktree-extension.test.ts` 新增用例：
   - 另一克隆推送 `fix/002-other` 后本仓库不 fetch，创建结果编号为 003。
   - `--no-fetch` 时新编号基于本地可见状态，并仍完成占号。
-- [ ] T016 [US3] 运行 `pnpm format && pnpm check`，提交
+- [X] T016 [US3] 运行 `pnpm format && pnpm check`，提交
 
 **Checkpoint**: 别人已推送、本机未 fetch 时编号仍然避让。
 

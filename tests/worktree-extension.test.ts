@@ -251,6 +251,24 @@ describe('worktree 扩展脚本', { timeout: 30_000 }, () => {
     expect(res.stdout).toContain('specs/002-other');
   });
 
+  it('算号前同步远程分支，未 fetch 的占号分支被避让', () => {
+    const dev2 = secondClone(base);
+    pushBranch(dev2, 'fix/002-other');
+    const out = json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'fresh'));
+    expect(out.FEATURE_NUM).toBe('003');
+    expect(remoteBranches(repo)).toContain('fix/002-other');
+    expect(remoteBranches(repo)).toContain('feat/003-fresh');
+  });
+
+  it('--no-fetch 跳过同步时仍完成占号', () => {
+    const out = json(
+      script(repo, 'create-worktree.sh', '--json', '--no-fetch', '--short-name', 'no-fetch'),
+    );
+    expect(out.FEATURE_NUM).toBe('002');
+    expect(out.CLAIMED).toBe(true);
+    expect(remoteBranches(repo)).toContain('feat/002-no-fetch');
+  });
+
   it('已在 feature worktree 内运行时复用当前 worktree', () => {
     json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'reuse-me'));
     const wt = path.join(repo, 'worktrees', '002-reuse-me');
