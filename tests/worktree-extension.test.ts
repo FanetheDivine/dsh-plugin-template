@@ -47,6 +47,29 @@ function mergeIntoMain(cwd: string, branch: string): void {
   git(cwd, 'push', '--quiet', 'origin', 'main');
 }
 
+/** 在临时 origin 旁再建一个克隆，模拟第二名开发者。 */
+function secondClone(base: string): string {
+  const clone = path.join(base, 'dev2');
+  git(base, 'clone', '--quiet', path.join(base, 'origin.git'), clone);
+  return clone;
+}
+
+/** 在克隆中从 main 建分支并推送，然后回到 main。 */
+function pushBranch(clone: string, branch: string): void {
+  git(clone, 'checkout', '--quiet', '-B', branch, 'main');
+  git(clone, 'push', '--quiet', 'origin', branch);
+  git(clone, 'checkout', '--quiet', 'main');
+}
+
+/** 远程分支名列表，去掉 refs/heads/ 前缀。 */
+function remoteBranches(cwd: string): string[] {
+  return git(cwd, 'ls-remote', '--heads', 'origin')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => line.split('\t')[1]?.replace('refs/heads/', '') ?? '');
+}
+
 function json(res: RunResult): Record<string, string | boolean> {
   if (res.status !== 0) throw new Error(`脚本失败：${res.stderr}`);
   return JSON.parse(res.stdout.trim().split('\n').pop() ?? '{}');
@@ -116,6 +139,134 @@ describe('worktree 扩展脚本', { timeout: 30_000 }, () => {
     expect(out.BRANCH_NAME).toBe('feat/008-next');
     expect(out.CREATED).toBe(false);
     expect(existsSync(path.join(repo, 'worktrees', '008-next'))).toBe(false);
+  });
+
+  it('创建时推送占号分支，CLAIMED 为 true', () => {
+    const out = json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'claimed'));
+    expect(out.CLAIMED).toBe(true);
+    expect(remoteBranches(repo)).toContain('feat/002-claimed');
+  });
+
+  it('--dry-run 不占号也不创建 worktree', () => {
+    const out = json(
+      script(repo, 'create-worktree.sh', '--json', '--dry-run', '--short-name', 'dry'),
+    );
+    expect(out.CLAIMED).toBe(false);
+    expect(out.CREATED).toBe(false);
+    expect(remoteBranches(repo)).not.toContain('feat/002-dry');
+    expect(existsSync(path.join(repo, 'worktrees', '002-dry'))).toBe(false);
+  });
+
+  it('占号推送失败时中止且不留下分支与 worktree', () => {
+    git(repo, 'remote', 'set-url', 'origin', path.join(base, 'missing.git'));
+    const res = script(
+      repo,
+      'create-worktree.sh',
+      '--json',
+      '--no-fetch',
+      '--short-name',
+      'offline',
+    );
+    expect(res.status).not.toBe(0);
+    expect(res.stderr).toContain('failed to push claim branch');
+    expect(git(repo, 'branch', '--list', 'feat/002-offline')).toBe('');
+    expect(existsSync(path.join(repo, 'worktrees', '002-offline'))).toBe(false);
+  });
+
+  it('同号冲突时字典序靠后的分支自动改号', () => {
+    const dev2 = secondClone(base);
+    pushBranch(dev2, 'fix/002-alpha');
+    const out = json(
+      script(
+        repo,
+        'create-worktree.sh',
+        '--json',
+        '--no-fetch',
+        '--type',
+        'fix',
+        '--short-name',
+        'zeta',
+      ),
+    );
+    expect(out.FEATURE_NUM).toBe('003');
+    expect(out.CLAIMED).toBe(true);
+    const branches = remoteBranches(repo);
+    expect(branches).toContain('fix/002-alpha');
+    expect(branches).toContain('fix/003-zeta');
+    expect(branches).not.toContain('fix/002-zeta');
+  });
+
+  it('同号冲突时字典序靠前的分支保留编号', () => {
+    const dev2 = secondClone(base);
+    pushBranch(dev2, 'fix/002-beta');
+    const out = json(
+      script(
+        repo,
+        'create-worktree.sh',
+        '--json',
+        '--no-fetch',
+        '--type',
+        'fix',
+        '--short-name',
+        'alpha',
+      ),
+    );
+    expect(out.FEATURE_NUM).toBe('002');
+    expect(out.BRANCH_NAME).toBe('fix/002-alpha');
+    expect(remoteBranches(repo)).toContain('fix/002-beta');
+  });
+
+  it('check-spec-number：编号唯一时退出 0', () => {
+    json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'unique'));
+    const wt = path.join(repo, 'worktrees', '002-unique');
+    const out = json(script(wt, 'check-spec-number.sh', '--json'));
+    expect(out.UNIQUE).toBe(true);
+    expect(out.FEATURE_NUM).toBe('002');
+  });
+
+  it('check-spec-number：同号分支时退出 4', () => {
+    json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'conflict'));
+    const wt = path.join(repo, 'worktrees', '002-conflict');
+    const dev2 = secondClone(base);
+    pushBranch(dev2, 'fix/002-alpha');
+    const res = script(wt, 'check-spec-number.sh', '--json');
+    expect(res.status).toBe(4);
+    const out = JSON.parse(res.stdout.trim());
+    expect(out.UNIQUE).toBe(false);
+    expect(out.CONFLICTS).toContain('fix/002-alpha');
+  });
+
+  it('check-spec-number：base ref 有同号 spec 目录时退出 4', () => {
+    json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'merged'));
+    const wt = path.join(repo, 'worktrees', '002-merged');
+    const dev2 = secondClone(base);
+    mkdirSync(path.join(dev2, 'specs', '002-other'), { recursive: true });
+    writeFileSync(path.join(dev2, 'specs', '002-other', 'spec.md'), '# other\n');
+    git(dev2, 'add', '-A');
+    git(dev2, 'commit', '--quiet', '-m', 'spec: 002-other');
+    git(dev2, 'push', '--quiet', 'origin', 'main');
+
+    const res = script(wt, 'check-spec-number.sh', '--json');
+    expect(res.status).toBe(4);
+    expect(res.stdout).toContain('specs/002-other');
+  });
+
+  it('算号前同步远程分支，未 fetch 的占号分支被避让', () => {
+    const dev2 = secondClone(base);
+    pushBranch(dev2, 'fix/002-other');
+    const out = json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'fresh'));
+    expect(out.FEATURE_NUM).toBe('003');
+    expect(remoteBranches(repo)).toContain('fix/002-other');
+    expect(remoteBranches(repo)).toContain('feat/003-fresh');
+  });
+
+  it('--no-fetch 跳过同步时仍完成占号', () => {
+    const out = json(
+      script(repo, 'create-worktree.sh', '--json', '--no-fetch', '--short-name', 'no-fetch'),
+    );
+    expect(out.FEATURE_NUM).toBe('002');
+    expect(out.CLAIMED).toBe(true);
+    expect(remoteBranches(repo)).toContain('feat/002-no-fetch');
   });
 
   it('已在 feature worktree 内运行时复用当前 worktree', () => {

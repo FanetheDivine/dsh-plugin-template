@@ -50,23 +50,20 @@ You **MUST** consider the user input before proceeding (if not empty). When invo
 
 4. **Create the branch and worktree.** The target state is: branch `<type>/<NNN>-<short-name>`
    checked out in a nested worktree at `worktrees/<NNN>-<short-name>` inside the primary checkout,
-   with no tracking upstream (`--no-track`), based on `origin/main` (or the `base_ref` in
+   with no tracking upstream, based on `origin/main` (or the `base_ref` in
    `worktree-config.yml`).
 
-   Use whichever method is available:
+   Run the script from the repository root. It pushes the branch to `origin` before creating the
+   worktree, so other developers see the number as taken; a failed push aborts with no worktree and
+   no branch left behind.
 
-   - **Native worktree tool**: first run the script with `--dry-run --json` to obtain
-     `BRANCH_NAME`, `WORKTREE_PATH`, and `BASE_REF` without touching the filesystem, then use
-     the native tool to create a branch `BRANCH_NAME` from `BASE_REF` at `WORKTREE_PATH`.
-   - **Script** (run from the repository root):
+   ```
+   .specify/extensions/worktree/scripts/bash/create-worktree.sh --json --type "<type>" --short-name "<short-name>"
+   ```
 
-     ```
-     .specify/extensions/worktree/scripts/bash/create-worktree.sh --json --type "<type>" --short-name "<short-name>"
-     ```
-
-     Parse the JSON output: `BRANCH_NAME`, `FEATURE_NUM`, `FEATURE_NAME`, `FEATURE_DIRECTORY`,
-     `WORKTREE_PATH`, `MAIN_WORKTREE`, `BASE_REF`, `CREATED`, `IN_WORKTREE`.
-
+   - Do NOT create the worktree with a host-native worktree tool: that path skips the claim push.
+   - Parse the JSON output: `BRANCH_NAME`, `FEATURE_NUM`, `FEATURE_NAME`, `FEATURE_DIRECTORY`,
+     `WORKTREE_PATH`, `MAIN_WORKTREE`, `BASE_REF`, `CREATED`, `IN_WORKTREE`, `CLAIMED`.
    - Do NOT pass `--base-ref` unless the user asked for a specific base.
    - If `IN_WORKTREE` is `true`, the session is already inside a feature worktree — reuse it and
      skip to step 5.
@@ -83,5 +80,5 @@ You **MUST** consider the user input before proceeding (if not empty). When invo
 
 ## Output
 
-Report `BRANCH_NAME`, `WORKTREE_PATH`, `FEATURE_DIRECTORY` and the primary checkout's
+Report `BRANCH_NAME`, `WORKTREE_PATH`, `FEATURE_DIRECTORY`, `CLAIMED` and the primary checkout's
 `MAIN_COMMIT` and `UPDATED` in one short block, then continue with the calling workflow.

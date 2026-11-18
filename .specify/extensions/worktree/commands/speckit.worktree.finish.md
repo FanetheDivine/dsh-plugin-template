@@ -56,7 +56,19 @@ Run inside `WORKTREE_PATH`:
 
 4. Commit any remaining changes, including the merge and lock file updates (Conventional Commit
    message, e.g. `feat: <summary>` or `chore: merge origin/main`).
-5. Push and open the PR:
+
+5. Verify the spec number is unique:
+
+   ```bash
+   .specify/extensions/worktree/scripts/bash/check-spec-number.sh --json
+   ```
+
+   - Exit 0: the number is unique; continue.
+   - Exit 4: another branch or the base branch uses the same number. Report the conflicting refs
+     from `CONFLICTS` and stop; do not push or open the PR.
+   - Exit 1: report the error and stop.
+
+6. Push and open the PR:
 
    ```bash
    git push -u origin "<BRANCH_NAME>"
@@ -65,7 +77,7 @@ Run inside `WORKTREE_PATH`:
 
    Record the PR number. If `gh` is unavailable, give the user the compare URL from the push
    output and stop, leaving the worktree and both branches in place.
-6. Wait for CI as a background job:
+7. Wait for CI as a background job:
 
    ```bash
    gh pr checks "<PR>" --watch --fail-fast --interval 30
@@ -74,7 +86,7 @@ Run inside `WORKTREE_PATH`:
    Exit 0 means every check passed. Any other code means a failing check: read
    `gh pr checks "<PR>"`, fix, then go back to step 3 to sync the base, commit, push and start a
    new wait.
-7. Wait for feedback, conflicts and the merge as one background job:
+8. Wait for feedback, conflicts and the merge as one background job:
 
    ```bash
    base=$(gh pr view "<PR>" --json reviews,comments --jq '(.reviews | length) + (.comments | length)')
@@ -107,17 +119,17 @@ Run inside `WORKTREE_PATH`:
 
    - `MERGED`: continue to cleanup.
    - `CLOSED ...`: the PR was closed without merging; report and stop without cleanup.
-   - `CONFLICTING`: go back to step 3, sync the base, commit, push, then restart step 6 and this
+   - `CONFLICTING`: go back to step 3, sync the base, commit, push, then restart step 7 and this
      step.
    - `FEEDBACK`: read it with `gh pr view "<PR>" --json reviews,comments`. When it reports a defect,
      fix it and go back to step 3 before pushing. When it asks for something else, apply it,
-     commit, push and restart step 6 and this step.
+     commit, push and restart step 7 and this step.
 
-8. Clean up (see below).
+9. Clean up (see below).
 
 ### Waits run in the background
 
-Steps 6 and 7 are waits, each with no deadline. Start one as a managed background job and continue
+Steps 7 and 8 are waits, each with no deadline. Start one as a managed background job and continue
 when it reports completion; keep its identifier to stop it when it no longer matters. Run at most
 one wait at a time: stop the finished job before starting its replacement, and never reuse a job
 that already exited.
