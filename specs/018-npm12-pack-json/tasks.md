@@ -18,19 +18,19 @@
 
 **Independent Test**: `pnpm vitest run --project code tests/pack-report.test.ts` 通过；`pnpm build` 通过。
 
-- [ ] T002 [P] [US1] 新增 `tests/support/pack-report.ts`：
+- [X] T002 [P] [US1] 新增 `tests/support/pack-report.ts`：
   - 导出 `packedFilePaths(report: unknown): string[]`。
   - 数组形状按元素取包报告；对象形状按 `Object.values` 取包报告。
   - 每个包的 `files[].path` 汇总为路径列表，缺 `files` 或 `files` 非数组时该包贡献空列表。
   - 数组与对象之外抛 `TypeError`，消息含 `JSON.stringify(report)` 的前 200 个字符，`undefined` 时用 `String(report)` 兜底。
   - 文件头注释说明两种形状的来源与 npm 版本。
-- [ ] T003 [P] [US1] 新增 `tests/pack-report.test.ts`，覆盖 [data-model.md](./data-model.md) 的四类输入：
+- [X] T003 [P] [US1] 新增 `tests/pack-report.test.ts`，覆盖 [data-model.md](./data-model.md) 的四类输入：
   - npm 11 的数组形状，断言路径列表含两份文件。
   - npm 12 的对象形状，断言与数组形状得到相同路径。
   - 包报告缺 `files`，断言该包不贡献路径。
   - 非法形状（`null`、`"[]"`），断言抛 `TypeError` 且消息含输出片段。
-- [ ] T004 [US1] 修改 `tests/package-pack.test.ts` 的 `packedPaths()`：改用 `packedFilePaths(JSON.parse(...))`，删除内联的 `flatMap` 与数组类型断言；断言项保持不变，文件头注释说明兼容 npm 11 与 npm 12。
-- [ ] T005 [US1] 运行 `pnpm format && pnpm check && pnpm build`，提交
+- [X] T004 [US1] 修改 `tests/package-pack.test.ts` 的 `packedPaths()`：改用 `packedFilePaths(JSON.parse(...))`，删除内联的 `flatMap` 与数组类型断言；断言项保持不变，文件头注释说明兼容 npm 11 与 npm 12。
+- [X] T005 [US1] 运行 `pnpm format && pnpm check && pnpm build`，提交
 
 **Checkpoint**: 两种 npm 输出形状都能解析，tarball 断言结果不变。
 
