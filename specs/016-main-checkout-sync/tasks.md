@@ -18,16 +18,16 @@
 
 **Independent Test**: `pnpm vitest run tests/sync-main.test.ts` 通过。
 
-- [ ] T002 [P] 新增 `.specify/extensions/worktree/scripts/bash/sync-main.sh`：
+- [X] T002 [P] 新增 `.specify/extensions/worktree/scripts/bash/sync-main.sh`：
   - 参数只有 `--json` 与 `-h`。
   - 按 research R1 的顺序检查与同步，退出码按 R3。
   - 逻辑包在函数中，最后一行为 `main "$@"; exit $?`，原因见 R2。
   - 文件头注释说明用途、用法与退出码。
-- [ ] T003 [P] 新增 `tests/sync-main.test.ts`，在临时仓库与 bare origin 中覆盖 [quickstart.md](./quickstart.md) 自动验证表的 8 个场景：
+- [X] T003 [P] 新增 `tests/sync-main.test.ts`，在临时仓库与 bare origin 中覆盖 [quickstart.md](./quickstart.md) 自动验证表的 9 个场景：
   - 临时仓库提交 `.gitignore`，内容含 `worktrees/` 与一个被忽略的文件名。
   - 用另一个 clone 推送提交，模拟 `origin/main` 前进。
   - 退出码非 0 时断言主工作区 HEAD、分支与文件不变。
-- [ ] T004 运行 `pnpm format && pnpm check`，提交
+- [X] T004 运行 `pnpm format && pnpm check`，提交
 
 **Checkpoint**: 同步脚本可独立运行。
 
