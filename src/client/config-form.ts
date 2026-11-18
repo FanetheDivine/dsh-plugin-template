@@ -35,7 +35,7 @@ export interface ConfigFormState extends SettingsFormShell {
   prefix: SettingsFieldState;
 }
 
-/** 配置页注册面向槽位组件提供的注入值。 */
+/** 配置页向槽位组件提供的注入值。 */
 export interface ConfigPageInjected extends SettingsFormActions {
   /** 草稿与表单状态。 */
   hooks: { configForm: SnapshotStore<ConfigFormState> };
@@ -77,7 +77,7 @@ export class PluginConfigForm {
     }));
   }
 
-  /** @returns 配置页注册面向槽位组件提供的注入值。 */
+  /** @returns 配置页向槽位组件提供的注入值。 */
   inject(): ConfigPageInjected {
     return { hooks: { configForm: this.state }, ...this.form.actions() };
   }
