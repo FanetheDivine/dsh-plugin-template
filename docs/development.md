@@ -76,7 +76,7 @@
 
 - `full-check` 依次运行 `check` 与 `build`：`check` 不读取 `dist`，产物测试在 `build` 末尾执行。
 - `publish` 由 `if: false` 禁用，原触发条件以注释保留；`pnpm run release` 推送的 tag 不会在 npm 产生新版本。
-- 模板转化时解禁，步骤见[宪章](../.specify/memory/constitution.md)原则 VII。
+- 模板转化时解禁，步骤见 [template-conversion.md](./template-conversion.md)。
 
 ## 测试
 

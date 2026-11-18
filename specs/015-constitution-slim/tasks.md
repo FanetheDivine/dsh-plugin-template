@@ -71,16 +71,16 @@
 
 **Independent Test**: 只读 `AGENTS.md` 与 `docs/template-conversion.md`，对照原原则 VII 的步骤与顺序。
 
-- [ ] T014 [US4] 新增 `docs/template-conversion.md`，承载原原则 VII，顺序不变：
+- [X] T014 [US4] 新增 `docs/template-conversion.md`，承载原原则 VII，顺序不变：
   - 变更类别：每个 spec 声明模板变更或模板转化，无法归类时在 clarify 阶段向用户确认。
   - 模板变更：保持 `demo_echo` 示例、README 与测试可用，新用户能按 README 跑通。
   - 模板转化：重新修订宪章与 `AGENTS.md`，更新项目名、包名、README 与 `cordis.patch.yml`，宪章版本按语义化规则递增并记录理由。
   - 发布设置之前向用户确认是否把依赖升级到 npm 上最新的 `@deepseek-ai/dsh` 版本；确认后按宪章原则 I 同步全部依赖与 `minimumReleaseAgeExclude`，按原则 II 提醒实机测试；拒绝时版本不变。
   - 发布设置：清空 `package.json` 的 `version`；恢复 `.github/workflows/ci.yml` 中 `publish` 的 `if` 并删除 `if: false`；提醒用户绑定 npm Trusted Publisher；清空过往 spec 与 changelog。
-- [ ] T015 [US4] 修改 `AGENTS.md`：新增「模板说明」节，写明本仓库是 DSH 插件模板、spec 声明变更类别、模板转化前先读 `docs/template-conversion.md`；文档索引加入该文档
-- [ ] T016 [P] [US4] 修改 `docs/development.md` CI 节：模板转化链接改为 `docs/template-conversion.md`
-- [ ] T017 [P] [US4] 修改 `.github/workflows/ci.yml` 注释：步骤来源改为 `docs/template-conversion.md`
-- [ ] T018 [US4] 运行 `pnpm format && pnpm check`，提交
+- [X] T015 [US4] 修改 `AGENTS.md`：新增「模板说明」节，写明本仓库是 DSH 插件模板、spec 声明变更类别、模板转化前先读 `docs/template-conversion.md`；文档索引加入该文档
+- [X] T016 [P] [US4] 修改 `docs/development.md` CI 节：模板转化链接改为 `docs/template-conversion.md`
+- [X] T017 [P] [US4] 修改 `.github/workflows/ci.yml` 注释：步骤来源改为 `docs/template-conversion.md`
+- [X] T018 [US4] 运行 `pnpm format && pnpm check`，提交
 
 ---
 
