@@ -17,13 +17,13 @@
 
 **Independent Test**: 单元测试触发 `loader/volatile-update`，工具与日志使用新值；实机后端用例通过。
 
-- [ ] T003 [US2] 在 `src/config.ts` 新增 `Config` 接口与 schemastery schema：`demoEnabled` 为 `boolean` 默认 `true`，`prefix` 为 `string` 默认 `demo` 且含非空白字符，两者 `.volatile()`；新增 `readConfig(config)`：把 `Volatile` 引用展开为普通值后交给 `resolveConfig`，未知键与非法值抛错
-- [ ] T004 [P] [US2] 在 `src/types.ts` 以 type-only 方式再导出 `Volatile`，并引入 `@deepseek-ai/cordis-plugin-loader` 的事件类型
-- [ ] T005 [P] [US2] 把 `src/events.ts` 的 `setupDemoListeners(ctx, prefix)` 改为接收 `getPrefix: () => string`，日志每次读取实时前缀
-- [ ] T006 [US2] 改造 `src/index.ts`：导出 `Config`；`apply` 第一步 `readConfig`；工具按 `demoEnabled` 注册，监听 `loader/volatile-update` 后重新读取并注销或重注册 `demo_echo`；读取失败记录警告并保持当前状态；`ctx.effect` 在卸载时注销工具
-- [ ] T007 [US2] 扩展 `tests/helpers.ts`：`makeCtx` 支持 `Volatile` 引用工厂、`tools.register` 返回可观测的注销函数、按事件名触发监听
-- [ ] T008 [US2] 更新 `tests/plugin.test.ts`：`readConfig` 的默认值、未知键、非法类型、空白前缀；`apply` 在 `prefix` 与 `demoEnabled` 变化后的工具重注册、注销与日志前缀；读取失败时保持原状
-- [ ] T009 [US2] 更新 `tests/package-pack.test.ts` 与 `tests/client-bundle.test.ts` 如受影响，运行 `pnpm format && pnpm check`
+- [x] T003 [US2] 在 `src/config.ts` 新增 `Config` 接口与 schemastery schema：`demoEnabled` 为 `boolean` 默认 `true`，`prefix` 为 `string` 默认 `demo` 且含非空白字符，两者 `.volatile()`；新增 `readConfig(config)`：把 `Volatile` 引用展开为普通值后交给 `resolveConfig`，未知键与非法值抛错
+- [x] T004 [P] [US2] 在 `src/types.ts` 以 type-only 方式再导出 `Volatile`，并引入 `@deepseek-ai/cordis-plugin-loader` 的事件类型
+- [x] T005 [P] [US2] 把 `src/events.ts` 的 `setupDemoListeners(ctx, prefix)` 改为接收 `getPrefix: () => string`，日志每次读取实时前缀
+- [x] T006 [US2] 改造 `src/index.ts`：导出 `Config`；`apply` 第一步 `readConfig`；工具按 `demoEnabled` 注册，监听 `loader/volatile-update` 后重新读取并注销或重注册 `demo_echo`；读取失败记录警告并保持当前状态；`ctx.effect` 在卸载时注销工具
+- [x] T007 [US2] 扩展 `tests/helpers.ts`：`makeCtx` 支持 `Volatile` 引用工厂、`tools.register` 返回可观测的注销函数、按事件名触发监听
+- [x] T008 [US2] 更新 `tests/plugin.test.ts`：`readConfig` 的默认值、未知键、非法类型、空白前缀；`apply` 在 `prefix` 与 `demoEnabled` 变化后的工具重注册、注销与日志前缀；读取失败时保持原状
+- [x] T009 [US2] 更新 `tests/package-pack.test.ts` 与 `tests/client-bundle.test.ts` 如受影响，运行 `pnpm format && pnpm check`
 
 ## Phase 3: US1 在插件面板编辑配置（浏览器侧，P1）
 

@@ -30,6 +30,8 @@ export function textBlock(text: string) {
 export function makeCtx() {
   const onCallbacks = new Map<string, ((...args: unknown[]) => unknown)[]>();
   const registeredTools: unknown[] = [];
+  const activeTools = new Set<unknown>();
+  const effectDisposers: Array<() => void> = [];
   const loggerCalls: Array<{ level: 'debug' | 'info' | 'warn'; args: unknown[] }> = [];
   const logger = {
     debug: (...args: unknown[]) => {
@@ -47,7 +49,16 @@ export function makeCtx() {
     tools: {
       register: (def: unknown) => {
         registeredTools.push(def);
+        activeTools.add(def);
+        return () => {
+          activeTools.delete(def);
+        };
       },
+    },
+    effect(fn: () => unknown) {
+      const disposer = fn();
+      if (typeof disposer === 'function') effectDisposers.push(disposer as () => void);
+      return () => true;
     },
     on(type: string, fn: (...args: unknown[]) => unknown) {
       let list = onCallbacks.get(type);
@@ -60,12 +71,41 @@ export function makeCtx() {
     },
     _onCallbacks: onCallbacks,
     _registeredTools: registeredTools,
+    _activeTools: activeTools,
+    /** 触发某事件的全部监听。 */
+    _emit: (type: string, ...args: unknown[]) => {
+      for (const fn of onCallbacks.get(type) ?? []) fn(...args);
+    },
+    /** 模拟插件卸载：执行全部 effect 清理函数。 */
+    _dispose: () => {
+      for (const fn of effectDisposers.splice(0)) fn();
+    },
     _loggerCalls: loggerCalls,
   };
   return ctx as unknown as Context & {
     _onCallbacks: Map<string, ((...args: unknown[]) => unknown)[]>;
-    _registeredTools: Array<{ name?: string }>;
+    _registeredTools: Array<{ name?: string; description?: string }>;
+    _activeTools: Set<{ name?: string; description?: string }>;
+    _emit: (type: string, ...args: unknown[]) => void;
+    _dispose: () => void;
     _loggerCalls: Array<{ level: 'debug' | 'info' | 'warn'; args: unknown[] }>;
+  };
+}
+
+/** 热重载引用：`.get()` 读取实时值，`set` 模拟宿主写入新值。 */
+export interface FakeVolatile<T> {
+  get(): T;
+  set(value: T): void;
+}
+
+/** 构造一个热重载引用。 */
+export function volatile<T>(initial: T): FakeVolatile<T> {
+  let value = initial;
+  return {
+    get: () => value,
+    set: (next) => {
+      value = next;
+    },
   };
 }
 
