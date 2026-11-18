@@ -43,10 +43,10 @@
 
 **Goal**: 作者能从文档学会配置插槽与热重载。
 
-- [ ] T017 [US3] 更新 `docs/how-it-works.md`：入口契约表加入 `Config`；新增“配置与热重载”节（volatile 字段、`loader/volatile-update`、`readConfig`）与“配置插槽”节（三个插槽的用途与键格式、`view` 取值、表单服务、模板实现位置）
-- [ ] T018 [P] [US3] 更新 `docs/development.md`：测试表、文件地图、实机测试用例表的新条目
-- [ ] T019 [P] [US3] 更新 `README.md`：功能与配置节说明可在插件面板编辑与热重载；`docs/known-risks.md` 补充宿主侧限制（仅 volatile 字段出现在面板、配置被更高层覆盖时拒绝保存）
-- [ ] T020 [US3] 运行 `pnpm format && pnpm check`
+- [x] T017 [US3] 更新 `docs/how-it-works.md`：入口契约表加入 `Config`；新增“配置与热重载”节（volatile 字段、`loader/volatile-update`、`readConfig`）与“配置插槽”节（三个插槽的用途与键格式、`view` 取值、表单服务、模板实现位置）
+- [x] T018 [P] [US3] 更新 `docs/development.md`：测试表、文件地图、实机测试用例表的新条目
+- [x] T019 [P] [US3] 更新 `README.md`：功能与配置节说明可在插件面板编辑与热重载；`docs/known-risks.md` 补充宿主侧限制（仅 volatile 字段出现在面板、配置被更高层覆盖时拒绝保存）
+- [x] T020 [US3] 运行 `pnpm format && pnpm check`
 
 ## Phase 5: 实机测试与收尾
 

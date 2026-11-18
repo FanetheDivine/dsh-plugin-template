@@ -78,17 +78,19 @@
 
 | 文件 | 覆盖内容 |
 | --- | --- |
-| `tests/plugin.test.ts` | 配置校验、demo 工具、`apply` 接线 |
+| `tests/plugin.test.ts` | 配置校验、热重载、demo 工具、`apply` 接线 |
+| `tests/config-form.test.ts` | 配置页草稿、空白前缀拒绝、保存、恢复默认与放弃 |
 | `tests/release-archive.test.mjs` | CHANGELOG 归档计划 |
-| `tests/client.test.ts` | 前端服务声明、字典与槽位注册、双语渲染 |
+| `tests/client.test.ts` | 前端服务声明、字典与槽位注册、示例行与配置页渲染 |
 | `tests/client-bundle.test.ts` | `dist/client.js` 的注册契约与导出 |
 | `tests/package-pack.test.ts` | npm 包只含发布所需文件，含前端产物 |
 | `tests/worktree-extension.test.ts` | worktree 扩展的创建、复用与清理 |
 | `tests/helpers.ts` | 模拟宿主与客户端 `ctx`，记录注册、事件监听与日志 |
+| `tests/support/primitives.ts` | 把平台组件包解析到源码，避开已发布产物内联的依赖 |
 
 测试要求见[宪章](../.specify/memory/constitution.md)原则 IV。
 
-浏览器用例由仓库内的 `playwright` 驱动无头 Chrome。
+浏览器用例由仓库内的 `playwright` 驱动无头 Chrome。`vitest.config.ts` 把 `@deepseek-ai/dsh-client-ui-primitives` 指向包的源码：已发布的 `lib` 内联了 shiki、katex 等未声明的依赖，源码只依赖 react、clsx 与 `dsh-client-store`。
 
 ## Spec Kit 流程
 
@@ -126,15 +128,17 @@ DSH 从 `.dsh/skills/` 加载 `speckit-*` skill，在对话框输入 `/` 调用�
 ```text
 cordis.patch.yml            # 插件行，dsh plugin add 时插入 profile
 src/
-├── index.ts                # 打包入口，导出 name、inject、apply
-├── config.ts               # 配置默认值与严格校验
+├── index.ts                # 打包入口，导出 name、inject、apply、Config
+├── config.ts               # Config schema、默认值、严格校验与热重载读取
 ├── constants.ts            # 共享常量
 ├── demo-tool.ts            # demo_echo 工具
 ├── events.ts               # agent 事件监听示例
 ├── types.ts                # 宿主类型再导出
 ├── utils.ts                # 零依赖工具函数
 └── client/
-    ├── index.ts            # 浏览器入口：注册字典与槽位
+    ├── index.ts            # 浏览器入口：注册字典、示例行与配置页
+    ├── config-form.ts      # 配置页草稿模型与行键常量
+    ├── config-page.tsx     # 配置页的 summary 与 page 视图
     ├── demo-dock.tsx       # 前端示例行组件
     └── locales.ts          # 中英文字典与命名空间
 dist/
