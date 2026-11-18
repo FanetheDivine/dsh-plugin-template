@@ -31,13 +31,13 @@
 
 **Independent Test**: 单元测试覆盖草稿、解析与保存；实机浏览器用例打开配置页并保存。
 
-- [ ] T010 [US1] 在 `src/client/locales.ts` 增加 `config.*` 键（标题、两个字段的标签与说明、非法提示、保存相关文案、重置、已覆盖标记），中文是键集事实源，英文键集一致
-- [ ] T011 [US1] 新增 `src/client/config-form.ts`：`PluginConfigForm` 用 `SettingsFormModel` 管理 `prefix`（非空白文本，空白为非法，不用 `settingsTextField` 的清除语义）与 `demoEnabled`（草稿 `true` 或 `false`）；导出行键常量 `ROW_KEY = 'dsh-plugin-template#dsh-plugin-template'` 与命名空间常量
-- [ ] T012 [US1] 新增 `src/client/config-page.tsx`：`ConfigPage` 返回 `summary` 的一行描述，或用 `SettingsForm`、`SettingsValueField`、`Switch` 渲染 `page`；开关行样式与官方 forge 配置页一致（13px 标题、12px 说明、`--dsw-*` 令牌、字段间 0.5px l2 分隔线）
-- [ ] T013 [US1] 改造 `src/client/index.ts`：`inject` 增加 `configForms`；创建 `PluginConfigForm`，用 `ctx.effect` 在卸载时 `dispose`；向 `plugins.row.config` 注册配置页；增加对 `dsh-client-ui-plugin-manager/client` 与 `dsh-client-ui-settings/client` 的 type-only 导入
-- [ ] T014 [P] [US1] 新增 `tests/config-form.test.ts`：用假 `SettingsFormScope` 验证草稿、`prefix` 空白被拒、保存的 `set` 操作、放弃与重置
-- [ ] T015 [US1] 更新 `tests/client.test.ts` 与 `tests/helpers.ts`：`makeClientCtx` 增加 `configForms.get`；断言 `inject` 含 `configForms`、行配置页键正确、中英文字典键集一致、`summary` 与 `page` 两种视图渲染
-- [ ] T016 [US1] 运行 `pnpm format && pnpm check && pnpm build`，确认 `dist/client.js` 无多余内联的宿主模块
+- [x] T010 [US1] 在 `src/client/locales.ts` 增加 `config.*` 键（标题、两个字段的标签与说明、非法提示、保存相关文案、重置、已覆盖标记），中文是键集事实源，英文键集一致
+- [x] T011 [US1] 新增 `src/client/config-form.ts`：`PluginConfigForm` 用 `SettingsFormModel` 管理 `prefix`（非空白文本，空白为非法，不用 `settingsTextField` 的清除语义）与 `demoEnabled`（草稿 `true` 或 `false`）；导出行键常量 `ROW_KEY = 'dsh-plugin-template#dsh-plugin-template'` 与命名空间常量
+- [x] T012 [US1] 新增 `src/client/config-page.tsx`：`ConfigPage` 返回 `summary` 的一行描述，或用 `SettingsForm`、`SettingsValueField`、`Switch` 渲染 `page`；开关行样式与官方 forge 配置页一致（13px 标题、12px 说明、`--dsw-*` 令牌、字段间 0.5px l2 分隔线）
+- [x] T013 [US1] 改造 `src/client/index.ts`：`inject` 增加 `configForms`；创建 `PluginConfigForm`，用 `ctx.effect` 在卸载时 `dispose`；向 `plugins.row.config` 注册配置页；增加对 `dsh-client-ui-plugin-manager/client` 与 `dsh-client-ui-settings/client` 的 type-only 导入
+- [x] T014 [P] [US1] 新增 `tests/config-form.test.ts`：用假 `SettingsFormScope` 验证草稿、`prefix` 空白被拒、保存的 `set` 操作、放弃与重置
+- [x] T015 [US1] 更新 `tests/client.test.ts` 与 `tests/helpers.ts`：`makeClientCtx` 增加 `configForms.get`；断言 `inject` 含 `configForms`、行配置页键正确、中英文字典键集一致、`summary` 与 `page` 两种视图渲染
+- [x] T016 [US1] 运行 `pnpm format && pnpm check && pnpm build`，确认 `dist/client.js` 无多余内联的宿主模块
 
 ## Phase 4: US3 文档（P2）
 

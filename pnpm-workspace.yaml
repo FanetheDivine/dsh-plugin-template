@@ -4,6 +4,7 @@ packages:
 minimumReleaseAgeExclude:
   - '@deepseek-ai/dsh-agent@0.2.2-rc.3'
   - '@deepseek-ai/dsh-client-locale@0.2.2-rc.3'
+  - '@deepseek-ai/dsh-client-store@0.2.2-rc.3'
   - '@deepseek-ai/dsh-client-ui-conversation@0.2.2-rc.3'
   - '@deepseek-ai/dsh-client-ui-plugin-manager@0.2.2-rc.3'
   - '@deepseek-ai/dsh-client-ui-primitives@0.2.2-rc.3'
