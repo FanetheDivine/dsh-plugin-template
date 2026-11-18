@@ -42,10 +42,10 @@
 
 **Independent Test**: 阅读 `.github/workflows/ci.yml`，publish job 中没有 npm 安装步骤。
 
-- [ ] T006 [US2] 修改 `.github/workflows/ci.yml`：
+- [X] T006 [US2] 修改 `.github/workflows/ci.yml`：
   - 删除 publish job 的 `Update npm (>= 11.5.1 required for OIDC)` 步骤。
   - 在 `setup-node` 之后加一行注释：Trusted Publishing 要求 npm ≥ 11.5.1，Node 24 自带版本已满足，工作流不单独安装 npm。
-- [ ] T007 [US2] 运行 `pnpm format && pnpm check`，提交
+- [X] T007 [US2] 运行 `pnpm format && pnpm check`，提交
 
 **Checkpoint**: CI 不再有漂移的 npm 版本输入。
 
