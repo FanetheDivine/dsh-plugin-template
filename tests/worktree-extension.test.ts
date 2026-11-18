@@ -47,6 +47,29 @@ function mergeIntoMain(cwd: string, branch: string): void {
   git(cwd, 'push', '--quiet', 'origin', 'main');
 }
 
+/** 在临时 origin 旁再建一个克隆，模拟第二名开发者。 */
+function secondClone(base: string): string {
+  const clone = path.join(base, 'dev2');
+  git(base, 'clone', '--quiet', path.join(base, 'origin.git'), clone);
+  return clone;
+}
+
+/** 在克隆中从 main 建分支并推送，然后回到 main。 */
+function pushBranch(clone: string, branch: string): void {
+  git(clone, 'checkout', '--quiet', '-B', branch, 'main');
+  git(clone, 'push', '--quiet', 'origin', branch);
+  git(clone, 'checkout', '--quiet', 'main');
+}
+
+/** 远程分支名列表，去掉 refs/heads/ 前缀。 */
+function remoteBranches(cwd: string): string[] {
+  return git(cwd, 'ls-remote', '--heads', 'origin')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => line.split('\t')[1]?.replace('refs/heads/', '') ?? '');
+}
+
 function json(res: RunResult): Record<string, string | boolean> {
   if (res.status !== 0) throw new Error(`脚本失败：${res.stderr}`);
   return JSON.parse(res.stdout.trim().split('\n').pop() ?? '{}');

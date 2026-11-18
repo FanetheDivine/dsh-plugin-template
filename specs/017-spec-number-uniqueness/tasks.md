@@ -18,12 +18,12 @@
 
 **Independent Test**: `pnpm test:code -- tests/worktree-extension.test.ts` 通过。
 
-- [ ] T002 [P] 新增 `.specify/extensions/worktree/scripts/bash/spec-number-lib.sh`：
+- [X] T002 [P] 新增 `.specify/extensions/worktree/scripts/bash/spec-number-lib.sh`：
   - `feature_number_from_branch BRANCH` 从分支名最后一段取三位以上数字，无匹配时输出空。
   - `spec_branches_with_number NUMBER` 从 `git ls-remote --heads` 输出中筛出同编号分支的完整名。
   - `claim_owner NUMBER` 返回同编号分支中按 `LC_ALL=C sort` 排第一的分支名。
   - 文件只定义函数，无副作用；文件头注释说明职责与导出。
-- [ ] T003 [P] 在 `tests/worktree-extension.test.ts` 新增测试辅助：
+- [X] T003 [P] 在 `tests/worktree-extension.test.ts` 新增测试辅助：
   - `secondClone()`：在临时 origin 旁建第二个克隆。
   - `pushBranch(clone, branch)`：在克隆中建分支并推送。
   - 断言辅助：读取远程分支列表与脚本 JSON。
