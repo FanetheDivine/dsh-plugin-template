@@ -80,7 +80,7 @@
 
 ## Phase 5: Polish
 
-- [ ] T012 按 [quickstart.md](./quickstart.md) 全部步骤验证，在主工作区手工运行一次 `sync-main.sh --json`；勾选本文件任务并提交
+- [X] T012 按 [quickstart.md](./quickstart.md) 全部步骤验证，在主工作区手工运行一次 `sync-main.sh --json`；勾选本文件任务并提交
 
 ---
 
