@@ -123,6 +123,7 @@ Sync Impact Report
   - 清空 `package.json` 的 `version`，由具体插件填入自己的首个版本号。
   - 恢复 `.github/workflows/ci.yml` 中 `publish` job 被注释的 `if: startsWith(github.ref, 'refs/tags/')`，并删除 `if: false`。
   - 提醒用户把 npm Trusted Publisher 绑定到新仓库与 `.github/workflows/ci.yml`。
+  - 清空过往 spec 和 changelog
 - 无法归类时 MUST 在 clarify 阶段向用户确认类别。
 
 理由：模板与插件的约束不同。混用会让模板示例与真实插件相互拖累。
