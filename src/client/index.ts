@@ -1,6 +1,6 @@
 /**
  * 浏览器入口：注册示例行文案、输入区上方的列表项与插件面板的配置页。
- * 导出 inject 与 apply。
+ * 导出 apply；前端服务按功能可选。
  */
 import type { Context } from '@deepseek-ai/cordis';
 import type {} from '@deepseek-ai/dsh-client-locale/client';
@@ -17,31 +17,41 @@ import { ConfigPage } from './config-page.tsx';
 import { DemoDock } from './demo-dock.tsx';
 import { en, NS, zh } from './locales.ts';
 
-/** 需要宿主注入的客户端服务。 */
-export const inject = ['slots', 'locale', 'configForms'];
-
-/** 插件在前端启用时调用：注册字典、示例行与面板配置页。 */
+/**
+ * 插件在前端启用时调用。
+ * 三项客户端服务都是可选的：每个功能用 `ctx.inject` 只等待自己用到的服务，
+ * 服务缺失时该功能不加载，就绪后加载，撤掉后卸载。
+ */
 export function apply(ctx: Context): void {
-  ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'dsh-plugin-template: dictionaries');
-  ctx.slots.inject('conversation.composer.dock', () =>
-    ctx.slots.register(
-      { name: 'conversation.composer.dock', id: 'demo', order: 5, locale: NS },
-      DemoDock,
-    ),
-  );
+  // 字典
+  ctx.inject(['locale'], (ctx) => {
+    ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'dsh-plugin-template: dictionaries');
+  });
+
+  // 输入区上方的示例行
+  ctx.inject(['slots', 'locale'], (ctx) => {
+    ctx.slots.inject('conversation.composer.dock', () =>
+      ctx.slots.register(
+        { name: 'conversation.composer.dock', id: 'demo', order: 5, locale: NS },
+        DemoDock,
+      ),
+    );
+  });
 
   // 配置页：宿主为该行提供的表单命名空间是行 id
-  const form = new PluginConfigForm(ctx.configForms.get<ConfigFields>(ROW_ID));
-  ctx.effect(
-    () => () => {
-      form.dispose();
-    },
-    'dsh-plugin-template: config form',
-  );
-  ctx.slots.inject('plugins.row.config', () =>
-    ctx.slots.register(
-      { name: 'plugins.row.config', key: ROW_KEY, locale: NS, inject: () => form.inject() },
-      ConfigPage,
-    ),
-  );
+  ctx.inject(['slots', 'locale', 'configForms'], (ctx) => {
+    const form = new PluginConfigForm(ctx.configForms.get<ConfigFields>(ROW_ID));
+    ctx.effect(
+      () => () => {
+        form.dispose();
+      },
+      'dsh-plugin-template: config form',
+    );
+    ctx.slots.inject('plugins.row.config', () =>
+      ctx.slots.register(
+        { name: 'plugins.row.config', key: ROW_KEY, locale: NS, inject: () => form.inject() },
+        ConfigPage,
+      ),
+    );
+  });
 }
