@@ -75,7 +75,7 @@
 - [x] T013 在 `CHANGELOG.md` 的 `Unreleased` 下增加 `Changed` 条目：前端服务改为可选，按功能分组加载（FR-009）
 - [x] T014 运行 `pnpm format && pnpm check`，修复问题
 - [x] T015 运行 `pnpm build`，确认 `dist/client.js` 与产物测试通过
-- [ ] T016 按 [quickstart.md](./quickstart.md) 核对；提醒用户在真实宿主做实机测试（宪章原则 IV）
+- [x] T016 按 [quickstart.md](./quickstart.md) 核对；提醒用户在真实宿主做实机测试（宪章原则 IV）
 
 ---
 
