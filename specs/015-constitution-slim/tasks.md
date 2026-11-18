@@ -86,9 +86,9 @@
 
 ## Phase 6: Polish
 
-- [ ] T019 按 [quickstart.md](./quickstart.md) 全部步骤核对
-- [ ] T020 按宪章原则 III 审查改动文件：每条规则只在归属文档完整出现；按原则 V 检查只引用仓库内路径
-- [ ] T021 有修正时运行 `pnpm format && pnpm check` 并提交
+- [X] T019 按 [quickstart.md](./quickstart.md) 全部步骤核对
+- [X] T020 按宪章原则 III 审查改动文件：每条规则只在归属文档完整出现；按原则 V 检查只引用仓库内路径
+- [X] T021 有修正时运行 `pnpm format && pnpm check` 并提交
 
 ---
 
