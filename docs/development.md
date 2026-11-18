@@ -83,12 +83,13 @@
 | `tests/release-archive.test.mjs` | CHANGELOG 归档计划 |
 | `tests/client.test.ts` | 前端服务声明、字典与槽位注册、示例行与配置页渲染 |
 | `tests/client-bundle.test.ts` | `dist/client.js` 的注册契约与导出 |
-| `tests/package-pack.test.ts` | npm 包只含发布所需文件，含前端产物 |
+| `tests/package-pack.test.ts` | npm 包只含发布所需文件，含前端产物与元数据资源 |
+| `tests/metadata.test.ts` | 插件元数据的结构、键集、禁用字符与清单声明 |
 | `tests/worktree-extension.test.ts` | worktree 扩展的创建、复用与清理 |
 | `tests/helpers.ts` | 模拟宿主与客户端 `ctx`，记录注册、事件监听与日志 |
 | `tests/support/primitives.ts` | 把平台组件包解析到源码，避开已发布产物内联的依赖 |
 
-测试要求见[宪章](../.specify/memory/constitution.md)原则 IV。
+测试要求见[宪章](../.specify/memory/constitution.md)原则 IV。文案与元数据的规范见 [i18n.md](./i18n.md)。
 
 浏览器用例由仓库内的 `playwright` 驱动无头 Chrome。`vitest.config.ts` 把 `@deepseek-ai/dsh-client-ui-primitives` 指向包的源码：已发布的 `lib` 内联了 shiki、katex 等未声明的依赖，源码只依赖 react、clsx 与 `dsh-client-store`。
 
@@ -147,6 +148,7 @@ dist/
 ├── index.d.ts              # 宿主类型声明
 └── client/                 # 前端类型声明
 scripts/release-archive.mjs # 发布时归档 CHANGELOG
+locale/                     # 插件元数据资源，规范见 i18n.md
 tests/                      # vitest 单元测试
 changelogs/                 # 各版本的 CHANGELOG 归档
 docs/                       # 开发者文档
