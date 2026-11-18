@@ -76,7 +76,7 @@
 
 - `full-check` 依次运行 `check` 与 `build`：`check` 不读取 `dist`，产物测试在 `build` 末尾执行。
 - `publish` 由 `if: false` 禁用，原触发条件以注释保留；`pnpm run release` 推送的 tag 不会在 npm 产生新版本。
-- 模板转化时解禁，步骤见[宪章](../.specify/memory/constitution.md)原则 VII。
+- 模板转化时解禁，步骤见 [template-conversion.md](./template-conversion.md)。
 
 ## 测试
 
@@ -89,12 +89,13 @@
 | `tests/client-bundle.test.ts` | `dist/client.js` 的注册契约与导出（产物测试） |
 | `tests/package-pack.test.ts` | npm 包只含发布所需文件，含前端产物与元数据资源（产物测试） |
 | `tests/metadata.test.ts` | 插件元数据的结构、键集、禁用字符与清单声明 |
+| `tests/dependency-versions.test.ts` | `dsh-*` 依赖版本一致，并以同版本列入 `minimumReleaseAgeExclude` |
 | `tests/dist-freshness.test.ts` | 产物新鲜度判定的三种状态 |
 | `tests/worktree-extension.test.ts` | worktree 扩展的创建、复用与清理 |
 | `tests/helpers.ts` | 模拟宿主与客户端 `ctx`，记录注册、事件监听与日志 |
 | `tests/support/primitives.ts` | 把平台组件包解析到源码，避开已发布产物内联的依赖 |
 
-测试要求见[宪章](../.specify/memory/constitution.md)原则 IV。文案与元数据的规范见 [i18n.md](./i18n.md)。
+测试要求见[宪章](../.specify/memory/constitution.md)原则 II。文案与元数据的规范见 [i18n.md](./i18n.md)。
 
 vitest 拆成 `code` 与 `dist` 两个 project。产物测试读取 `dist`，由 `build` 末尾的 `test:dist` 执行；`test:code` 不读取 `dist`。产物缺失或早于构建输入时，产物测试失败并提示运行 `pnpm build`。
 

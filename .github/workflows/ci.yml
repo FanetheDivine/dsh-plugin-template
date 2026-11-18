@@ -25,7 +25,7 @@ jobs:
         run: pnpm run full-check
 
   # 模板阶段禁用发布：模板本身不是可用插件。
-  # 模板转化时解禁，步骤见 .specify/memory/constitution.md 原则 VII：
+  # 模板转化时解禁，步骤见 docs/template-conversion.md：
   # 清空 package.json 的 version -> 恢复下面注释的 if、删掉 if: false
   # -> 提醒用户把 npm Trusted Publisher 绑定到新仓库与 .github/workflows/ci.yml。
   publish:
