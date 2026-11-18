@@ -59,8 +59,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T008 [P] [US2] 在 `tests/package-pack.test.ts` 删除条件构建，`packedPaths()` 前调用 `assertFreshDist()`，保留 tarball 断言
-- [ ] T009 [US2] 运行验证：过期产物下 `pnpm test:dist` 的两个文件都给出一致提示；`pnpm build` 后两个文件通过
+- [X] T008 [P] [US2] 在 `tests/package-pack.test.ts` 删除条件构建，`packedPaths()` 前调用 `assertFreshDist()`，保留 tarball 断言
+- [X] T009 [US2] 运行验证：过期产物下 `pnpm test:dist` 的两个文件都给出一致提示；`pnpm build` 后两个文件通过
 
 **Checkpoint**: 两个产物测试共用判定，US1 行为不变
 
