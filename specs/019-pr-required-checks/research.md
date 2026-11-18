@@ -26,11 +26,16 @@
 - **决定**：`bypass_actors: []`。
 - **理由**：需求要求管理员同样受限。管理员仍可编辑或删除规则集本身，这是仓库级设置的边界。
 
-## D5 直接推送被拒
+## D5 允许直接推送
 
-- **决定**：加 `pull_request` 规则，`required_approving_review_count: 0`。
-- **理由**：仅靠 `required_status_checks` 不保证拦截直接推送；`pull_request` 规则要求改动经 PR 进入，同时满足「不要求评审」。
-- **实测**：`pull_request` 规则必须给出全部参数，缺字段返回 422；不带参数可创建，但语义不明。全量参数已验证可创建。
+- **决定**：规则集不加 `pull_request` 规则。
+- **理由**：GitHub 文档把推送限制交给 `pull_request` 规则，`required_status_checks` 只约束合并；用户要求保留直接推送能力。
+- **备选**：`pull_request` 规则（`required_approving_review_count: 0`）；可创建，但会拦截全部直接推送。
+
+## D5b 禁止强推与删除
+
+- **决定**：加 `non_fast_forward` 与 `deletion` 两条规则，均不带参数。
+- **理由**：强推改写已验证的历史，删除让 `main` 消失。两条规则同样对管理员生效，因为绕过名单为空。
 
 ## D6 应用与幂等
 

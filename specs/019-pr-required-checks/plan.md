@@ -6,7 +6,7 @@
 
 ## Summary
 
-把 `main` 的合并门禁落到 GitHub 仓库规则集：PR 合并前 `check` 通过、分支包含最新 `main`、管理员同样受限、直接推送被拒。仓库改动只有 `docs/development.md` 的 CI 说明与 `CHANGELOG.md` 条目，不新增文件。
+把 `main` 的合并门禁落到 GitHub 仓库规则集：PR 合并前 `check` 通过、分支包含最新 `main`、管理员同样受限、禁止强推与删除。直接推送保持可用。仓库改动只有 `docs/development.md` 的 CI 说明与 `CHANGELOG.md` 条目，不新增文件。
 
 ## Technical Context
 
@@ -16,7 +16,7 @@
 
 **Storage**: GitHub 仓库设置。
 
-**Testing**: API 读回、PR 合并判定、直接推送被拒。
+**Testing**: API 读回、PR 合并判定、强推与删除被拒、普通推送成功。
 
 **Target Platform**: GitHub 公开仓库 `FanetheDivine/dsh-plugin-template`，默认分支 `main`。
 
@@ -85,23 +85,14 @@ CHANGELOG.md          # Unreleased / Changed 增加条目
         ]
       }
     },
-    {
-      "type": "pull_request",
-      "parameters": {
-        "required_approving_review_count": 0,
-        "dismiss_stale_reviews_on_push": false,
-        "require_code_owner_review": false,
-        "require_last_push_approval": false,
-        "required_review_thread_resolution": false,
-        "allowed_merge_methods": ["merge", "squash", "rebase"]
-      }
-    }
+    { "type": "non_fast_forward" },
+    { "type": "deletion" }
   ],
   "bypass_actors": []
 }
 ```
 
-`pull_request` 规则的参数必须全量给出，缺字段返回 422（已实测）。`required_status_checks` 的 `context` 取 PR 上运行的 check 名。
+`non_fast_forward` 禁止强推，`deletion` 禁止删除。`required_status_checks` 的 `context` 取 PR 上运行的 check 名。允许直接推送，因此不加 `pull_request` 规则。
 
 ## 实施备注
 
