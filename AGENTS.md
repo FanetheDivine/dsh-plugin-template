@@ -21,6 +21,15 @@ DSH 插件模板，用 TypeScript 开发，用 tsdown 构建，用 biome 检查�
 - 每个 spec 按 [template-conversion.md](./docs/template-conversion.md#变更类别) 声明变更类别。
 - 把模板改造成插件前，先读 [template-conversion.md](./docs/template-conversion.md#模板转化)，按其中的顺序执行。
 
+# 主工作区
+
+主工作区指仓库根目录的检出，即 `git worktree list` 的第一项。
+
+- 主工作区 MUST 位于 `main` 分支。
+- 主工作区 MUST 保持干净，`git status --porcelain` 输出为空。
+- 在主工作区只运行 `git fetch` 与 `git pull`。
+- 任何变更 MUST 在 worktree 中进行，文档、配置、spec 与代码同样适用。
+
 # 开发流程
 
 在用户给出需求、缺陷或其他变更要求时，**立刻**获取 skill `speckit-specify` 的内容，并按流程推进。
