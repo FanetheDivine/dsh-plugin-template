@@ -50,10 +50,10 @@
 
 ## Phase 5: 实机测试与收尾
 
-- [ ] T021 扩展 `.dsh/skills/real-device-test/scripts/run-test.mjs`：增加 B5 热重载不重启（保存 `prefix` 后插件实例不变，回显用新前缀），并确认 B2–B4 仍成立
-- [ ] T022 扩展 `.dsh/skills/real-device-test/scripts/browser-test.mjs`：C4 在插件页打开模板插件配置页，断言控件、改前缀、保存、`cordis.patch.yml` 写入新值，再发 `ECHO_CASE` 回显新前缀；C5 空前缀被拒；截图写入 `shots/`
-- [ ] T023 搭建 profile 并运行 `/real-device-test` 全流程，检查截图与官方配置页的风格一致，写报告
-- [ ] T024 修复实机发现的问题，补充 `CHANGELOG.md` 条目，运行 `pnpm format && pnpm check`
+- [x] T021 扩展 `.dsh/skills/real-device-test/scripts/run-test.mjs`：增加 B5 热重载不重启（保存 `prefix` 后插件实例不变，回显用新前缀），并确认 B2–B4 仍成立
+- [x] T022 扩展 `.dsh/skills/real-device-test/scripts/browser-test.mjs`：C4 在插件页打开模板插件配置页，断言控件、改前缀、保存、`cordis.patch.yml` 写入新值，再发 `ECHO_CASE` 回显新前缀；C5 空前缀被拒；截图写入 `shots/`
+- [x] T023 搭建 profile 并运行 `/real-device-test` 全流程，检查截图与官方配置页的风格一致，写报告
+- [x] T024 修复实机发现的问题，补充 `CHANGELOG.md` 条目，运行 `pnpm format && pnpm check`
 
 ## Dependencies
 

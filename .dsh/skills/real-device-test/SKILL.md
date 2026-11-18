@@ -63,9 +63,10 @@ node run-test.mjs
 | --- | --- |
 | A1 装载 | 插件已激活，已安装版本和 dist 哈希与仓库一致 |
 | B1 工具调用 | 请求携带 `demo_echo`，工具结果为 `[rdt] (session <id>) hello` |
-| B2 热更新 | 修改 `prefix` 后回显使用新前缀 |
+| B2 热更新 | 修改 `prefix` 后回显使用新前缀，插件实例不变 |
 | B3 关闭工具 | `demoEnabled: false` 时请求不含 `demo_echo` |
 | B4 配置错误 | 未知配置键使插件加载失败，恢复后重新激活 |
+| B5 热重载不重启 | 改 `prefix`、关开 `demoEnabled` 后 `fiber.uid` 不变，工具说明随新前缀重新注册 |
 
 mock provider 的约定：
 
@@ -95,9 +96,11 @@ mock provider 的约定：
 
 | 用例 | 操作 | 断言 |
 | --- | --- | --- |
-| C1 对话冒烟 | 在工作区输入 `ECHO_CASE:gui` 并发送 | 回复含 `mock：工具返回 [rdt]`，展开本轮后出现 `demo_echo` 工具卡片 |
+| C1 对话冒烟 | 在工作区输入 `ECHO_CASE:gui` 并发送 | 回复含 `mock：工具返回 [`，展开本轮后出现 `demo_echo` 工具卡片 |
 | C2 插件页 | 打开插件页 | 已安装插件列出被测插件，启用开关为开 |
 | C3 前端示例 | 在已打开的会话中查看输入区上方 | 示例行可见，点击按钮后计数递增 |
+| C4 配置页保存 | 插件页 → 包详情 → 行“配置”，改前缀并保存，再新建会话发送 `ECHO_CASE:<新前缀>` | `cordis.patch.yml` 写入新前缀，回显使用新前缀，GUI 不重启 |
+| C5 非法前缀 | 在配置页输入空白前缀 | 输入框标红并提示，保存按钮禁用，配置不变 |
 
 新增流程时在 `browser-test.mjs` 中加一个 `check('<编号> <名称>', fn)`。界面标签的定位依据见 [pitfalls.md](references/pitfalls.md)。
 

@@ -164,13 +164,15 @@ try {
   });
 
   await check('B2 热更新 prefix 后回显使用新前缀', async () => {
+    const uid = entry.fiber?.uid;
     await config({ prefix: 'hot' });
     assert.equal(entry.fiber.state, FIBER_ACTIVE);
+    assert.equal(entry.fiber?.uid, uid, 'volatile 配置不应重新挂载插件');
     const a = await create('rdt-prefix');
     await turn(a, 'ECHO_CASE:again');
     const out = toolResults(a);
     assert(out[0]?.startsWith('[hot] '), `回显前缀错误：${out[0]}`);
-    return { toolResult: out[0] };
+    return { toolResult: out[0], sameInstance: true };
   });
 
   await check('B3 demoEnabled=false 时工具不出现在请求中', async () => {
@@ -201,6 +203,30 @@ try {
     return { rejectedAtUpdate: rejected, recovered: true };
   });
 
+  await check('B5 热重载不重启：工具随配置重新注册', async () => {
+    await config({ prefix: 'rdt', demoEnabled: true });
+    const uid = entry.fiber?.uid;
+    assert(uid, '插件未激活');
+    const description = () => app.tools.get(TOOL_NAME)?.description ?? '';
+
+    await config({ demoEnabled: true, prefix: 'live' });
+    assert.equal(entry.fiber?.uid, uid, '改 prefix 后插件被重新挂载');
+    assert(description().includes('live'), `工具说明未使用新前缀：${description()}`);
+
+    await config({ demoEnabled: false, prefix: 'live' });
+    assert.equal(entry.fiber?.uid, uid, '注销工具时插件被重新挂载');
+    assert.equal(app.tools.get(TOOL_NAME), undefined, '关闭后工具仍然注册');
+
+    await config({ demoEnabled: true, prefix: 'back' });
+    assert.equal(entry.fiber?.uid, uid, '注册工具时插件被重新挂载');
+    assert(description().includes('back'), `工具未按新前缀重新注册：${description()}`);
+
+    const a = await create('rdt-hot');
+    await turn(a, 'ECHO_CASE:hot');
+    assert.equal(toolResults(a)[0], `[back] (session ${a.id}) hot`);
+    return { uid, prefix: 'back' };
+  });
+
   writeFileSync(join(root, 'results.json'), JSON.stringify(results, null, 2));
   const fail = results.filter((r) => r.status === 'FAIL').length;
   console.log('RDT_DONE', JSON.stringify({ pass: results.length - fail, fail }));
@@ -213,6 +239,30 @@ try {
 } catch (e) {
   console.error(e);
   writeFileSync(join(root, 'fatal.txt'), e?.stack ?? String(e));
+  await check('B5 热重载不重启：工具随配置重新注册', async () => {
+    await config({ prefix: 'rdt', demoEnabled: true });
+    const uid = entry.fiber?.uid;
+    assert(uid, '插件未激活');
+    const description = () => app.tools.get(TOOL_NAME)?.description ?? '';
+
+    await config({ demoEnabled: true, prefix: 'live' });
+    assert.equal(entry.fiber?.uid, uid, '改 prefix 后插件被重新挂载');
+    assert(description().includes('live'), `工具说明未使用新前缀：${description()}`);
+
+    await config({ demoEnabled: false, prefix: 'live' });
+    assert.equal(entry.fiber?.uid, uid, '注销工具时插件被重新挂载');
+    assert.equal(app.tools.get(TOOL_NAME), undefined, '关闭后工具仍然注册');
+
+    await config({ demoEnabled: true, prefix: 'back' });
+    assert.equal(entry.fiber?.uid, uid, '注册工具时插件被重新挂载');
+    assert(description().includes('back'), `工具未按新前缀重新注册：${description()}`);
+
+    const a = await create('rdt-hot');
+    await turn(a, 'ECHO_CASE:hot');
+    assert.equal(toolResults(a)[0], `[back] (session ${a.id}) hot`);
+    return { uid, prefix: 'back' };
+  });
+
   writeFileSync(join(root, 'results.json'), JSON.stringify(results, null, 2));
   await runtime.shutdown.shutdown(1);
 }
