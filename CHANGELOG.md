@@ -14,6 +14,7 @@
 - `AGENTS.md` 新增模板说明节，链接模板转化文档
 - `AGENTS.md` 新增主工作区节：主工作区位于 `main` 且干净，只运行 `git fetch` 与 `git pull`，任何变更在 worktree 中进行
 - `/speckit-worktree-create` 在创建 worktree 前、`/speckit-worktree-finish` 在清理后，把主工作区 `main` 快进到 `origin/main`
+- `main` 启用合并门禁：PR 需通过 `check` job 且分支包含最新 `main`，管理员同样受限，直接推送被拒
 
 ### Added
 

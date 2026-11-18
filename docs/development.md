@@ -78,6 +78,16 @@
 - `publish` 由 `if: false` 禁用，原触发条件以注释保留；`pnpm run release` 推送的 tag 不会在 npm 产生新版本。
 - 模板转化时解禁，步骤见 [template-conversion.md](./template-conversion.md)。
 
+### 合并门禁
+
+`main` 由名称为 `main` 的仓库规则集保护，合并条件：
+
+- 必需 check 为 `ci.yml` 中 `check` job 的显示名。
+- 分支必须包含最新 `main`。
+- 管理员同样受限，直接推送 `main` 被拒。
+
+改 job 显示名后同步更新规则集，否则 PR 永久等待。规则集只存在于仓库设置，删除即回滚。
+
 ## 测试
 
 | 文件 | 覆盖内容 |
