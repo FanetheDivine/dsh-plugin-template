@@ -1,11 +1,3 @@
-先阅读 [README.md](./README.md) 了解项目。
-
-# 文档索引
-
-- [how-it-works.md](./docs/how-it-works.md)：插件的构造方式与运行流程。
-- [known-risks.md](./docs/known-risks.md)：已知风险与宿主限制。
-- [development.md](./docs/development.md)：本地开发、命令、测试、Spec Kit 命令一览、worktree 扩展维护与文件地图。
-
 # 写作规范
 
 适用于所有由 AI 产出的文档、注释、spec、plan、提交说明与回复。
@@ -19,6 +11,20 @@
   - 堆叠否定，例如「A，不 B，不 C」。仅写A。
   - 「不是 A，而是 B」。直接写 B。
 - 只描述当前状态，不写新旧对比或变更过程。
+
+# 项目说明
+
+DSH 插件模板，用 TypeScript 开发，用 tsdown 构建，用 biome 检查代码质量，用 vitest 运行测试。
+
+- 常用 pnpm 脚本：`dev`、`build`、`check`、`full-check`、`release`、`test:code`、`test:dist`、`lint`、`lint:fix`、`format`。
+- 命令说明见 [development.md](./docs/development.md#命令)。
+
+# 文档索引
+
+- [README.md](./README.md) 了解项目功能。
+- [how-it-works.md](./docs/how-it-works.md)：插件的构造方式与运行流程。
+- [known-risks.md](./docs/known-risks.md)：已知风险与宿主限制。
+- [development.md](./docs/development.md)：本地开发、命令、测试、Spec Kit 命令一览、worktree 扩展维护与文件地图。
 
 # 开发流程
 
