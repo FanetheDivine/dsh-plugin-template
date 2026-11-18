@@ -66,25 +66,25 @@
 
 **Independent Test**: 按 [quickstart.md](./quickstart.md) 场景 3 与场景 5 核对。
 
-- [ ] T009 [US2] 修改 `.specify/extensions/worktree/scripts/bash/create-worktree.sh`：
+- [X] T009 [US2] 修改 `.specify/extensions/worktree/scripts/bash/create-worktree.sh`：
   - 占号后重新执行 `git ls-remote --heads origin`，用 `spec_branches_with_number` 取同号分支。
   - 本分支名不是 `claim_owner` 结果时，删除远程占号分支与本地分支，编号取当前已知最大编号加一后重试，最多 10 次。
   - 第 10 次仍是冲突时退出 1，删除本次占号。
   - `git ls-remote` 失败时删除占号并退出 1。
-- [ ] T010 [US2] 新增 `.specify/extensions/worktree/scripts/bash/check-spec-number.sh`，按 [contracts/check-spec-number-cli.md](./contracts/check-spec-number-cli.md)：
+- [X] T010 [US2] 新增 `.specify/extensions/worktree/scripts/bash/check-spec-number.sh`，按 [contracts/check-spec-number-cli.md](./contracts/check-spec-number-cli.md)：
   - 先 `git fetch --quiet origin <base-ref 的分支>`。
   - 远程同号分支与 base ref 的同号 spec 目录都算冲突。
   - 退出码 0/4/1，`--json` 与 `KEY=VALUE` 两种输出。
-- [ ] T011 [P] [US2] 在 `tests/worktree-extension.test.ts` 新增用例：
+- [X] T011 [P] [US2] 在 `tests/worktree-extension.test.ts` 新增用例：
   - 另一克隆已推送 `fix/002-alpha`，本仓库 `--no-fetch` 创建 `zeta` 时改为 003，远程保留 `fix/002-alpha` 与 `fix/003-zeta`。
   - 本分支字典序靠前时保留原编号。
   - `check-spec-number.sh`：无冲突退出 0 且 `UNIQUE=true`；同号分支冲突退出 4 并列出分支；base ref 含同号 spec 目录时退出 4。
-- [ ] T012 [P] [US2] 修改 `.specify/extensions/worktree/commands/speckit.worktree.finish.md`：
+- [X] T012 [P] [US2] 修改 `.specify/extensions/worktree/commands/speckit.worktree.finish.md`：
   - 在提交之后、推送与 PR 之前新增一步运行 `check-spec-number.sh --json`。
   - 退出 4 时停止并报告冲突引用；退出 1 时停止。
   - 后续步骤重新编号，正文引用同步。
   - 把正文同步到 `.dsh/skills/speckit-worktree-finish/SKILL.md`，保留 front matter。
-- [ ] T013 [US2] 运行 `pnpm format && pnpm check`，提交
+- [X] T013 [US2] 运行 `pnpm format && pnpm check`，提交
 
 **Checkpoint**: 同号冲突在创建时收敛，交付前拦截残留冲突。
 

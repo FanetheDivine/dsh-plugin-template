@@ -173,6 +173,84 @@ describe('worktree 扩展脚本', { timeout: 30_000 }, () => {
     expect(existsSync(path.join(repo, 'worktrees', '002-offline'))).toBe(false);
   });
 
+  it('同号冲突时字典序靠后的分支自动改号', () => {
+    const dev2 = secondClone(base);
+    pushBranch(dev2, 'fix/002-alpha');
+    const out = json(
+      script(
+        repo,
+        'create-worktree.sh',
+        '--json',
+        '--no-fetch',
+        '--type',
+        'fix',
+        '--short-name',
+        'zeta',
+      ),
+    );
+    expect(out.FEATURE_NUM).toBe('003');
+    expect(out.CLAIMED).toBe(true);
+    const branches = remoteBranches(repo);
+    expect(branches).toContain('fix/002-alpha');
+    expect(branches).toContain('fix/003-zeta');
+    expect(branches).not.toContain('fix/002-zeta');
+  });
+
+  it('同号冲突时字典序靠前的分支保留编号', () => {
+    const dev2 = secondClone(base);
+    pushBranch(dev2, 'fix/002-beta');
+    const out = json(
+      script(
+        repo,
+        'create-worktree.sh',
+        '--json',
+        '--no-fetch',
+        '--type',
+        'fix',
+        '--short-name',
+        'alpha',
+      ),
+    );
+    expect(out.FEATURE_NUM).toBe('002');
+    expect(out.BRANCH_NAME).toBe('fix/002-alpha');
+    expect(remoteBranches(repo)).toContain('fix/002-beta');
+  });
+
+  it('check-spec-number：编号唯一时退出 0', () => {
+    json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'unique'));
+    const wt = path.join(repo, 'worktrees', '002-unique');
+    const out = json(script(wt, 'check-spec-number.sh', '--json'));
+    expect(out.UNIQUE).toBe(true);
+    expect(out.FEATURE_NUM).toBe('002');
+  });
+
+  it('check-spec-number：同号分支时退出 4', () => {
+    json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'conflict'));
+    const wt = path.join(repo, 'worktrees', '002-conflict');
+    const dev2 = secondClone(base);
+    pushBranch(dev2, 'fix/002-alpha');
+    const res = script(wt, 'check-spec-number.sh', '--json');
+    expect(res.status).toBe(4);
+    const out = JSON.parse(res.stdout.trim());
+    expect(out.UNIQUE).toBe(false);
+    expect(out.CONFLICTS).toContain('fix/002-alpha');
+  });
+
+  it('check-spec-number：base ref 有同号 spec 目录时退出 4', () => {
+    json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'merged'));
+    const wt = path.join(repo, 'worktrees', '002-merged');
+    const dev2 = secondClone(base);
+    mkdirSync(path.join(dev2, 'specs', '002-other'), { recursive: true });
+    writeFileSync(path.join(dev2, 'specs', '002-other', 'spec.md'), '# other\n');
+    git(dev2, 'add', '-A');
+    git(dev2, 'commit', '--quiet', '-m', 'spec: 002-other');
+    git(dev2, 'push', '--quiet', 'origin', 'main');
+
+    const res = script(wt, 'check-spec-number.sh', '--json');
+    expect(res.status).toBe(4);
+    expect(res.stdout).toContain('specs/002-other');
+  });
+
   it('已在 feature worktree 内运行时复用当前 worktree', () => {
     json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'reuse-me'));
     const wt = path.join(repo, 'worktrees', '002-reuse-me');
