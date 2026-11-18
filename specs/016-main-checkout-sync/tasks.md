@@ -39,13 +39,13 @@
 
 **Independent Test**: 按 [quickstart.md](./quickstart.md) 文档验证第 1、2 步核对。
 
-- [ ] T005 [US1] 在 `AGENTS.md` 的「模板说明」与「开发流程」之间新增「主工作区」一节：
+- [X] T005 [US1] 在 `AGENTS.md` 的「模板说明」与「开发流程」之间新增「主工作区」一节：
   - 主工作区指仓库根目录的检出，即 `git worktree list` 的第一项。
   - 主工作区 MUST 位于 `main` 分支。
   - 主工作区 MUST 保持干净，`git status --porcelain` 输出为空。
   - 在主工作区只运行 `git fetch` 与 `git pull`。
   - 任何变更 MUST 在 worktree 中进行，文档、配置、spec 与代码同样适用。
-- [ ] T006 [US1] 运行 `pnpm format && pnpm check`，提交
+- [X] T006 [US1] 运行 `pnpm format && pnpm check`，提交
 
 **Checkpoint**: `AGENTS.md` 含主工作区约束；宪章不变。
 
