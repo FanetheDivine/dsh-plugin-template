@@ -45,8 +45,8 @@
 
 **独立验证**：未批准、部分认可和无豁免时均保持 `Draft`；实质修改使旧批准失效，历史记录保留。
 
-- [ ] T006 [US2] 修改 `.dsh/skills/speckit-clarify/SKILL.md`，在访谈写回后请求完整规格审查，维护 `Draft|Approved|Waived`、审查记录、部分认可处理、豁免风险和实质修改失效
-- [ ] T007 [US2] 修改 `.dsh/skills/speckit-plan/SKILL.md`，在 setup-plan 前检查规格为 `Approved` 或 `Waived`，且待确认决策均为空或已豁免；失败时返回规格审查
+- [X] T006 [US2] 修改 `.dsh/skills/speckit-clarify/SKILL.md`，在访谈写回后请求完整规格审查，维护 `Draft|Approved|Waived`、审查记录、部分认可处理、豁免风险和实质修改失效
+- [X] T007 [US2] 修改 `.dsh/skills/speckit-plan/SKILL.md`，在 setup-plan 前检查规格为 `Approved` 或 `Waived`，且待确认决策均为空或已豁免；失败时返回规格审查
 
 **阶段提交**：`docs(019): 增加完整规格批准门禁`
 
