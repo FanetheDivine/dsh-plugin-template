@@ -70,10 +70,10 @@
 
 **目的**：统一入口说明、维护要求、受管文件清单与最终质量。
 
-- [ ] T011 [P] 更新 `AGENTS.md` 开发流程表，将 clarify 标为必做，并写明两段探索后访谈、完整规格/计划审查及未决项清零门禁
-- [ ] T012 [P] 更新 `docs/development.md` 的 Spec Kit 流程、命令产出、核心 skill 本地定制与 manifest 同步说明、测试清单和文件地图
-- [ ] T013 更新 `.specify/integrations/dsh.manifest.json` 与 `.specify/integrations/speckit.manifest.json`，使五个 skill 和两个模板的 SHA-256 与实际文件一致
-- [ ] T014 按 `specs/019-spec-clarification-review/quickstart.md` 审查最终 diff，并运行 `git diff --check`、`pnpm format && pnpm check` 与 `pnpm run full-check`
+- [X] T011 [P] 更新 `AGENTS.md` 开发流程表，将 clarify 标为必做，并写明两段探索后访谈、完整规格/计划审查及未决项清零门禁
+- [X] T012 [P] 更新 `docs/development.md` 的 Spec Kit 流程、命令产出、核心 skill 本地定制与 manifest 同步说明、测试清单和文件地图
+- [X] T013 更新 `.specify/integrations/dsh.manifest.json` 与 `.specify/integrations/speckit.manifest.json`，使五个 skill 和两个模板的 SHA-256 与实际文件一致
+- [X] T014 按 `specs/019-spec-clarification-review/quickstart.md` 审查最终 diff，并运行 `git diff --check`、`pnpm format && pnpm check` 与 `pnpm run full-check`
 
 **阶段提交**：`docs(019): 同步流程说明与受管文件清单`
 

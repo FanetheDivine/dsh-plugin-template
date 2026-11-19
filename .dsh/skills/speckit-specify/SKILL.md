@@ -56,7 +56,11 @@ Generate the specification draft. Formal requirement questions are owned by the 
    Resolution order:
 
    1. Use an explicitly provided `SPECIFY_FEATURE_DIRECTORY`.
-   2. Otherwise scan existing directories under `specs/`, select the next sequential three-digit feature number, and construct `specs/<NNN>-<short-name>`.
+   2. Otherwise read `.specify/init-options.json` for `feature_numbering`, with `branch_numbering` accepted only as a deprecated fallback:
+      - `timestamp`: prefix the short name with `YYYYMMDD-HHMMSS` using the current timestamp.
+      - `sequential` or absent: scan existing directories under `specs/`, select the next sequential three-digit feature number, and prefix the short name with it.
+      - When only deprecated `branch_numbering` is used, warn: "`branch_numbering` in init-options.json is deprecated. Rename to `feature_numbering`."
+   3. Construct `SPECIFY_FEATURE_DIRECTORY` as `specs/<prefix>-<short-name>`.
 
    Create the directory and initial spec:
 

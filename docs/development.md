@@ -102,6 +102,8 @@
 
 vitest 拆成 `code` 与 `dist` 两个 project。产物测试读取 `dist`，由 `build` 末尾的 `test:dist` 执行；`test:code` 不读取 `dist`。产物缺失或早于构建输入时，产物测试失败并提示运行 `pnpm build`。
 
+纯文档流程变更不新增测试文件时，仍须运行质量门禁。专项验收步骤记录在对应 spec 的 `quickstart.md`。
+
 浏览器用例由仓库内的 `playwright` 驱动无头 Chrome。`vitest.config.ts` 把 `@deepseek-ai/dsh-client-ui-primitives` 指向包的源码：已发布的 `lib` 内联了 shiki、katex 等未声明的依赖，源码只依赖 react、clsx 与 `dsh-client-store`。
 
 ## Spec Kit 流程
@@ -113,12 +115,12 @@ DSH 从 `.dsh/skills/` 加载 `speckit-*` skill，在对话框输入 `/` 调用�
 
 | 步骤 | 命令 | 产出 |
 | --- | --- | --- |
-| 1 | `/speckit-specify <需求描述>` | 主工作区 `main` 同步到 `origin/main`，占号分支、worktree 与 `spec.md` |
-| 2 | `/speckit-clarify` | 写回 spec 的澄清结果 |
-| 3 | `/speckit-plan` | `plan.md` 与设计产物 |
-| 4 | `/speckit-tasks` | `tasks.md` |
+| 1 | `/speckit-specify <需求描述>` | 主工作区 `main` 同步到 `origin/main`，占号分支、worktree、规格草稿与待确认决策 |
+| 2 | `/speckit-clarify` | 探索结果、分批访谈记录、更新后的 spec，以及完整规格的 `Approved` 或 `Waived` 审查记录 |
+| 3 | `/speckit-plan` | `plan.md` 与设计产物、实现细节访谈记录，以及完整计划的 `Approved` 或 `Waived` 审查记录 |
+| 4 | `/speckit-tasks` | 通过规格与计划门禁后生成的 `tasks.md` |
 | 5 | `/speckit-analyze` | 跨产物一致性报告 |
-| 6 | `/speckit-implement` | 按阶段提交的实现 |
+| 6 | `/speckit-implement` | 复核门禁并按阶段提交的实现；新未决项返回对应访谈 |
 | 7 | `/speckit-worktree-finish` | 基线同步、编号校验、PR、无上限等待合并与合并后的清理，或以 `abandon` 放弃；清理后主工作区 `main` 同步到 `origin/main` |
 
 - `base_ref` 默认为 `origin/main`，必须已包含 `.specify/` 与 `.dsh/skills/`。
@@ -126,6 +128,28 @@ DSH 从 `.dsh/skills/` 加载 `speckit-*` skill，在对话框输入 `/` 调用�
 - 同号分支按完整分支名排序，保留第一个，其余自动改号；占号失败时中止，不留下分支与 worktree。
 - `/speckit-worktree-finish` 在推送与 PR 前运行 `check-spec-number.sh`，发现同号时停止。
 - `worktrees/` 已加入 `.gitignore`，biome 与 vitest 也会跳过它。
+
+## 维护 Spec Kit 核心流程
+
+核心 `.dsh/skills/speckit-*/SKILL.md` 由 Spec Kit integration 生成，仓库没有对应的本地命令渲染源。修改这些文件时：
+
+1. 保留 front matter。
+2. 更新 `.specify/integrations/dsh.manifest.json` 中被修改 skill 的 SHA-256。
+3. 修改 `.specify/templates/` 或 `.specify/scripts/` 时，同步更新 `.specify/integrations/speckit.manifest.json` 中对应条目。
+4. 上游 Spec Kit 刷新后重新审查并应用本地流程定制。
+
+可用以下命令计算候选文件哈希，再仅更新实际修改的 manifest 条目：
+
+```sh
+sha256sum .dsh/skills/speckit-*/SKILL.md .specify/templates/*.md
+```
+
+spec 与 plan 模板包含状态、待确认决策、澄清记录和审查记录。访谈与审查的完整执行规则归属对应 skill：
+
+- [speckit-clarify](../.dsh/skills/speckit-clarify/SKILL.md)：需求探索、分批需求访谈与完整规格审查。
+- [speckit-plan](../.dsh/skills/speckit-plan/SKILL.md)：技术探索、分批实现细节访谈与完整计划审查。
+- [speckit-tasks](../.dsh/skills/speckit-tasks/SKILL.md)：任务生成前的规格与计划门禁。
+- [speckit-implement](../.dsh/skills/speckit-implement/SKILL.md)：实现前复核与新未决项处理。
 
 ## 维护 worktree 扩展
 
@@ -175,7 +199,8 @@ specs/<NNN>-<name>/         # 每个需求的 spec、plan、tasks
 └── speckit-*/              # Spec Kit 流程 skill
 .specify/
 ├── memory/constitution.md  # 项目宪章
-├── templates/              # Spec Kit 模板
+├── templates/              # Spec Kit 产物模板与审查区块
+├── integrations/           # 受管 skill、脚本与模板的 SHA-256 清单
 ├── scripts/bash/           # Spec Kit 脚本
 ├── extensions.yml          # 扩展钩子
 └── extensions/worktree/    # 本地 worktree 扩展
