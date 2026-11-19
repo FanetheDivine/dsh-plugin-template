@@ -32,8 +32,8 @@
 
 **独立验证**：clarify 不再包含固定五问或一次一问，specify 固定进入 clarify；待确认列表支持部分回答与跨会话恢复。
 
-- [ ] T004 [P] [US1] 修改 `.dsh/skills/speckit-specify/SKILL.md`，保留规格草稿生成，将正式提问移至必经的 clarify，并在完成报告固定指向 clarify
-- [ ] T005 [P] [US1] 修改 `.dsh/skills/speckit-clarify/SKILL.md`，在提问前完成代码库/文档/接口/约束探索，持久化待确认决策，按依赖在每批提出全部独立问题，附稳定编号和推荐答案，取消数量上限并处理部分回答与跳过
+- [X] T004 [P] [US1] 修改 `.dsh/skills/speckit-specify/SKILL.md`，保留规格草稿生成，将正式提问移至必经的 clarify，并在完成报告固定指向 clarify
+- [X] T005 [P] [US1] 修改 `.dsh/skills/speckit-clarify/SKILL.md`，在提问前完成代码库/文档/接口/约束探索，持久化待确认决策，按依赖在每批提出全部独立问题，附稳定编号和推荐答案，取消数量上限并处理部分回答与跳过
 
 **阶段提交**：`docs(019): 实现探索后的分批需求访谈`
 
