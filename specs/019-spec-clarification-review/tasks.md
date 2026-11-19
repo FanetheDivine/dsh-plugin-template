@@ -18,8 +18,8 @@
 
 **目的**：为规格与计划提供状态、待确认决策、澄清记录和审查记录。
 
-- [ ] T002 [P] 在 `.specify/templates/spec-template.md` 增加 `Draft|Approved|Waived` 状态语义、待确认决策、带稳定编号的澄清记录和包含日期/范围/未确认事项/风险的审查记录
-- [ ] T003 [P] 在 `.specify/templates/plan-template.md` 增加同一组状态与区块，并保留原有技术背景、宪章检查和项目结构
+- [X] T002 [P] 在 `.specify/templates/spec-template.md` 增加 `Draft|Approved|Waived` 状态语义、待确认决策、带稳定编号的澄清记录和包含日期/范围/未确认事项/风险的审查记录
+- [X] T003 [P] 在 `.specify/templates/plan-template.md` 增加同一组状态与区块，并保留原有技术背景、宪章检查和项目结构
 
 **独立验证**：两个模板都包含四类区块，且没有新增脚本或状态文件。
 **阶段提交**：`docs(019): 增加规格与计划审查区块`
