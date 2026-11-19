@@ -8,6 +8,28 @@
 
 **Input**: User description: "$ARGUMENTS"
 
+## Open Decisions
+
+<!--
+Status values:
+- Draft: the current full document is not approved or waived.
+- Approved: the user approved the current full document.
+- Waived: the user waived the review and accepted the recorded risks.
+Record each undecided question with a stable id and its dependencies.
+-->
+
+- [ ] [D-001] [Question] | Depends on: none | Status: not asked
+
+## Clarifications
+
+### Session [DATE]
+
+- [D-001] Q: [Question] -> A: [Answer]
+
+## Review Record
+
+- [DATE] | Decision: [Approved|Waived] | Scope: current full document | Open items: [none|list] | Risks: [none|list]
+
 ## User Scenarios & Testing *(mandatory)*
 
 <!--
