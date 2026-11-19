@@ -58,9 +58,9 @@
 
 **独立验证**：plan 在技术探索后分批确认实现细节并请求计划审查；tasks/implement 在状态缺失或未决项未豁免时停止。
 
-- [ ] T008 [US3] 修改 `.dsh/skills/speckit-plan/SKILL.md`，在 Phase 0/1 与技术探索完成后按依赖分批确认全部实现细节，写回受影响设计文档，请求完整计划审查并维护状态与实质修改失效
-- [ ] T009 [P] [US3] 修改 `.dsh/skills/speckit-tasks/SKILL.md`，在 setup-tasks 前检查规格和计划的 `Approved|Waived` 状态及待确认决策，缺失时返回对应审查
-- [ ] T010 [P] [US3] 修改 `.dsh/skills/speckit-implement/SKILL.md`，实现前复查规格/计划状态与未决项，发现新未决项时暂停受影响工作并返回对应探索、访谈与审查
+- [X] T008 [US3] 修改 `.dsh/skills/speckit-plan/SKILL.md`，在 Phase 0/1 与技术探索完成后按依赖分批确认全部实现细节，写回受影响设计文档，请求完整计划审查并维护状态与实质修改失效
+- [X] T009 [P] [US3] 修改 `.dsh/skills/speckit-tasks/SKILL.md`，在 setup-tasks 前检查规格和计划的 `Approved|Waived` 状态及待确认决策，缺失时返回对应审查
+- [X] T010 [P] [US3] 修改 `.dsh/skills/speckit-implement/SKILL.md`，实现前复查规格/计划状态与未决项，发现新未决项时暂停受影响工作并返回对应探索、访谈与审查
 
 **阶段提交**：`docs(019): 增加实现访谈与计划批准门禁`
 

@@ -95,7 +95,7 @@ Generate the specification draft. Formal requirement questions are owned by the 
    1. Create `SPECIFY_FEATURE_DIRECTORY/checklists/requirements.md` from the active checklist template.
    2. Validate the draft against every checklist item.
    3. If quality items fail, revise the draft until they pass or the remaining ambiguity is represented as an open decision.
-   4. Unanswered requirements do not by themselves block planning; they must remain visible in `Open Decisions` for mandatory clarification.
+   4. Unanswered requirements do not block draft completion; they remain visible in `Open Decisions` and block planning until mandatory clarification resolves or explicitly waives them.
    5. Update the checklist with current pass/fail status after each revision.
 
 ## Mandatory Post-Execution Hooks
