@@ -29,6 +29,17 @@
 | 多次运行报 `SessionAlreadyExistsError` | 固定 sessionId 与上轮落盘会话冲突 | `run-test.mjs` 启动时清理 `test-sessions` |
 | 驱动找不到 `lib/profile-boot.js` | 旧版宿主只提供带 hash 的文件名 | `run-test.mjs` 按导出的 `runProfile` 查找 |
 
+## 热更新
+
+| 现象 | 原因 | 处理 |
+| --- | --- | --- |
+| 构建后插件行为不变 | profile 不是链接安装，或 `cordis.patch.yml` 缺 `hmr` 条目 | 确认 `node_modules/<插件>` 指向仓库；确认补丁含 `- id: hmr` 与 `root: ["<repo>/dist"]` |
+| 构建后插件不可用 | 新产物导入或启动失败 | 修正代码后重新构建，HMR 会再次导入并恢复 |
+| 构建后毫无变化 | 只改了 `src`，没有构建 | 运行 `pnpm build` 或保持 `pnpm dev` 运行 |
+| 前端改动不生效 | 宿主轮询产物有延迟，或 `dist/client.js` 未更新 | 等待数秒；确认构建产物已更新 |
+| 仓库在点目录下时监听不到 | HMR 默认忽略 `**/.*` | 把仓库放在不含点目录的路径，或在 `hmr` 配置中调整 `ignored` |
+| 同一轮里手工改过 `cordis.patch.yml` | 宿主按补丁重新组合，可能重载插件 | 补丁改动后按新配置重跑用例 |
+
 ## 浏览器
 
 `browser-test.mjs` 用 Playwright 驱动无头 Chrome。界面标签随宿主语言变化，脚本按中英文两套标签依次尝试。定位依据：

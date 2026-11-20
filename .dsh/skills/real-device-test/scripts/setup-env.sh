@@ -60,10 +60,9 @@ elif ! dsh --profile "$PROFILE" --from-default-profile web --dump-config >/dev/n
   }, null, 2) + '\n')" "$PDIR/package.json" "$PROFILE"
 fi
 
-echo "== 4/6 安装插件"
-# tgz 留在 profile 目录：profile 的 package.json 以 file: 依赖指向它
-TGZ=$(cd "$REPO_U" && pnpm pack --pack-destination "$PDIR_U" | tail -1)
-dsh plugin --profile "$PROFILE" add "$(cygpath -m "$TGZ")"
+echo "== 4/6 安装插件（链接到仓库，构建后热更新）"
+# 链接安装：profile 记录 link: 依赖，node_modules 指向仓库，HMR 监听仓库 dist 即可替换插件
+dsh plugin --profile "$PROFILE" add "$REPO"
 
 echo "== 5/6 写隔离配置并复制驱动脚本"
 # 预先确认宿主的欢迎弹窗：版本号须与宿主内置常量完全一致，旧版宿主没有该常量时跳过
@@ -82,12 +81,25 @@ WELCOME_PATCH=""
 "
 if grep -q "rdt-mock" "$PDIR_U/cordis.patch.yml" 2>/dev/null; then
   echo "cordis.patch.yml 已含测试配置，保留"
+  # 补齐 HMR 监听；旧补丁可能只有 [] 占位，追加列表项前先去掉
+  if ! grep -q "id: hmr" "$PDIR_U/cordis.patch.yml"; then
+    grep -v '^\[\]$' "$PDIR_U/cordis.patch.yml" >"$PDIR_U/cordis.patch.yml.tmp"
+    cat >>"$PDIR_U/cordis.patch.yml.tmp" <<EOF
+- id: hmr
+  config:
+    root: ["$REPO/dist"]
+EOF
+    mv "$PDIR_U/cordis.patch.yml.tmp" "$PDIR_U/cordis.patch.yml"
+  fi
 else
   cat >"$PDIR_U/cordis.patch.yml" <<EOF
 # 实机测试隔离配置：停用真实模型，会话与存储写入 profile 目录，mock provider 由末尾 insert 加载。
 - id: $PLUGIN
   config:
     prefix: rdt
+- id: hmr
+  config:
+    root: ["$REPO/dist"]
 - id: agent-default-model
   config:
     provider: mock
@@ -131,4 +143,6 @@ cat <<EOF
   eval \$(bash $SCRIPTS_DIR/gui-up.sh $PROFILE)   # 启动 GUI 并导出 RDT_GUI_URL
   cd $REPO_U && node $SCRIPTS_DIR/browser-test.mjs   # 浏览器用例
 browser-test.mjs 依赖仓库的 playwright，因此在仓库内运行。
+迭代：改代码后运行 pnpm build（或 pnpm dev），运行中的实例自动替换插件，无需重装或重启。
+结束：保存报告与截图后删除 profile：rm -rf $PDIR_U
 EOF

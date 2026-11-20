@@ -143,10 +143,10 @@ try {
     );
     const installed = join(root, 'node_modules', PLUGIN);
     const version = (dir) => JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8')).version;
-    assert.equal(version(installed), version(REPO), '已安装版本与仓库不一致');
+    assert.equal(version(installed), version(REPO), '加载的版本与仓库不一致');
     const hash = (f) => createHash('sha256').update(readFileSync(f)).digest('hex').slice(0, 12);
     const sha = hash(join(installed, 'dist', 'index.mjs'));
-    assert.equal(sha, hash(join(REPO, 'dist', 'index.mjs')), '已安装 dist 与仓库 dist 不一致');
+    assert.equal(sha, hash(join(REPO, 'dist', 'index.mjs')), '加载产物与仓库 dist 不一致');
     return { version: version(installed), sha };
   });
   if (results.at(-1)?.status !== 'PASS') throw new Error('装载失败，中止后续用例');
