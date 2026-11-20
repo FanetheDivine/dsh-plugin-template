@@ -43,6 +43,13 @@
 - 新增或升级宿主客户端依赖时，核对平台种子表与宿主版本。
 - 类型声明由 `tsc -p tsconfig.build.json` 生成到 `dist/client/`。
 
+## 前端 UI 链接
+
+前端 UI 里 `a` 标签的 `href` MUST 使用完整 URL：
+
+- 完整 URL 含协议与主机，例如 `https://github.com/FanetheDivine/dsh-plugin-template`。
+- Desktop 用应用内地址加载前端页面。`href` 写成相对路径时，点击后指向应用地址，打不开目标。
+
 ## 环境要求
 
 - Node.js 24.9 及以上，与 DSH 的运行要求一致；CI 使用 Node 24。
