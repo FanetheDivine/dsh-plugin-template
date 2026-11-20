@@ -6,6 +6,7 @@
 
 - Spec Kit 主流程在探索后按依赖分批访谈，规格与计划经用户批准或豁免后推进，任务与实现复核未决项
 - 实机测试驱动按插件页的 `data-plugin-package` 与元数据标题定位插件，配置保存改为轮询补丁文件
+- 实机测试改为链接安装并启用 HMR：构建后同一 GUI 实例自动替换插件，前后端都无需刷新或重启，每轮结束删除 profile
 - 前端入口不再声明必需服务，`locale`、`slots`、`configForms` 按功能用 `ctx.inject` 分组加载，缺失时跳过对应功能
 - `pnpm check` 的 lint 只报告 error 级诊断，`test:code` 换用 `minimal` reporter 并隐藏通过用例的日志
 - `pnpm build` 的 `test:dist` 换用 `minimal` reporter 并隐藏通过用例的日志

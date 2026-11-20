@@ -140,10 +140,10 @@ pnpm build        # 或 pnpm dev，持续监听 src
 
 ## 阶段 5：报告与清理
 
-1. 按 [cases.md](references/cases.md) 末尾的结构写报告。
+1. 按 [cases.md](references/cases.md) 末尾的结构写报告，保存截图与结果文件。
 2. 结束 GUI 进程：用 `netstat -ano` 找到 GUI 端口的 PID，再 `taskkill //F //T //PID <pid>`。
 3. 浏览器驱动会自行关闭浏览器，无需清理页面。
-4. 保留 profile、日志与截图供复查。
+4. 删除 profile：`rm -rf <profile目录>`。下一轮重新搭建。
 
 ## 环境变量
 
