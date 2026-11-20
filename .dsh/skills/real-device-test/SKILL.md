@@ -20,7 +20,7 @@ description: 在真实 DSH 宿主上端到端测试本插件，验证插件在 D
 
 ## 阶段 0：准备
 
-1. 在仓库运行 `pnpm i && pnpm check`，确保 `dist/` 对应当前代码。
+1. 在仓库运行 `pnpm i && pnpm check`，确保 `dist/` 对应当前代码。构建是迭代动作，后续改代码只需再跑一次 `pnpm build`。
 2. 确认 `playwright` 已安装。脚本用 `channel: 'chrome'` 启动本机 Chrome，无需下载浏览器。
 
 ## 阶段 1：搭建环境（A）
@@ -36,11 +36,12 @@ bash .dsh/skills/real-device-test/scripts/setup-env.sh <仓库绝对路径> [pro
    - 全局 `dsh` 版本一致时直接使用。
    - 版本不一致时安装到 `~/.dsh-local/dsh-<版本>`，全局安装保持不变。
 2. 创建 profile，默认名为 `rdt-<日期>`。
-3. 用 `pnpm pack` 打包插件，`dsh plugin add` 安装。
+3. 用 `dsh plugin add` 以链接方式安装当前检出，`node_modules` 指向仓库。
 4. 写隔离配置 `cordis.patch.yml`：
    - 停用真实模型，加载 mock provider。
    - 会话、存储、凭据写入 profile 目录。
    - 跳过宿主的欢迎弹窗。
+   - 启用 HMR 并监听仓库 `dist`，构建后自动替换插件。
 5. 复制 `mock-provider.mjs` 与 `run-test.mjs` 到 profile 目录。
 6. 注册测试工作区。
 
@@ -61,7 +62,7 @@ node run-test.mjs
 
 | 用例 | 断言 |
 | --- | --- |
-| A1 装载 | 插件已激活，已安装版本和 dist 哈希与仓库一致 |
+| A1 装载 | 插件已激活，加载的版本和 dist 哈希与仓库一致 |
 | B1 工具调用 | 请求携带 `demo_echo`，工具结果为 `[rdt] (session <id>) hello` |
 | B2 热更新 | 修改 `prefix` 后回显使用新前缀，插件实例不变 |
 | B3 关闭工具 | `demoEnabled: false` 时请求不含 `demo_echo` |
