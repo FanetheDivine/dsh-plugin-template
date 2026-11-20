@@ -17,6 +17,7 @@
 - `/speckit-worktree-create` 在创建 worktree 前、`/speckit-worktree-finish` 在清理后，把主工作区 `main` 快进到 `origin/main`
 - `/speckit-worktree-create` 创建 spec 时同步远程全部分支并推送占号分支，同号时按分支名自动改号；`/speckit-worktree-finish` 在推送与 PR 前校验编号唯一
 - `publish` job 改用 Node 24 自带的 npm，删除 `npm install -g npm@latest` 步骤
+- `docs/development.md` 增加前端 UI 链接规则：`a` 标签的 `href` 使用完整 URL，相对链接在 Desktop 中打不开目标
 
 ### Fixed
 
