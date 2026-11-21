@@ -52,6 +52,11 @@ function sync(cwd: string): RunResult {
   return run('bash', [SCRIPT, '--json'], cwd);
 }
 
+/** 在 cwd 下运行 sync-main.sh --json --prepare。 */
+function prepare(cwd: string): RunResult {
+  return run('bash', [SCRIPT, '--json', '--prepare'], cwd);
+}
+
 /** 解析成功输出的 JSON 行。 */
 function json(res: RunResult): Record<string, string | boolean> {
   if (res.status !== 0) throw new Error(`脚本失败：${res.stderr}`);
@@ -171,6 +176,91 @@ describe('sync-main.sh', { timeout: 30_000 }, () => {
     expect(res.status).toBe(1);
     expect(res.stderr).toContain("failed to fetch 'origin'");
     expect(git(repo, 'rev-parse', 'HEAD')).toBe(head);
+  });
+
+  it('prepare：在 topic 分支时切回 main 并快进', () => {
+    git(repo, 'checkout', '--quiet', '-b', 'topic');
+    const remote = advanceOrigin('g.txt');
+    const out = json(prepare(repo));
+    expect(out.STASHED).toBe(false);
+    expect(out.TEMP_BRANCH).toBe('');
+    expect(out.UPDATED).toBe(true);
+    expect(out.MAIN_COMMIT).toBe(remote);
+    expect(git(repo, 'rev-parse', '--abbrev-ref', 'HEAD')).toBe('main');
+    expect(git(repo, 'rev-parse', 'HEAD')).toBe(remote);
+  });
+
+  it('prepare：未提交变更进入 stash 后可恢复', () => {
+    git(repo, 'checkout', '--quiet', '-b', 'topic');
+    writeFileSync(path.join(repo, 'draft.txt'), 'draft\n');
+    const remote = advanceOrigin('h.txt');
+    const out = json(prepare(repo));
+    expect(out.STASHED).toBe(true);
+    expect(out.MAIN_COMMIT).toBe(remote);
+    expect(git(repo, 'status', '--porcelain')).toBe('');
+    expect(existsSync(path.join(repo, 'draft.txt'))).toBe(false);
+    expect(git(repo, 'stash', 'list')).toContain('worktree-finish');
+    git(repo, 'stash', 'pop');
+    expect(existsSync(path.join(repo, 'draft.txt'))).toBe(true);
+  });
+
+  it('prepare：其他分支的未推送提交留在原分支', () => {
+    git(repo, 'checkout', '--quiet', '-b', 'topic');
+    writeFileSync(path.join(repo, 'proposal.txt'), 'proposal\n');
+    git(repo, 'add', '-A');
+    git(repo, 'commit', '--quiet', '-m', 'proposal');
+    const topicHead = git(repo, 'rev-parse', 'HEAD');
+    const remote = advanceOrigin('i.txt');
+    const out = json(prepare(repo));
+    expect(out.STASHED).toBe(false);
+    expect(out.TEMP_BRANCH).toBe('');
+    expect(git(repo, 'rev-parse', '--abbrev-ref', 'HEAD')).toBe('main');
+    expect(git(repo, 'rev-parse', 'HEAD')).toBe(remote);
+    expect(git(repo, 'rev-parse', 'topic')).toBe(topicHead);
+  });
+
+  it('prepare：main 领先时保存到 wip 分支并重置', () => {
+    writeFileSync(path.join(repo, 'local.txt'), 'local\n');
+    git(repo, 'add', '-A');
+    git(repo, 'commit', '--quiet', '-m', 'local');
+    const local = git(repo, 'rev-parse', 'HEAD');
+    const remote = advanceOrigin('j.txt');
+    const out = json(prepare(repo));
+    expect(out.TEMP_BRANCH).toMatch(/^wip\/main-\d{8}T\d{6}$/);
+    expect(out.MAIN_COMMIT).toBe(remote);
+    expect(git(repo, 'rev-parse', 'HEAD')).toBe(remote);
+    expect(git(repo, 'rev-parse', String(out.TEMP_BRANCH))).toBe(local);
+    expect(existsSync(path.join(repo, 'local.txt'))).toBe(false);
+  });
+
+  it('prepare：detached HEAD 保存到 wip/detached 分支', () => {
+    git(repo, 'checkout', '--quiet', '--detach');
+    writeFileSync(path.join(repo, 'detached.txt'), 'detached\n');
+    git(repo, 'add', '-A');
+    git(repo, 'commit', '--quiet', '-m', 'detached');
+    const detached = git(repo, 'rev-parse', 'HEAD');
+    const remote = advanceOrigin('k.txt');
+    const out = json(prepare(repo));
+    expect(out.TEMP_BRANCH).toMatch(/^wip\/detached-\d{8}T\d{6}$/);
+    expect(git(repo, 'rev-parse', '--abbrev-ref', 'HEAD')).toBe('main');
+    expect(git(repo, 'rev-parse', 'HEAD')).toBe(remote);
+    expect(git(repo, 'rev-parse', String(out.TEMP_BRANCH))).toBe(detached);
+  });
+
+  it('prepare：已同步时不创建 stash 与临时分支', () => {
+    const head = git(repo, 'rev-parse', 'HEAD');
+    const out = json(prepare(repo));
+    expect(out.UPDATED).toBe(false);
+    expect(out.STASHED).toBe(false);
+    expect(out.TEMP_BRANCH).toBe('');
+    expect(out.MAIN_COMMIT).toBe(head);
+  });
+
+  it('prepare：origin 不可达时退出 1', () => {
+    git(repo, 'remote', 'set-url', 'origin', path.join(base, 'missing.git'));
+    const res = prepare(repo);
+    expect(res.status).toBe(1);
+    expect(res.stderr).toContain("failed to fetch 'origin'");
   });
 
   it('脚本在执行中被 pull 改写时仍正常结束', () => {
