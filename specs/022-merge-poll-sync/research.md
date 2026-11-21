@@ -18,9 +18,9 @@
 
 ## R3 合并等待的 gh 调用
 
-- **Decision**: 每轮一次 `gh pr view "<PR>" --json state,mergedAt,mergeable,reviewDecision,reviews,comments`，用 `jq` 取字段与评论计数。
-- **Rationale**: 10 秒节奏下把每轮 4 次调用降为 1 次，判断顺序不变。
-- **Alternatives considered**: 保留原多次调用；缓存字段会引入过期状态。
+- **Decision**: 每轮一次 `gh pr view "<PR>" --json state,mergedAt,mergeable,reviewDecision,reviews,comments --template '...'`，用 `--template` 输出以 `|` 分隔的字段，再用 `IFS='|' read` 读取。
+- **Rationale**: 10 秒节奏下把每轮 4 次调用降为 1 次，判断顺序不变；本机没有 `jq`，`gh` 自带模板不需要额外依赖。
+- **Alternatives considered**: 外部 `jq`（当前环境未安装）；多次 `--jq` 调用（回到每轮多次调用）。
 
 ## R4 轮询节奏
 

@@ -20,6 +20,7 @@
 - [P-001] 问：主工作区的 stash、切换与临时分支保存放在哪里？ → 答：给 `sync-main.sh` 加 `--prepare`，默认模式不变。
 - [P-002] 问：保存未推送提交的临时分支如何命名？ → 答：`wip/<branch>-<timestamp>`。
 - [P-003] 问：合并等待每轮的 gh 调用怎么处理？ → 答：每轮一次 `gh pr view`，用 `jq` 取字段。
+- 实现期间确认本机没有 `jq`：仍保持每轮一次 `gh pr view`，改用 `--template` 输出字段并用 `IFS='|' read` 读取。
 
 ## Review Record
 
@@ -46,7 +47,7 @@
 
 **Language/Version**: Bash；TypeScript 测试，Node.js 24.9+
 
-**Primary Dependencies**: git、GitHub CLI `gh`、jq（skill 片段使用）；无新增依赖
+**Primary Dependencies**: git、GitHub CLI `gh`（片段用 `--template` 取值）；无新增依赖
 
 **Storage**: N/A
 

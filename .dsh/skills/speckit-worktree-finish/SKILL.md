@@ -85,7 +85,7 @@ Run inside `WORKTREE_PATH`:
 7. Wait for CI as a background job:
 
    ```bash
-   gh pr checks "<PR>" --watch --fail-fast --interval 30
+   gh pr checks "<PR>" --watch --fail-fast --interval 15
    ```
 
    Exit 0 means every check passed. Any other code means a failing check: read
@@ -95,32 +95,24 @@ Run inside `WORKTREE_PATH`:
 
    ```bash
    base=$(gh pr view "<PR>" --json reviews,comments --jq '(.reviews | length) + (.comments | length)')
+   start=$(date +%s)
    while :; do
-     state=$(gh pr view "<PR>" --json state,mergedAt --jq '.state + " " + (.mergedAt // "none")')
-     case "$state" in
-       "MERGED "*) echo MERGED; break ;;
-       "CLOSED "*) echo "$state"; break ;;
-     esac
-     if [[ "$(gh pr view "<PR>" --json mergeable --jq .mergeable)" == "CONFLICTING" ]]; then
-       echo CONFLICTING
-       break
-     fi
-     if [[ "$(gh pr view "<PR>" --json reviewDecision --jq .reviewDecision)" == "CHANGES_REQUESTED" ]]; then
-       echo FEEDBACK
-       break
-     fi
-     now=$(gh pr view "<PR>" --json reviews,comments --jq '(.reviews | length) + (.comments | length)')
-     if (( now > base )); then
-       echo FEEDBACK
-       break
-     fi
-     sleep 60
+     snapshot=$(gh pr view "<PR>" --json state,mergedAt,mergeable,reviewDecision,reviews,comments --template '{{.state}}|{{if .mergedAt}}{{.mergedAt}}{{else}}none{{end}}|{{.mergeable}}|{{.reviewDecision}}|{{len .reviews}}|{{len .comments}}')
+     IFS='|' read -r state merged_at mergeable review_decision reviews comments <<<"$snapshot"
+     if [[ "$state" == "MERGED" ]]; then echo MERGED; break; fi
+     if [[ "$state" == "CLOSED" ]]; then echo "CLOSED $merged_at"; break; fi
+     if [[ "$mergeable" == "CONFLICTING" ]]; then echo CONFLICTING; break; fi
+     if [[ "$review_decision" == "CHANGES_REQUESTED" ]]; then echo FEEDBACK; break; fi
+     if (( reviews + comments > base )); then echo FEEDBACK; break; fi
+     if (( $(date +%s) - start < 300 )); then sleep 10; else sleep 30; fi
    done
    ```
 
-   The loop has no deadline. Each iteration checks the merge state first, then the conflict state,
-   then feedback, so a merge that lands while feedback is pending wins. As with the other snippets,
-   substitute the recorded PR number for `"<PR>"`.
+   The loop has no deadline and makes one `gh pr view` call per iteration. Each iteration checks the
+   merge state first, then the conflict state, then feedback, so a merge that lands while feedback is
+   pending wins. The interval is 10 seconds for the first 5 minutes and 30 seconds afterwards; the
+   window starts when the loop starts. As with the other snippets, substitute the recorded PR number
+   for `"<PR>"`.
 
    - `MERGED`: continue to cleanup.
    - `CLOSED ...`: the PR was closed without merging; report and stop without cleanup.
@@ -139,9 +131,10 @@ when it reports completion; keep its identifier to stop it when it no longer mat
 one wait at a time: stop the finished job before starting its replacement, and never reuse a job
 that already exited.
 
-The loop and its interval live inside the job. Do not wrap a wait in repeated foreground `sleep`
-calls: a long foreground command is moved to the background, and its output arrives too late to act
-on. The waits do not block the session; keep handling other user requests while they run.
+The loop and its interval live inside the job; the merge wait switches from 10 to 30 seconds after
+5 minutes. Do not wrap a wait in repeated foreground `sleep` calls: a long foreground command is
+moved to the background, and its output arrives too late to act on. The waits do not block the
+session; keep handling other user requests while they run.
 
 Only three things in this loop need action: a failing CI check, feedback that reports a defect, and
 a conflict with the base. Whether the merge itself causes problems is the merger's concern. Do not
