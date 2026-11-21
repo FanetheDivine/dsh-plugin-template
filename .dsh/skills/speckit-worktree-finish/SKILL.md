@@ -11,8 +11,9 @@ metadata:
 
 Close out the feature developed in the current worktree: after the user accepts the result, merge
 the latest base into the branch, push it, open a pull request, and stay with the PR until it is
-merged; then remove the worktree, the local branch and the remote branch. If the user abandons the
-feature, discard it and leave a pushed branch on the remote.
+merged; then fast-forward the primary checkout's `main`, and remove the worktree, the local branch
+and the remote branch. If the user abandons the feature, sync `main` the same way, discard the
+feature and leave a pushed branch on the remote.
 
 ## User Input
 
@@ -114,7 +115,7 @@ Run inside `WORKTREE_PATH`:
    window starts when the loop starts. As with the other snippets, substitute the recorded PR number
    for `"<PR>"`.
 
-   - `MERGED`: continue to cleanup.
+   - `MERGED`: continue to step 9.
    - `CLOSED ...`: the PR was closed without merging; report and stop without cleanup.
    - `CONFLICTING`: go back to step 3, sync the base, commit, push, then restart step 7 and this
      step.
@@ -122,7 +123,7 @@ Run inside `WORKTREE_PATH`:
      fix it and go back to step 3 before pushing. When it asks for something else, apply it,
      commit, push and restart step 7 and this step.
 
-9. Clean up (see below).
+9. Sync the primary checkout, then clean up (see below).
 
 ### Waits run in the background
 
@@ -143,37 +144,45 @@ merge the PR yourself.
 ## Abandon mode
 
 Confirm with the user that uncommitted and unpushed work in `WORKTREE_PATH` will be discarded,
-then clean up with `--abandon`. A branch already pushed to the remote is left there; mention it.
+then sync the primary checkout and clean up with `--abandon`. A branch already pushed to the
+remote is left there; mention it.
 
-## Clean up
+## Sync the primary checkout, then clean up
+
+Both modes run these steps in this order.
 
 1. Change the session working directory to `MAIN_WORKTREE` (a worktree cannot be removed while the
    session is inside it). Verify with `pwd`.
-2. Run:
+2. Sync `main`:
+
+   ```bash
+   .specify/extensions/worktree/scripts/bash/sync-main.sh --json --prepare
+   ```
+
+   The script stashes uncommitted changes, switches another branch back to `main`, saves `main`
+   commits that are not on `origin/main` on a `wip/...` branch, and fast-forwards `main`. Parse
+   `MAIN_COMMIT`, `UPDATED`, `STASHED` and `TEMP_BRANCH` from the JSON output.
+
+   - Exit 0: `main` equals `origin/main`; continue.
+   - Exit 2 or 1: report the stderr reason and continue. The primary checkout keeps its state.
+
+   The stash and the temporary branch stay in the repository; report them and leave them for the
+   user.
+3. Remove the worktree and branches:
 
    ```bash
    .specify/extensions/worktree/scripts/bash/finish-worktree.sh --json --merged --path "<WORKTREE_PATH>"   # deliver, after the PR merged
    .specify/extensions/worktree/scripts/bash/finish-worktree.sh --json --abandon --path "<WORKTREE_PATH>"  # abandon
    ```
 
-3. If the script refuses (missing `--merged`, uncommitted changes, unpushed commits), report the
+4. If the script refuses (missing `--merged`, uncommitted changes, unpushed commits), report the
    reason; do not force removal in deliver mode.
-4. `REMOTE_DELETED` in the output tells whether the remote branch was deleted; `false` means it
+5. `REMOTE_DELETED` in the output tells whether the remote branch was deleted; `false` means it
    was already gone.
-5. Sync the primary checkout in both modes, after `finish-worktree.sh` succeeds:
-
-   ```bash
-   .specify/extensions/worktree/scripts/bash/sync-main.sh --json
-   ```
-
-   The script fast-forwards the primary checkout's `main` to `origin/main` with `git fetch` and
-   `git pull --ff-only`. Parse `MAIN_COMMIT` and `UPDATED` from the JSON output.
-
-   - Exit 0: `main` equals `origin/main`.
-   - Exit 2 or 1: report the stderr reason and leave the primary checkout as it is.
 
 ## Output
 
 Report the outcome: PR URL, and that the worktree, local branch and remote branch were removed
-(deliver), or the discarded branch (abandon). Add the primary checkout sync result: `MAIN_COMMIT`
-and `UPDATED`, or the reason the sync was skipped.
+(deliver), or the discarded branch (abandon). Add the primary checkout sync result: `MAIN_COMMIT`,
+`UPDATED`, the stash created (`STASHED`), the temporary branch (`TEMP_BRANCH`), or the reason the
+sync failed.

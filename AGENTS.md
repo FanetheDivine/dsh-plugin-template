@@ -25,9 +25,15 @@ DSH 插件模板，用 TypeScript 开发，用 tsdown 构建，用 biome 检查�
 
 主工作区指仓库根目录的检出，即 `git worktree list` 的第一项。
 
-- 主工作区 MUST 位于 `main` 分支。
-- 主工作区 MUST 保持干净，`git status --porcelain` 输出为空。
-- 在主工作区只运行 `git fetch` 与 `git pull`。
+- 主工作区 MUST 位于 `main` 分支，并保持干净：`git status --porcelain` 输出为空。
+- 状态不满足上述约束时，先恢复再继续：未提交变更存入 stash，其他分支切回 `main`，未推送的提交保存在临时分支。
+- 在主工作区只运行 `git fetch`、`git pull` 与可恢复的操作。可恢复的操作指不丢失已提交内容与未提交变更的操作：
+  - `git stash`
+  - `git switch`
+  - `git branch`
+  - `git reset --hard`，只在目标提交已保存到临时分支时使用
+  - `git worktree remove`
+  - `git branch -D`
 - 任何变更 MUST 在 worktree 中进行，文档、配置、spec 与代码同样适用。
 
 # 开发流程
