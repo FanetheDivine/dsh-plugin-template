@@ -1,4 +1,4 @@
-# Implementation Plan: 放弃模式关闭 PR 并清理远程分支
+# Implementation Plan: 放弃模式关闭 PR 并删除远程分支
 
 **Branch**: `feat/023-abandon-remote-cleanup` | **Date**: 2026-11-23 | **Spec**: [spec.md](./spec.md)
 
@@ -10,30 +10,19 @@
 
 无。
 
-## Clarifications
-
-- 规格阶段的决策见 [spec.md](./spec.md#澄清记录)。
-- [P-001] 问：墓碑放在哪里？ → 答：远程 `refs/tags/abandoned/<分支名>`，指向被删除的分支头。
-- [P-002] 问：编号逻辑读什么？ → 答：`create-worktree.sh` 读 base ref 的 `specs/`、主工作区 `specs/`、本地与远程跟踪分支；占号后用 `git ls-remote` 校验。墓碑加入这两处来源。
-
 ## Review Record
 
-- 2026-11-23：任务指令要求自行实现、PR 与合并。 | Decision: Waived | Scope: current full document | Open items: none | Risks: 默认删除远程分支；墓碑 tag 积累在远程
+- 2026-11-23：任务指令要求自行实现、PR 与合并。 | Decision: Waived | Scope: current full document | Open items: none | Risks: 被放弃的编号可能被后续 spec 复用
 
 ## Summary
 
-- `spec-number-lib.sh` 新增 `remote_spec_refs`：从 `git ls-remote --heads --tags` 输出提取分支名与 `abandoned/*` 墓碑名。
-- `create-worktree.sh`：
-  - fetch 用显式 refspec 同步分支与 `refs/tags/abandoned/*`。
-  - 初始算号读取 `refs/tags/abandoned`。
-  - 占号校验读取墓碑；同号墓碑存在时改号。
-- `check-spec-number.sh`：同号墓碑列为冲突。
-- `finish-worktree.sh --abandon`：
-  - 删除 worktree 与本地分支后，用 `gh pr list --head` 查 open PR 并 `gh pr close --comment`。
-  - `git push --atomic origin +<sha>:refs/tags/abandoned/<branch> :refs/heads/<branch>`。
-  - 失败记入 `WARNINGS` 并继续。
-  - `--keep-remote` 跳过以上两步。
-- 文档与测试同步。
+- `finish-worktree.sh` 放弃模式在删除本地分支后：
+  - `gh pr list --head <branch> --state open --json number --jq '.[].number'`，逐个 `gh pr close`。
+  - `git ls-remote --heads origin <branch>` 存在时 `git push origin --delete <branch>`。
+  - 失败记入 `WARNINGS`，最后以 5 退出。
+- JSON 增加 `PR_CLOSED` 与 `WARNINGS`；`REMOTE_DELETED` 在放弃模式反映实际结果。
+- 编号脚本保持原样。
+- 同步 finish 命令、skill、`docs/development.md` 与 CHANGELOG。
 
 ## Constitution Check
 

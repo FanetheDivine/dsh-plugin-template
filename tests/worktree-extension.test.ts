@@ -2,7 +2,15 @@
 // .specify/extensions/worktree/scripts/bash 下的 create-worktree.sh / finish-worktree.sh，
 // 断言分支命名、编号、平行 worktree 位置、复用与清理行为。
 import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,8 +34,16 @@ interface RunResult {
   stderr: string;
 }
 
-function run(cmd: string, args: string[], cwd: string): RunResult {
-  const res = spawnSync(cmd, args, { cwd, encoding: 'utf8', env: GIT_ENV });
+/** 脚本额外的环境变量，每个用例在 beforeEach 中重置。 */
+let scriptEnv: Record<string, string> = {};
+
+function run(
+  cmd: string,
+  args: string[],
+  cwd: string,
+  env: NodeJS.ProcessEnv = GIT_ENV,
+): RunResult {
+  const res = spawnSync(cmd, args, { cwd, encoding: 'utf8', env });
   return { status: res.status, stdout: res.stdout ?? '', stderr: res.stderr ?? '' };
 }
 
@@ -38,7 +54,27 @@ function git(cwd: string, ...args: string[]): string {
 }
 
 function script(cwd: string, name: string, ...args: string[]): RunResult {
-  return run('bash', [`.specify/extensions/worktree/scripts/bash/${name}`, ...args], cwd);
+  return run('bash', [`.specify/extensions/worktree/scripts/bash/${name}`, ...args], cwd, {
+    ...GIT_ENV,
+    ...scriptEnv,
+  });
+}
+
+/** 假 gh：记录调用参数；FAKE_GH_PRS 为 open PR 编号，FAKE_GH_FAIL 让 list 或 close 失败。 */
+const FAKE_GH = [
+  '#!/usr/bin/env bash',
+  'echo "$*" >> "$FAKE_GH_LOG"',
+  'case "$1 $2" in',
+  '  "pr list") [[ "${FAKE_GH_FAIL:-}" == list ]] && exit 1; for n in ${FAKE_GH_PRS:-}; do echo "$n"; done ;;',
+  '  "pr close") [[ "${FAKE_GH_FAIL:-}" == close ]] && exit 1 ;;',
+  'esac',
+  'exit 0',
+  '',
+].join('\n');
+
+/** 把 Windows 路径转成 bash 可用的正斜杠形式。 */
+function posix(p: string): string {
+  return p.replace(/\\/g, '/');
 }
 
 /** 在临时仓库把特性分支合入 main 并推送，模拟 PR 合并后的状态。 */
@@ -94,7 +130,24 @@ describe('worktree 扩展脚本', { timeout: 30_000 }, () => {
     git(repo, 'add', '-A');
     git(repo, 'commit', '--quiet', '-m', 'init');
     git(repo, 'push', '--quiet', '-u', 'origin', 'main');
+    const fakeGh = path.join(base, 'fake-gh');
+    writeFileSync(fakeGh, FAKE_GH, { mode: 0o755 });
+    scriptEnv = { WORKTREE_GH: posix(fakeGh), FAKE_GH_LOG: posix(path.join(base, 'gh.log')) };
   });
+
+  /** 假 gh 的调用记录。 */
+  function ghLog(): string {
+    const file = path.join(base, 'gh.log');
+    return existsSync(file) ? readFileSync(file, 'utf8') : '';
+  }
+
+  /** 创建并推送一个待放弃的特性 worktree。 */
+  function abandonable(name: string): string {
+    json(script(repo, 'create-worktree.sh', '--json', '--short-name', name));
+    const wt = path.join(repo, 'worktrees', `002-${name}`);
+    git(wt, 'push', '--quiet', '-u', 'origin', `feat/002-${name}`);
+    return wt;
+  }
 
   afterEach(() => {
     rmSync(base, { recursive: true, force: true });
@@ -364,17 +417,64 @@ describe('worktree 扩展脚本', { timeout: 30_000 }, () => {
     expect(git(repo, 'branch', '--list', 'feat/002-unpushed')).not.toBe('');
   });
 
-  it('finish --abandon：丢弃未提交改动并保留远程分支', () => {
-    json(script(repo, 'create-worktree.sh', '--json', '--short-name', 'drop-it'));
-    const wt = path.join(repo, 'worktrees', '002-drop-it');
-    git(wt, 'push', '--quiet', '-u', 'origin', 'feat/002-drop-it');
+  it('finish --abandon：无 PR 时跳过关闭，丢弃未提交改动并删除远程分支', () => {
+    const wt = abandonable('drop-it');
     writeFileSync(path.join(wt, 'wip.txt'), 'wip\n');
-    const out = json(script(repo, 'finish-worktree.sh', '--json', '--abandon', '--path', wt));
+    const res = script(repo, 'finish-worktree.sh', '--json', '--abandon', '--path', wt);
+    const out = json(res);
     expect(out.ABANDONED).toBe(true);
-    expect(out.REMOTE_DELETED).toBe(false);
+    expect(out.REMOTE_DELETED).toBe(true);
+    expect(out.PR_CLOSED).toBe('');
+    expect(res.stderr).toContain('no open PR');
+    expect(ghLog()).not.toContain('pr close');
     expect(existsSync(wt)).toBe(false);
     expect(git(repo, 'branch', '--list', 'feat/002-drop-it')).toBe('');
-    expect(git(repo, 'ls-remote', '--heads', 'origin', 'feat/002-drop-it')).not.toBe('');
+    expect(git(repo, 'ls-remote', '--heads', 'origin', 'feat/002-drop-it')).toBe('');
+  });
+
+  it('finish --abandon：关闭分支的 open PR', () => {
+    const wt = abandonable('with-pr');
+    scriptEnv.FAKE_GH_PRS = '7';
+    const out = json(script(repo, 'finish-worktree.sh', '--json', '--abandon', '--path', wt));
+    expect(out.PR_CLOSED).toBe('7');
+    expect(out.REMOTE_DELETED).toBe(true);
+    expect(ghLog()).toContain('pr list --head feat/002-with-pr --state open');
+    expect(ghLog()).toContain('pr close 7');
+  });
+
+  it('finish --abandon：gh 不可用时跳过关闭 PR', () => {
+    const wt = abandonable('no-gh');
+    scriptEnv.WORKTREE_GH = posix(path.join(base, 'missing-gh'));
+    const res = script(repo, 'finish-worktree.sh', '--json', '--abandon', '--path', wt);
+    const out = json(res);
+    expect(res.stderr).toContain('is not available');
+    expect(out.REMOTE_DELETED).toBe(true);
+  });
+
+  it('finish --abandon：关闭 PR 失败时仍删除远程分支并退出 5', () => {
+    const wt = abandonable('gh-fail');
+    scriptEnv.FAKE_GH_PRS = '7';
+    scriptEnv.FAKE_GH_FAIL = 'close';
+    const res = script(repo, 'finish-worktree.sh', '--json', '--abandon', '--path', wt);
+    expect(res.status).toBe(5);
+    const out = JSON.parse(res.stdout.trim());
+    expect(out.PR_CLOSED).toBe('');
+    expect(out.WARNINGS).toContain('PR #7');
+    expect(out.REMOTE_DELETED).toBe(true);
+    expect(existsSync(wt)).toBe(false);
+    expect(git(repo, 'ls-remote', '--heads', 'origin', 'feat/002-gh-fail')).toBe('');
+  });
+
+  it('finish --abandon：远程不可达时保留本地清理结果并退出 5', () => {
+    const wt = abandonable('offline');
+    git(repo, 'remote', 'set-url', 'origin', path.join(base, 'missing.git'));
+    const res = script(repo, 'finish-worktree.sh', '--json', '--abandon', '--path', wt);
+    expect(res.status).toBe(5);
+    const out = JSON.parse(res.stdout.trim());
+    expect(out.REMOTE_DELETED).toBe(false);
+    expect(out.WARNINGS).toContain('remote');
+    expect(existsSync(wt)).toBe(false);
+    expect(git(repo, 'branch', '--list', 'feat/002-offline')).toBe('');
   });
 
   it('finish 拒绝在 worktree 内部运行', () => {
