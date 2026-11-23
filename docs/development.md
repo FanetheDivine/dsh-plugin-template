@@ -128,7 +128,7 @@ DSH 从 `.dsh/skills/` 加载 `speckit-*` skill，在对话框输入 `/` 调用�
 | 4 | `/speckit-tasks` | 通过规格与计划门禁后生成的 `tasks.md` |
 | 5 | `/speckit-analyze` | 跨产物一致性报告 |
 | 6 | `/speckit-implement` | 复核门禁并按阶段提交的实现；新未决项返回对应访谈 |
-| 7 | `/speckit-worktree-finish` | 基线同步、编号校验、PR、无上限等待 CI 与合并、合并后同步主工作区 `main` 并清理，或以 `abandon` 放弃；两种模式都在清理前同步 `main` |
+| 7 | `/speckit-worktree-finish` | 基线同步、编号校验、PR、无上限等待 CI 与合并、合并后同步主工作区 `main` 并清理，或以 `abandon` 放弃：删除 worktree 与本地分支，关闭 PR 并删除远程分支；两种模式都在清理前同步 `main` |
 
 - `base_ref` 默认为 `origin/main`，必须已包含 `.specify/` 与 `.dsh/skills/`。
 - 创建 spec 时，`create-worktree.sh` 先同步远程全部分支，再推送 `<type>/<NNN>-<name>` 占号，最后创建 worktree。

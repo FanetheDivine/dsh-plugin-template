@@ -13,7 +13,7 @@ Close out the feature developed in the current worktree: after the user accepts 
 the latest base into the branch, push it, open a pull request, and stay with the PR until it is
 merged; then fast-forward the primary checkout's `main`, and remove the worktree, the local branch
 and the remote branch. If the user abandons the feature, sync `main` the same way, discard the
-feature and leave a pushed branch on the remote.
+feature, close its PR and delete the remote branch.
 
 ## User Input
 
@@ -144,8 +144,9 @@ merge the PR yourself.
 ## Abandon mode
 
 Confirm with the user that uncommitted and unpushed work in `WORKTREE_PATH` will be discarded,
-then sync the primary checkout and clean up with `--abandon`. A branch already pushed to the
-remote is left there; mention it.
+then sync the primary checkout and clean up with `--abandon`. The script closes the open PR of the
+branch and deletes the remote branch. Exit 5 means the local cleanup finished and `WARNINGS`
+lists the PR or remote steps that failed; report them.
 
 ## Sync the primary checkout, then clean up
 
@@ -183,6 +184,6 @@ Both modes run these steps in this order.
 ## Output
 
 Report the outcome: PR URL, and that the worktree, local branch and remote branch were removed
-(deliver), or the discarded branch (abandon). Add the primary checkout sync result: `MAIN_COMMIT`,
-`UPDATED`, the stash created (`STASHED`), the temporary branch (`TEMP_BRANCH`), or the reason the
-sync failed.
+(deliver), or the discarded branch, `PR_CLOSED` and `REMOTE_DELETED` (abandon). Add the primary
+checkout sync result: `MAIN_COMMIT`, `UPDATED`, the stash created (`STASHED`), the temporary
+branch (`TEMP_BRANCH`), or the reason the sync failed.

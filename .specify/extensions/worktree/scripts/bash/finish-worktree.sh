@@ -5,9 +5,13 @@
 #
 # Run it from the primary checkout (the session must not be inside the worktree
 # being removed). --merged cleans up after the PR merged and deletes the remote
-# branch; --abandon discards everything and keeps a pushed remote branch.
+# branch; --abandon discards everything, closes the open PRs of the branch and
+# deletes the remote branch. A missing gh, a missing PR or a missing remote
+# branch is skipped with a note. A failed PR or remote step exits 5 after the
+# local cleanup and lists the failures in WARNINGS. WORKTREE_GH overrides gh.
 set -euo pipefail
 
+GH="${WORKTREE_GH:-gh}"
 JSON=false
 ABANDON=false
 MERGED=false
@@ -29,7 +33,7 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     -h | --help)
-      sed -n '2,8p' "$0"
+      sed -n '2,11p' "$0"
       exit 0
       ;;
     *) die "unknown argument: $1" ;;
@@ -79,13 +83,55 @@ if ! git -C "$MAIN_WORKTREE" worktree remove --force "$WT_PATH" 2>/dev/null; the
 fi
 git -C "$MAIN_WORKTREE" branch -D "$BRANCH_NAME" >/dev/null
 
+# Abandon mode: close the open PRs and delete the remote branch. The local
+# cleanup above is already done; failures here are recorded and exit 5.
+PR_CLOSED=""
+WARNINGS=""
+warn() {
+  echo "WARNING: $*" >&2
+  WARNINGS="${WARNINGS:+$WARNINGS; }$*"
+}
+
+if $ABANDON; then
+  if ! command -v "$GH" >/dev/null 2>&1; then
+    echo "NOTE: '$GH' is not available; skipped closing the PRs of '$BRANCH_NAME'" >&2
+  elif ! prs="$(cd "$MAIN_WORKTREE" && "$GH" pr list --head "$BRANCH_NAME" --state open --json number --jq '.[].number')"; then
+    warn "failed to list the PRs of '$BRANCH_NAME'; close them manually"
+  elif [[ -z "${prs//[[:space:]]/}" ]]; then
+    echo "NOTE: no open PR for '$BRANCH_NAME'" >&2
+  else
+    for pr in $prs; do
+      if (cd "$MAIN_WORKTREE" && "$GH" pr close "$pr" >&2); then
+        PR_CLOSED="${PR_CLOSED:+$PR_CLOSED,}$pr"
+      else
+        warn "failed to close PR #$pr"
+      fi
+    done
+  fi
+
+  if ! remote_heads="$(git -C "$MAIN_WORKTREE" ls-remote --heads origin "$BRANCH_NAME")"; then
+    warn "failed to query remote 'origin'; delete '$BRANCH_NAME' manually"
+  elif [[ -z "$remote_heads" ]]; then
+    echo "NOTE: remote branch '$BRANCH_NAME' does not exist" >&2
+  elif git -C "$MAIN_WORKTREE" push --quiet origin --delete "$BRANCH_NAME" >&2; then
+    REMOTE_DELETED=true
+  else
+    warn "failed to delete remote branch '$BRANCH_NAME'"
+  fi
+fi
+
 if $JSON; then
-  printf '{"BRANCH_NAME":"%s","WORKTREE_PATH":"%s","MAIN_WORKTREE":"%s","ABANDONED":%s,"REMOTE_DELETED":%s}\n' \
-    "$BRANCH_NAME" "$WT_PATH" "$MAIN_WORKTREE" "$ABANDON" "$REMOTE_DELETED"
+  printf '{"BRANCH_NAME":"%s","WORKTREE_PATH":"%s","MAIN_WORKTREE":"%s","ABANDONED":%s,"REMOTE_DELETED":%s,"PR_CLOSED":"%s","WARNINGS":"%s"}\n' \
+    "$BRANCH_NAME" "$WT_PATH" "$MAIN_WORKTREE" "$ABANDON" "$REMOTE_DELETED" "$PR_CLOSED" \
+    "${WARNINGS//\"/\\\"}"
 else
   echo "BRANCH_NAME=$BRANCH_NAME"
   echo "WORKTREE_PATH=$WT_PATH"
   echo "MAIN_WORKTREE=$MAIN_WORKTREE"
   echo "ABANDONED=$ABANDON"
   echo "REMOTE_DELETED=$REMOTE_DELETED"
+  echo "PR_CLOSED=$PR_CLOSED"
+  echo "WARNINGS=$WARNINGS"
 fi
+
+[[ -z "$WARNINGS" ]] || exit 5
