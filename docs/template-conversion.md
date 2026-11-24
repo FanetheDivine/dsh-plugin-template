@@ -16,7 +16,7 @@
 ## 模板变更
 
 - 保持 `demo_echo` 示例、README 与测试可用。
-- 新用户能按 README 跑通。
+- README 与插件功能一致。
 
 ## 模板转化
 
@@ -31,8 +31,9 @@
    - 用户拒绝：依赖版本保持不变。
 3. 发布设置：
    1. 清空 `package.json` 的 `version`，由具体插件填入自己的首个版本号。
-   2. 恢复 `.github/workflows/ci.yml` 中 `publish` job 被注释的 `if: startsWith(github.ref, 'refs/tags/')`，并删除 `if: false`。
-   3. 提醒用户把 npm Trusted Publisher 绑定到新仓库与 `.github/workflows/ci.yml`。
-   4. 清空过往 spec 与 changelog。
+   2. 在 `package.json` 设置 `repository`，值为新插件的仓库 URL。
+   3. 恢复 `.github/workflows/ci.yml` 中 `publish` job 被注释的 `if: startsWith(github.ref, 'refs/tags/')`，并删除 `if: false`。
+   4. 提醒用户把 npm Trusted Publisher 绑定到新仓库与 `.github/workflows/ci.yml`。
+   5. 清空过往 spec 与 changelog。
 
 模板与插件的约束不同。混用会让模板示例与真实插件相互拖累。

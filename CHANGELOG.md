@@ -4,6 +4,9 @@
 
 ### Changed
 
+- `README.md` 面向插件用户，只写简介与功能列表，开头带 npm 版本徽标
+- 宪章升到 v2.1.0：文档分为用户文档与技术文档，`README.md` 为唯一用户文档，不计入单一归属；原则 III 增加 README 规则
+- 模板转化的发布设置增加一步：把 `package.json` 的 `repository` 设为新插件的仓库 URL
 - `/speckit-worktree-finish` 放弃模式关闭分支的 open PR 并删除远程分支；gh 不可用或无 PR 时跳过，PR 或远程步骤失败时保留本地清理结果并以 5 退出
 - Spec Kit 主流程在探索后按依赖分批访谈，规格与计划经用户批准或豁免后推进，任务与实现复核未决项
 - 实机测试驱动按插件页的 `data-plugin-package` 与元数据标题定位插件，配置保存改为轮询补丁文件

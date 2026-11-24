@@ -7,7 +7,7 @@ DSH 插件模板，用 TypeScript 开发，用 tsdown 构建，用 biome 检查�
 
 # 文档索引
 
-- [README.md](./README.md) 了解项目功能。
+- [README.md](./README.md)：插件简介与功能。
 - [how-it-works.md](./docs/how-it-works.md)：插件的构造方式与运行流程。
 - [known-risks.md](./docs/known-risks.md)：已知风险与宿主限制。
 - [development.md](./docs/development.md)：本地开发、命令、测试、Spec Kit 命令一览、worktree 扩展维护与文件地图。
