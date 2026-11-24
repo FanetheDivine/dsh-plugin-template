@@ -1,17 +1,8 @@
 <!--
 Sync Impact Report
-- Version change: 1.9.0 → 2.0.0
+- Version change: 2.0.0 → 2.1.0
 - Modified principles:
-  - I. 宿主契约 → I. 宿主依赖版本：只保留依赖版本规则，以同版本 `@deepseek-ai/dsh` 为准
-  - IV. 测试同步 → II. 测试同步
-  - V. 文档结构 → III. 文档结构
-  - VI. 质量门禁 → IV. 质量门禁
-  - VIII. 公开引用 → V. 公开引用
-- Removed principles:
-  - II. 依赖归属：归属规则移入 `docs/how-it-works.md`，`minimumReleaseAgeExclude` 规则并入原则 I
-  - III. 严格配置：移入 `docs/how-it-works.md`
-  - VII. 模板定位：移入 `docs/template-conversion.md`
-  - IX. 国际化：移入 `docs/i18n.md`
+  - III. 文档结构：文档分为用户文档与技术文档；`README.md` 为用户文档，不计入单一归属；新增 README 规则；同步要求改为插件功能或使用建议变化时更新 README
 - Added sections: 无
 - Removed sections: 无
 - Templates requiring updates: 无，plan、spec、tasks 模板在运行时读取本文件
@@ -47,29 +38,37 @@ Sync Impact Report
 
 ### III. 文档结构
 
-文档分为五类，每类只写归属于自己的内容：
+文档分为用户文档与技术文档，按读者归属内容：
 
-| 文档 | 读者 | 归属内容 |
-| --- | --- | --- |
-| `README.md` | 插件用户 | 功能、安装、配置、工具 |
-| `AGENTS.md` | 每个会话的 Agent | 通用的信息和指令 |
-| 本宪章 | 执行 Spec Kit 流程的 Agent 与维护者 | 变更过程中必须遵循的硬约束 |
-| `docs/` | 开发者 | 工作机制、已知风险、开发说明 |
-| 代码注释 | 读代码的人 | 文件职责、函数与常量用途 |
+| 文档 | 类别 | 读者 | 归属内容 |
+| --- | --- | --- | --- |
+| `README.md` | 用户文档 | 插件用户 | 简介、功能、使用建议 |
+| `AGENTS.md` | 技术文档 | 每个会话的 Agent | 通用的信息和指令 |
+| 本宪章 | 技术文档 | 执行 Spec Kit 流程的 Agent 与维护者 | 变更过程中必须遵循的硬约束 |
+| `docs/` | 技术文档 | 开发者 | 工作机制、已知风险、开发说明 |
+| 代码注释 | 技术文档 | 读代码的人 | 文件职责、函数与常量用途 |
 
 引用规则：
 
-- 每条信息 MUST 只有一个归属文档。
-- 其他文档引用时 MUST 只放链接，禁止相互复述。
+- 技术文档中的每条信息 MUST 只有一个归属文档。
+- 技术文档之间引用时 MUST 只放链接，禁止相互复述。
 - 复述指完整重写另一文档已归属的规则或说明。以下不算复述：
   - 链接及其一句话锚文本。
   - `AGENTS.md` 文档索引中的条目说明。
   - 代码注释中与该代码相关的一句理由。
-- `README.md` 省略实现细节。
+- `README.md` 不计入单一归属，可以复述技术文档的内容。
+
+README 规则：
+
+- 开头 MUST 依次包含插件名、npm 版本徽标与简介，随后是功能列表。
+- npm 徽标 MUST 使用 shields.io 的版本徽标，链接到 npmjs.com 的包页。
+- MUST 省略安装命令、配置表、工具表、实现细节与面向开发者的内容。
+- 插件存在易混淆的功能或配置时，增加「使用建议」一节，内容限于该插件的具体功能。
+- 指向仓库文件的链接 MUST 使用 GitHub 绝对 URL。
 
 同步要求：
 
-- 用户可见行为变化 MUST 更新 `README.md`。
+- 插件功能或使用建议变化 MUST 更新 `README.md`。
 - 机制、风险、流程或文件结构变化 MUST 更新对应的归属文档。
 - CHANGELOG MUST 按分支规则维护：
   - `main` 上每个 commit 都增加条目。
@@ -80,7 +79,7 @@ Sync Impact Report
 - 文件顶部 MUST 用一两句话说明职责和关键导出。
 - 函数与常量 MUST 用一句话说明用途。
 
-理由：每条信息只在一处维护，文档之间不会相互矛盾；按读者分类让信息出现在固定位置。
+理由：技术文档的每条信息只在一处维护，文档之间不会相互矛盾；README 面向插件用户，按用户需要组织内容。
 
 ### IV. 质量门禁
 
@@ -131,4 +130,4 @@ Sync Impact Report
   - PATCH：措辞澄清。
 - `/speckit-plan` 的 Constitution Check 与 `/speckit-analyze` MUST 逐条核对本宪章。
 
-**Version**: 2.0.0 | **Ratified**: 2026-11-17 | **Last Amended**: 2026-11-18
+**Version**: 2.1.0 | **Ratified**: 2026-11-17 | **Last Amended**: 2026-11-24

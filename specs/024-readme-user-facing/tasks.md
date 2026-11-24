@@ -29,10 +29,10 @@
 
 **Independent Test**: 按 [quickstart.md](./quickstart.md) 第 3、4 步检查。
 
-- [ ] T004 [US2] [US3] 按 [research.md](./research.md#r2-宪章原则-iii) R2 改写 `.specify/memory/constitution.md` 原则 III；版本改为 2.1.0，Last Amended 改为 2026-11-24；Sync Impact Report 记录 2.0.0 → 2.1.0 与原则 III 的调整
-- [ ] T005 [P] [US3] 按 R3 修改 `AGENTS.md` 文档索引的 README 条目
-- [ ] T006 [P] [US3] 按 R3 修改 `docs/template-conversion.md` 模板变更一节的 README 要求
-- [ ] T007 [US3] 运行 `pnpm format && pnpm check`，提交
+- [X] T004 [US2] [US3] 按 [research.md](./research.md#r2-宪章原则-iii) R2 改写 `.specify/memory/constitution.md` 原则 III；版本改为 2.1.0，Last Amended 改为 2026-11-24；Sync Impact Report 记录 2.0.0 → 2.1.0 与原则 III 的调整
+- [X] T005 [P] [US3] 按 R3 修改 `AGENTS.md` 文档索引的 README 条目
+- [X] T006 [P] [US3] 按 R3 修改 `docs/template-conversion.md` 模板变更一节的 README 要求
+- [X] T007 [US3] 运行 `pnpm format && pnpm check`，提交
 
 ---
 
