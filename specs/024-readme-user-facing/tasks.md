@@ -18,8 +18,8 @@
 
 **Independent Test**: 按 [quickstart.md](./quickstart.md) 第 2 步检查 `README.md`。
 
-- [ ] T002 [US1] 按 [research.md](./research.md#r1-readme-正文) R1 重写 `README.md`
-- [ ] T003 [US1] 运行 `pnpm format && pnpm check`，提交
+- [X] T002 [US1] 按 [research.md](./research.md#r1-readme-正文) R1 重写 `README.md`
+- [X] T003 [US1] 运行 `pnpm format && pnpm check`，提交
 
 ---
 
