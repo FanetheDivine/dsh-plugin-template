@@ -28,10 +28,12 @@
 - [D-008] Q: 宪章原则 III 如何修订？ -> A: 按新的 README 规范修订：README 行改为插件用户与「简介、功能、使用建议」；写明 README 不属于技术文档，不计入单一归属；同步要求随之调整。
 - [D-009] Q: 宪章版本号如何递增？ -> A: MINOR，2.0.0 → 2.1.0。
 - [D-010] Q: 引用 README 的其他文档是否同步？ -> A: 同步 `AGENTS.md` 索引条目与 `docs/template-conversion.md` 中「新用户能按 README 跑通」的表述。
+- [D-011] Q: 模板转化的发布设置是否要求修改 `package.json` 的 `repository`？ -> A: 要求。转化步骤写明设置 `repository` 为新插件的仓库 URL；模板的 `package.json` 保持无该字段。
 
 ## Review Record
 
 - 2026-11-24 | Decision: Approved | Scope: current full document | Open items: none | Risks: 包未发布时 npm 徽标显示 not found
+- 2026-11-24 | Decision: Approved | Scope: current full document，含 D-011 与 FR-012 | Open items: none | Risks: 包未发布时 npm 徽标显示 not found
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -99,6 +101,7 @@
 - **FR-009**: 宪章修订 MUST 把版本号递增到 2.1.0 并更新 Sync Impact Report。
 - **FR-010**: `AGENTS.md` 索引条目与 `docs/template-conversion.md` MUST 与新的 README 范围一致。
 - **FR-011**: README MUST 继续进入 npm 包，package-pack 测试保持通过。
+- **FR-012**: `docs/template-conversion.md` 的发布设置 MUST 包含一步：在 `package.json` 设置 `repository` 为新插件的仓库 URL。
 
 ### Key Entities
 

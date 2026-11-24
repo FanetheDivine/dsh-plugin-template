@@ -89,6 +89,8 @@
   - `AGENTS.md` 索引条目：`- [README.md](./README.md)：插件简介与功能。`
   - `docs/template-conversion.md` 模板变更：`新用户能按 README 跑通` 改为 `README 与插件功能一致`。
   - `docs/template-conversion.md` 模板转化：`更新项目名、包名、README 与 cordis.patch.yml` 保持不变，README 的徽标随包名更新。
+  - `docs/template-conversion.md` 发布设置：在清空 `version` 之后增加「在 `package.json` 设置 `repository`，值为新插件的仓库 URL」。
+  - `.github/workflows/ci.yml` `publish` job 注释的步骤摘要同步该步骤。
 - Rationale: `docs/i18n.md` 与 `docs/how-it-works.md` 只提到 README 进包与详情页回落，与新范围一致，不改。
 
 ## R4 测试

@@ -20,10 +20,12 @@
 - [P-001] Q: README 正文采用 research.md R1 的草稿？ -> A: 采用。
 - [P-002] Q: 宪章原则 III 采用 research.md R2 的草稿？ -> A: 采用。
 - [P-003] Q: 是否新增 README 内容的自动测试？ -> A: 不新增。
+- [D-011] 实施中用户追加：发布设置增加设置 `package.json` `repository` 一步；`ci.yml` `publish` job 的注释同步该步骤。
 
 ## Review Record
 
 - 2026-11-24 | Decision: Approved | Scope: current full document | Open items: none | Risks: 包未发布时 npm 徽标显示 not found；README 无自动内容测试
+- 2026-11-24 | Decision: Approved | Scope: current full document，含 D-011 | Open items: none | Risks: 包未发布时 npm 徽标显示 not found；README 无自动内容测试
 
 ## Summary
 
@@ -33,6 +35,7 @@
   - README 的内容规则写在原则 III。
 - 宪章版本 2.0.0 → 2.1.0，更新 Sync Impact Report。
 - `AGENTS.md` 索引与 `docs/template-conversion.md` 同步 README 的新范围。
+- `docs/template-conversion.md` 发布设置增加：在 `package.json` 设置 `repository` 为新插件的仓库 URL；`.github/workflows/ci.yml` 的注释同步。
 
 ## Technical Context
 
@@ -55,7 +58,7 @@
 - 徽标与链接只用公网 URL，满足宪章原则 V。
 - README 作为 DSH 详情页时相对链接无法解析，链接用 GitHub 绝对 URL。
 
-**Scale/Scope**: 4 份文件：`README.md`、宪章、`AGENTS.md`、`docs/template-conversion.md`
+**Scale/Scope**: 4 份文档与 `.github/workflows/ci.yml` 的注释
 
 ## Constitution Check
 
@@ -94,10 +97,11 @@ specs/024-readme-user-facing/
 README.md                          # 徽标、简介与功能列表
 .specify/memory/constitution.md    # 原则 III 与版本号
 AGENTS.md                          # 文档索引中的 README 条目
-docs/template-conversion.md        # 模板变更与模板转化中的 README 要求
+docs/template-conversion.md        # README 要求与发布设置中的 repository 步骤
+.github/workflows/ci.yml           # publish job 注释中的转化步骤
 ```
 
-**Structure Decision**: 只改上述四份文档，代码、测试与构建配置不变。
+**Structure Decision**: 只改上述文档与 CI 注释，代码、测试与构建行为不变。
 
 ## Complexity Tracking
 

@@ -36,7 +36,19 @@
 
 ---
 
+## Phase 4: 发布设置补充 repository 步骤
+
+**Goal**: 模板转化的发布设置要求把 `package.json` 的 `repository` 设为新插件的仓库 URL。
+
+**Independent Test**: 阅读 `docs/template-conversion.md` 发布设置与 `.github/workflows/ci.yml` 注释，两处步骤一致。
+
+- [X] T008 [P] 修改 `docs/template-conversion.md` 发布设置，增加设置 `repository` 一步
+- [X] T009 [P] 同步 `.github/workflows/ci.yml` `publish` job 注释的步骤摘要
+- [X] T010 运行 `pnpm format && pnpm check`，提交
+
+---
+
 ## Dependencies
 
-- Phase 1 → Phase 2 → Phase 3。
+- Phase 1 → Phase 2 → Phase 3 → Phase 4。
 - T005 与 T006 改不同文件，可并行。
