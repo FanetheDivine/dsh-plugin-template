@@ -97,14 +97,19 @@ export function apply(ctx: Context, config?: unknown): void {
 
 工具注册时不校验 `parameters`，错误在枚举声明时才暴露。
 
-- 字面量声明满足规则，`demo_echo` 属于这一类。
-- 用 `z.toJSONSchema` 生成声明时，返回值带不可枚举的 `~standard` 键，不满足规则。展开复制只保留可枚举键，同时剔除模型不需要的 `$schema`：
+`demo_echo` 的写法把类型与声明分开，各自单一职责：
 
-  ```ts
-  const { $schema: _schema, ...parameters } = z.toJSONSchema(schema);
-  ```
+| 职责 | 位置 |
+| --- | --- |
+| 参数类型与运行时校验 | `ECHO_ARGS_SCHEMA`，`parseEchoArgs` 用它校验 |
+| 模型可见的声明 | `ECHO_PARAMETERS`，手写的普通 JSON 常量 |
 
-- 换用其他 schema 库生成声明时，同样 MUST 满足上述规则。
+- `ECHO_PARAMETERS` 用 `as const satisfies ParametersSchemaOf<EchoArgs>` 受类型约束，`EchoArgs` 由 `z.infer` 推出。
+- 两条类型断言（`AssertRequiredKeysInSync`、`AssertPropertyKeysInSync`）覆盖必填键与属性键集合。
+- `tests/tool-schema.test.ts` 断言 `ECHO_PARAMETERS` 与 `z.toJSONSchema(ECHO_ARGS_SCHEMA)` 剔除 `$schema` 与 `~standard` 后结构相等。
+- 声明 MUST 通过 `tests/support/lossless-json.ts` 的校验；测试同时断言 zod 的原始输出通不过，记录手写声明的原因。
+
+`z.toJSONSchema` 的返回值带不可枚举且不可删除的 `~standard` 键，因此宿主当前拒绝直接使用它的输出。宿主支持后按 [development.md](./development.md#依赖升级) 简化。
 
 ### 事件监听
 
