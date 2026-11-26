@@ -4,7 +4,10 @@
 
 ### Changed
 
-- `docs/how-it-works.md` 增加工具参数声明小节：`parameters` MUST 是宿主可克隆的无损 JSON，`z.toJSONSchema` 的输出需展开复制以剔除不可枚举的 `~standard` 键
+- `demo_echo` 的参数声明改为手写普通 JSON 常量，`parameters` 经 `as const satisfies` 受 zod 推出的类型约束；新增 `tests/tool-schema.test.ts` 与 `tests/support/lossless-json.ts` 校验全部工具声明的无损 JSON 与手写声明和 zod 投影的一致性
+- `docs/how-it-works.md` 增加工具参数声明小节：`parameters` MUST 是宿主可克隆的无损 JSON，`z.toJSONSchema` 的输出因不可枚举且不可删除的 `~standard` 键暂不可用
+- `docs/development.md` 新增「依赖升级」小节：核对宿主能否直接接受 zod 输出，以及接受后的简化步骤
+- `@deepseek-ai/dsh-*` 依赖升级到 `0.2.2-rc.5`
 - `README.md` 面向插件用户，只写简介与功能列表，开头带 npm 版本徽标
 - 宪章升到 v2.1.0：文档分为用户文档与技术文档，`README.md` 为唯一用户文档，不计入单一归属；原则 III 增加 README 规则
 - 模板转化的发布设置增加一步：把 `package.json` 的 `repository` 设为新插件的仓库 URL

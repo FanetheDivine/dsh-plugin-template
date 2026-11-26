@@ -36,9 +36,9 @@ description: "工具参数声明改为手写普通 JSON 并受 zod 类型约束�
 
 ### Implementation for User Story 4
 
-- [ ] T002 [US4] 把 `package.json` 的 10 个 `@deepseek-ai/dsh-*` 改为 `0.2.2-rc.5`。
-- [ ] T003 [P] [US4] 把 `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude` 10 条改为 `@<包名>@0.2.2-rc.5`。
-- [ ] T004 [US4] 运行 `pnpm install` 更新 `pnpm-lock.yaml`，再运行 `pnpm test:code tests/dependency-versions.test.ts`；出现 rc.5 接口变化导致的类型错误时按 P-D-004 处理。
+- [x] T002 [US4] 把 `package.json` 的 10 个 `@deepseek-ai/dsh-*` 改为 `0.2.2-rc.5`。
+- [x] T003 [P] [US4] 把 `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude` 10 条改为 `@<包名>@0.2.2-rc.5`。
+- [x] T004 [US4] 运行 `pnpm install` 更新 `pnpm-lock.yaml`，再运行 `pnpm test:code tests/dependency-versions.test.ts`；出现 rc.5 接口变化导致的类型错误时按 P-D-004 处理。
 
 **Checkpoint**: 依赖一致，可在 rc.5 上继续。
 
@@ -52,14 +52,14 @@ description: "工具参数声明改为手写普通 JSON 并受 zod 类型约束�
 
 ### Implementation for User Story 2
 
-- [ ] T005 [US2] 改写 `src/demo-tool.ts`：
+- [x] T005 [US2] 改写 `src/demo-tool.ts`：
   - 保留 `echoArgsSchema`，新增 `export type EchoArgs = z.infer<typeof echoArgsSchema>`。
   - 新增映射类型 `RequiredKeys<T>`、`JsonSchemaOf<T>`、`ParametersSchemaOf<T>`、`Assert<T>`、`Equal<A, B>`。
   - 新增 `export const ECHO_PARAMETERS`，内容为 `type: 'object'`、`properties.text`（`type: 'string'`、`minLength: 1`、`description: '要回显的文本'`）、`required: ['text']`、`additionalProperties: false`，用 `as const satisfies ParametersSchemaOf<EchoArgs>`。
   - 新增两条类型断言：必填键集合、属性键集合与 `EchoArgs` 相等。
   - `buildDemoTool` 的 `parameters` 改用 `ECHO_PARAMETERS`。
-- [ ] T006 [US2] 更新 `tests/plugin.test.ts` 的声明断言为 JSON Schema 根对象，保留工具行为断言。
-- [ ] T007 [US2] 运行 `pnpm typecheck`；按 [quickstart.md](./quickstart.md) S3 制造三处漂移确认失败后改回。
+- [x] T006 [US2] 更新 `tests/plugin.test.ts` 的声明断言为 JSON Schema 根对象，保留工具行为断言。
+- [x] T007 [US2] 运行 `pnpm typecheck`；按 [quickstart.md](./quickstart.md) S3 制造三处漂移确认失败后改回。
 
 **Checkpoint**: 声明形态与类型约束就位；完成后提交 `feat(025): 手写工具声明并受 zod 类型约束`。
 
@@ -73,13 +73,13 @@ description: "工具参数声明改为手写普通 JSON 并受 zod 类型约束�
 
 ### Implementation for User Story 3
 
-- [ ] T008 [P] [US3] 新增 `tests/support/lossless-json.ts`：导出按宿主规则校验的函数，递归检查值域（拒绝 `NaN`、`Infinity`、`-0`）、对象原型（`null` 或 `Object.prototype`）、键可枚举且为字符串、数组原型与连续性、循环引用；通过时返回深拷贝，失败时抛出含路径的 `Error`。
-- [ ] T009 [US3] 新增 `tests/tool-schema.test.ts`：
+- [x] T008 [P] [US3] 新增 `tests/support/lossless-json.ts`：导出按宿主规则校验的函数，递归检查值域（拒绝 `NaN`、`Infinity`、`-0`）、对象原型（`null` 或 `Object.prototype`）、键可枚举且为字符串、数组原型与连续性、循环引用；通过时返回深拷贝，失败时抛出含路径的 `Error`。
+- [x] T009 [US3] 新增 `tests/tool-schema.test.ts`：
   - 经 `apply` 的真实注册入口校验全部已注册工具的 `parameters`。
   - 断言 `ECHO_PARAMETERS` 与 `z.toJSONSchema(echoArgsSchema)` 剔除 `$schema` 与 `~standard` 后结构相等。
   - 断言 `z.toJSONSchema` 的原始输出未通过校验，注释说明宿主限制与升级后的简化方式。
   - 覆盖 FR-009 列出的非法值。
-- [ ] T010 [US3] 运行 `pnpm test:code`，按 [quickstart.md](./quickstart.md) S2、S4、S5、S6 核对。
+- [x] T010 [US3] 运行 `pnpm test:code`，按 [quickstart.md](./quickstart.md) S2、S4、S5、S6 核对。
 
 **Checkpoint**: 漂移与非法声明都会被测试拦住；完成后提交 `test(025): 工具声明校验与一致性测试`。
 
@@ -93,7 +93,7 @@ description: "工具参数声明改为手写普通 JSON 并受 zod 类型约束�
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] 改写 `docs/how-it-works.md` 的「参数声明」小节：
+- [x] T011 [US1] 改写 `docs/how-it-works.md` 的「参数声明」小节：
   - 保留无损 JSON 的判定规则、报错信息与 `better-mcp` 触发路径。
   - 写法改为：zod 声明类型与校验，`parameters` 手写并以 `as const satisfies` 约束，一致性由测试保证。
   - 说明当前写法存在的原因（zod 输出带不可枚举 `~standard`），以及宿主能直接接受 zod 输出后的简化方式。
@@ -110,8 +110,8 @@ description: "工具参数声明改为手写普通 JSON 并受 zod 类型约束�
 
 ### Implementation for User Story 5
 
-- [ ] T012 [US5] 在 `docs/development.md` 新增「依赖升级」小节：升级 `@deepseek-ai/dsh-*` 的同步要求（链接宪章原则 I）、升级后提醒实机测试、核对宿主能否直接接受 `z.toJSONSchema` 输出并能接受时的简化步骤。
-- [ ] T013 [P] [US5] 在 `docs/development.md` 的测试表补充 `tests/tool-schema.test.ts` 与 `tests/support/lossless-json.ts`。
+- [x] T012 [US5] 在 `docs/development.md` 新增「依赖升级」小节：升级 `@deepseek-ai/dsh-*` 的同步要求（链接宪章原则 I）、升级后提醒实机测试、核对宿主能否直接接受 `z.toJSONSchema` 输出并能接受时的简化步骤。
+- [x] T013 [P] [US5] 在 `docs/development.md` 的测试表补充 `tests/tool-schema.test.ts` 与 `tests/support/lossless-json.ts`。
 
 **Checkpoint**: 升级有据可依；完成后提交 `docs(025): 依赖升级核对项`。
 
@@ -119,9 +119,9 @@ description: "工具参数声明改为手写普通 JSON 并受 zod 类型约束�
 
 ## Phase 7: Polish - 收尾
 
-- [ ] T014 在 `CHANGELOG.md` 记录声明写法、测试与依赖升级。
-- [ ] T015 运行 `pnpm format && pnpm full-check`，按 [quickstart.md](./quickstart.md) 核对全部场景。
-- [ ] T016 提醒用户按 `0.2.2-rc.5` 执行实机测试。
+- [x] T014 在 `CHANGELOG.md` 记录声明写法、测试与依赖升级。
+- [x] T015 运行 `pnpm format && pnpm full-check`，按 [quickstart.md](./quickstart.md) 核对全部场景。
+- [x] T016 提醒用户按 `0.2.2-rc.5` 执行实机测试。
 
 **Commit**: 完成后提交 `chore(025): 变更记录与全量校验`。
 
