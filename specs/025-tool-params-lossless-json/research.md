@@ -31,13 +31,20 @@
 
 **Alternatives considered**: 在插件内包一层注册校验。它不影响宿主行为，只会增加模板复杂度。
 
-## R-04 `demo_echo` 的声明形态
+## R-04 `demo_echo` 的声明产出方式
 
-**Decision**: 用 `z.toJSONSchema` 生成 JSON Schema 根对象，展开复制剔除 `$schema`。
+**Decision**: zod schema 只负责参数类型与运行时校验；`parameters` 是手写的普通 JSON Schema 常量，用 `as const satisfies ParametersSchemaOf<EchoArgs>` 受类型约束。
 
-**Rationale**: `ToolDefinition.parameters` 在 `@deepseek-ai/dsh-llm` 的类型是 `Record<string, unknown>`，注释为「JSON Schema object for the arguments」；`defineTool` 才接受属性映射并编译成根对象。模板当前传入属性映射 `{ text: { … } }`，模型看到的参数表缺少 `type: object` 与 `properties` 包裹。改用根对象同时修正现有形态与示例写法。
+**Rationale**:
 
-**Alternatives considered**: 用 `z.toJSONSchema(schema).properties` 取回属性映射。它偏离宿主约定，且与 lark-bridge 的示例不一致。
+- `ToolDefinition.parameters` 在 `@deepseek-ai/dsh-llm` 的类型是 `Record<string, unknown>`，注释为「JSON Schema object for the arguments」；模板当前传入属性映射 `{ text: { … } }`，模型看到的参数表缺少 `type: object` 与 `properties` 包裹。
+- 宿主拒绝 zod 的直接输出（R-02），手写声明让发布路径不含任何转换与剔除逻辑。
+- zod 仍是类型的唯一来源：`z.infer` 推出参数类型，`satisfies` 把手写声明钉到该类型上。
+
+**Alternatives considered**:
+
+- 运行时用 `z.toJSONSchema` 转换（lark-bridge 的做法）。它需要在发布代码里复制并剔除键，且宿主限制解除前一直保留这段逻辑。
+- 用 `z.toJSONSchema(schema).properties` 拼回属性映射。它偏离宿主约定，也仍依赖 zod 输出。
 
 ## R-05 依赖对齐
 
@@ -62,3 +69,32 @@
 **Rationale**: `full-check` 含类型、lint、`code` 项目测试、构建与 `dist` 项目测试，覆盖本次改动面。规格 D-005 决定不做实机测试，风险记入 Review Record。
 
 **Alternatives considered**: 只跑 `pnpm check`。它不构建产物，包内容与前端注册契约得不到验证。
+## R-08 类型约束能拦住哪些漂移
+
+**Decision**: 用 `satisfies` 加两条类型断言，覆盖属性值类型、属性键集合与必填键集合。
+
+**Rationale**: 仓库内实测（`tsc --strict`）：
+
+- `satisfies` 拦住属性值类型错误、缺失 `required`、多余属性，各 1 处编译错误。
+- `required: []` 能通过 `satisfies`，因此另加 `Assert<Equal<(typeof P)['required'][number], RequiredKeys<EchoArgs>>>` 与 `Assert<Equal<keyof (typeof P)['properties'], keyof EchoArgs>>` 两条断言。
+
+映射类型 `JsonSchemaOf<T>` 只覆盖模板用到的节点（`string`、`number`、`boolean`、数组、对象），新参数类型不在其中时需扩展映射。
+
+**Alternatives considered**: 只用 `satisfies Record<string, unknown>`。它只保证是对象，不提供任何约束。
+
+## R-09 与 zod 投影的一致性由测试保证
+
+**Decision**: `tests/tool-schema.test.ts` 断言手写声明等于 `z.toJSONSchema(echoArgsSchema)` 剔除 `$schema` 与 `~standard` 后的结果。
+
+**Rationale**: 类型层只能约束 `z.infer` 推得出的部分；`minLength`、`description`、`additionalProperties` 这类注解只有在值与 zod 投影比较时才能发现漂移。zod 升级改变投影时该测试先失败。
+
+**Alternatives considered**: 只靠类型约束。它看不到注解字段的漂移。
+
+## R-10 宿主升级的核对点
+
+**Decision**: `docs/development.md` 新增「依赖升级」小节，核对宿主能否直接接受 zod 输出；`docs/how-it-works.md` 的参数声明小节说明现状与简化条件。
+
+**Rationale**: 手写声明是绕过当前限制的成本，需要一条可执行的回收路径。宪章原则 III 要求机制归 `how-it-works.md`、维护流程归 `docs/development.md`，两处各写各的归属内容。
+
+**Alternatives considered**: 只写在测试注释里。维护者升级依赖时不会翻测试。
+

@@ -1,4 +1,4 @@
-# Requirements Quality Checklist: 工具参数声明的无损 JSON 约定与 zod 示例
+# Requirements Quality Checklist: 工具参数声明的无损 JSON 约定与手写声明
 
 **Purpose**: 校验规格草稿的需求质量
 **Created**: 2026-11-26

@@ -1,19 +1,37 @@
-# Data Model: 工具参数声明的无损 JSON 与 zod 示例
+# Data Model: 工具参数声明的无损 JSON 与手写声明
 
 ## 实体
 
-### 工具声明参数
+### 手写参数声明
 
-`demo_echo` 注册时交给宿主的 `parameters`：
+`demo_echo` 的 `parameters`，一个 `as const` 的普通 JSON 常量：
 
 | 字段 | 值 | 说明 |
 | --- | --- | --- |
-| `type` | `'object'` | zod 对象的根类型 |
-| `properties` | `{ text: { type: 'string', minLength: 1, description } }` | 属性表 |
-| `required` | `['text']` | 必填字段 |
-| `additionalProperties` | `false` | zod 生成的默认收敛 |
-| `$schema` | 不存在 | 生成时剔除 |
-| `~standard` | 不存在 | 展开复制丢弃 |
+| `type` | `'object'` | 对象根 |
+| `properties.text.type` | `'string'` | 与 zod 的 `z.string()` 对应 |
+| `properties.text.minLength` | `1` | 与 `z.string().min(1)` 对应 |
+| `properties.text.description` | `'要回显的文本'` | 模型看到的说明 |
+| `required` | `['text']` | 与 `z.infer` 的必填键一致 |
+| `additionalProperties` | `false` | 与 zod 投影一致 |
+
+### zod 投影
+
+`z.toJSONSchema(echoArgsSchema)` 的输出：
+
+| 键 | 处理 |
+| --- | --- |
+| `$schema` | 剔除，模型不需要 |
+| `type`、`properties`、`required`、`additionalProperties` | 与手写声明逐字段相等 |
+| `~standard` | 不可枚举、不可配置；一致性测试剔除后比较 |
+
+### 类型约束
+
+| 约束 | 覆盖 |
+| --- | --- |
+| `as const satisfies ParametersSchemaOf<EchoArgs>` | 属性键集合、属性值类型、`required` 存在 |
+| `Assert<Equal<required[number], RequiredKeys<EchoArgs>>>` | 必填键集合精确相等 |
+| `Assert<Equal<keyof properties, keyof EchoArgs>>` | 属性键集合精确相等 |
 
 ### 无损 JSON 值
 
@@ -36,13 +54,14 @@
 
 ## 关系
 
-- `demo_echo` 的 `parameters` 与 `parseEchoArgs` 的校验共用同一个 zod schema `echoArgsSchema`。
+- `echoArgsSchema` 是参数类型与运行时校验的唯一来源；`EchoArgs` 由它推出。
+- `ECHO_PARAMETERS` 是手写常量，受 `EchoArgs` 派生出的类型约束。
+- 一致性测试把 `ECHO_PARAMETERS` 与 zod 投影绑定，任一侧漂移都会失败。
 - 每个已注册工具持有恰好一个 `parameters`，都必须是无损 JSON 值。
-- 校验函数只读输入，返回的副本可自由改写。
 
 ## 状态与校验规则
 
-1. 声明在 `buildDemoTool` 调用时生成一次，之后只读。
+1. `ECHO_PARAMETERS` 是模块级常量，注册时直接引用，不做转换。
 2. 声明键集合固定为 `type`、`properties`、`required`、`additionalProperties`。
-3. 任一已注册工具的声明校验失败即视为缺陷，不区分工具来源。
-4. `z.toJSONSchema` 的原始输出必须校验失败，证明展开复制是必需的。
+3. `z.toJSONSchema` 的原始输出必须通不过无损 JSON 校验，作为手写声明的理由记录在测试里。
+4. 宿主升级后若能直接接受 zod 输出，删除 `ECHO_PARAMETERS` 与一致性测试，改为 `parameters: 投影`。
