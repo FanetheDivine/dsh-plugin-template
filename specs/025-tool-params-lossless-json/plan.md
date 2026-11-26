@@ -4,7 +4,7 @@
 
 **Input**: Feature specification from `/specs/025-tool-params-lossless-json/spec.md`
 
-**Status**: Draft
+**Status**: Approved
 
 ## Open Decisions
 
@@ -29,7 +29,7 @@ None.
 
 ## Review Record
 
-- Pending: 按审查反馈修改，等待用户再次审查完整计划。
+- 2026-11-26 | Decision: Approved | Scope: current full document | Open items: none | Risks: 不做实机测试（规格 D-005）；映射类型覆盖面有限，新增参数类型需扩展。
 
 ## Summary
 
