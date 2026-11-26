@@ -102,7 +102,9 @@
 | `tests/dist-freshness.test.ts` | 产物新鲜度判定的三种状态 |
 | `tests/worktree-extension.test.ts` | worktree 扩展的创建、复用与清理 |
 | `tests/sync-main.test.ts` | 主工作区 `main` 快进到 `origin/main`；`--prepare` 整理其他分支、未提交变更、未推送提交与 detached HEAD |
+| `tests/tool-schema.test.ts` | 全部已注册工具的声明为无损 JSON；手写声明与 zod 投影一致 |
 | `tests/helpers.ts` | 模拟宿主与客户端 `ctx`，记录注册、事件监听与日志 |
+| `tests/support/lossless-json.ts` | 按宿主规则校验无损 JSON，通过时返回深拷贝 |
 | `tests/support/primitives.ts` | 把平台组件包解析到源码，避开已发布产物内联的依赖 |
 
 测试要求见[宪章](../.specify/memory/constitution.md)原则 II。文案与元数据的规范见 [i18n.md](./i18n.md)。
@@ -112,6 +114,22 @@ vitest 拆成 `code` 与 `dist` 两个 project。产物测试读取 `dist`，由
 纯文档流程变更不新增测试文件时，仍须运行质量门禁。专项验收步骤记录在对应 spec 的 `quickstart.md`。
 
 浏览器用例由仓库内的 `playwright` 驱动无头 Chrome。`vitest.config.ts` 把 `@deepseek-ai/dsh-client-ui-primitives` 指向包的源码：已发布的 `lib` 内联了 shiki、katex 等未声明的依赖，源码只依赖 react、clsx 与 `dsh-client-store`。
+
+## 依赖升级
+
+`@deepseek-ai/dsh-*` 的版本规则见[宪章](../.specify/memory/constitution.md)原则 I。
+
+升级步骤：
+
+1. 把 `package.json` 的 `dsh-*` 与 `pnpm-workspace.yaml` 的 `minimumReleaseAgeExclude` 改为同一确切版本。
+2. 运行 `pnpm install` 更新锁文件，再运行 `pnpm full-check`。
+3. 在真实宿主上做一次实机测试，版本号写进报告。
+
+升级后核对工具声明：
+
+- 检查宿主能否接受 `z.toJSONSchema` 的输出。`tests/tool-schema.test.ts` 断言它当前通不过无损 JSON 校验。
+- 宿主接受后，删除 `src/demo-tool.ts` 的 `ECHO_PARAMETERS`、类型断言与 `tests/support/lossless-json.ts`，把 `parameters` 改为 `z.toJSONSchema(ECHO_ARGS_SCHEMA)` 剔除 `$schema` 的结果。
+- 同时删除 `tests/tool-schema.test.ts` 里的一致性断言与原始输出断言。
 
 ## Spec Kit 流程
 
