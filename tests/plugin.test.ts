@@ -129,7 +129,10 @@ describe('demo 工具 parseEchoArgs / buildDemoTool', () => {
     expect(tool.name).toBe(DEMO_TOOL_NAME);
     expect(tool.description).toContain('demo');
     expect(tool.parameters).toEqual({
-      text: { type: 'string', description: '要回显的文本', required: true },
+      type: 'object',
+      properties: { text: { type: 'string', minLength: 1, description: '要回显的文本' } },
+      required: ['text'],
+      additionalProperties: false,
     });
     expect(typeof tool.execute).toBe('function');
     expect(tool.output.render({ text: 'x' }, 'out')).toEqual([{ type: 'text', text: 'out' }]);

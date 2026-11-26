@@ -75,7 +75,7 @@ export function apply(ctx: Context, config?: unknown): void {
 | 字段 | 含义 |
 | --- | --- |
 | `name`、`description` | 模型看到的工具名与说明 |
-| `parameters` | 参数声明 |
+| `parameters` | 参数声明，MUST 是无损 JSON |
 | `output` | 返回值的 JSON Schema 与渲染函数 |
 | `execute(args, exec)` | 执行体，`exec` 提供 `agent` 与 `signal` |
 
@@ -83,6 +83,33 @@ export function apply(ctx: Context, config?: unknown): void {
 
 1. 用 zod 校验参数。参数非法时返回提示文本。
 2. 返回 `[prefix] (session <id>) <text>`。
+
+### 参数声明
+
+宿主枚举工具声明时，把 `parameters` 当作无损 JSON 克隆。克隆失败会抛出 `tool "<name>" parameters must be lossless JSON before schema projection`。`dsh-plugin-better-mcp` 在每一步枚举全部工具声明，未捕获的异常会终止 DSH 进程。
+
+无损 JSON 的规则：
+
+- 值只能是纯对象、数组、字符串、有限数字、布尔与 `null`。
+- 对象的原型是 `null` 或 `Object.prototype`，数组的原型是 `Array.prototype`。
+- 对象的自有键全部是可枚举的字符串键。
+- 不含循环引用。
+
+工具注册时不校验 `parameters`，错误在枚举声明时才暴露。
+
+`demo_echo` 的写法把类型与声明分开，各自单一职责：
+
+| 职责 | 位置 |
+| --- | --- |
+| 参数类型与运行时校验 | `ECHO_ARGS_SCHEMA`，`parseEchoArgs` 用它校验 |
+| 模型可见的声明 | `ECHO_PARAMETERS`，手写的普通 JSON 常量 |
+
+- `ECHO_PARAMETERS` 用 `as const satisfies ParametersSchemaOf<EchoArgs>` 受类型约束，`EchoArgs` 由 `z.infer` 推出。
+- 两条类型断言（`AssertRequiredKeysInSync`、`AssertPropertyKeysInSync`）覆盖必填键与属性键集合。
+- `tests/tool-schema.test.ts` 断言 `ECHO_PARAMETERS` 与 `z.toJSONSchema(ECHO_ARGS_SCHEMA)` 剔除 `$schema` 与 `~standard` 后结构相等。
+- 声明 MUST 通过 `tests/support/lossless-json.ts` 的校验；测试同时断言 zod 的原始输出通不过，记录手写声明的原因。
+
+`z.toJSONSchema` 的返回值带不可枚举且不可删除的 `~standard` 键，因此宿主当前拒绝直接使用它的输出。宿主支持后按 [development.md](./development.md#依赖升级) 简化。
 
 ### 事件监听
 
