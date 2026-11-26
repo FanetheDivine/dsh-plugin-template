@@ -1,6 +1,6 @@
 /**
  * demo_echo 工具：把传入的文本加上前缀后返回。
- * 导出 buildDemoTool、参数校验函数 parseEchoArgs 与手写参数声明 ECHO_PARAMETERS。
+ * 导出 buildDemoTool、参数校验函数 parseEchoArgs、zod schema ECHO_ARGS_SCHEMA 与手写声明 ECHO_PARAMETERS。
  */
 import { z } from 'zod';
 
@@ -8,12 +8,12 @@ import { DEMO_TOOL_NAME } from './constants.ts';
 import type { ToolDefinition, ToolRunContext } from './types.ts';
 
 /** 工具参数的 zod schema：参数类型与运行时校验的唯一来源。 */
-const echoArgsSchema = z.object({
-  text: z.string().min(1, 'text 必须是非空字符串'),
+export const ECHO_ARGS_SCHEMA = z.object({
+  text: z.string().min(1, 'text 必须是非空字符串').describe('要回显的文本'),
 });
 
 /** 由 zod schema 推出的参数类型。 */
-export type EchoArgs = z.infer<typeof echoArgsSchema>;
+export type EchoArgs = z.infer<typeof ECHO_ARGS_SCHEMA>;
 
 /** 必填键：值类型不含 undefined 的键。 */
 type RequiredKeys<T> = { [K in keyof T]-?: undefined extends T[K] ? never : K }[keyof T];
@@ -86,7 +86,7 @@ export type EchoArgsParseResult = { ok: true; text: string } | { ok: false; erro
 
 /** 校验工具参数。 */
 export function parseEchoArgs(args: unknown): EchoArgsParseResult {
-  const parsed = echoArgsSchema.safeParse(args);
+  const parsed = ECHO_ARGS_SCHEMA.safeParse(args);
   if (!parsed.success) {
     const detail = parsed.error.issues.map((issue) => issue.message).join('; ');
     return { ok: false, error: `参数不合法：${detail}` };
