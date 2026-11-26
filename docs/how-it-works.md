@@ -75,7 +75,7 @@ export function apply(ctx: Context, config?: unknown): void {
 | 字段 | 含义 |
 | --- | --- |
 | `name`、`description` | 模型看到的工具名与说明 |
-| `parameters` | 参数声明 |
+| `parameters` | 参数声明，MUST 是无损 JSON |
 | `output` | 返回值的 JSON Schema 与渲染函数 |
 | `execute(args, exec)` | 执行体，`exec` 提供 `agent` 与 `signal` |
 
@@ -83,6 +83,28 @@ export function apply(ctx: Context, config?: unknown): void {
 
 1. 用 zod 校验参数。参数非法时返回提示文本。
 2. 返回 `[prefix] (session <id>) <text>`。
+
+### 参数声明
+
+宿主枚举工具声明时，把 `parameters` 当作无损 JSON 克隆。克隆失败会抛出 `tool "<name>" parameters must be lossless JSON before schema projection`。`dsh-plugin-better-mcp` 在每一步枚举全部工具声明，未捕获的异常会终止 DSH 进程。
+
+无损 JSON 的规则：
+
+- 值只能是纯对象、数组、字符串、有限数字、布尔与 `null`。
+- 对象的原型是 `null` 或 `Object.prototype`，数组的原型是 `Array.prototype`。
+- 对象的自有键全部是可枚举的字符串键。
+- 不含循环引用。
+
+工具注册时不校验 `parameters`，错误在枚举声明时才暴露。
+
+- 字面量声明满足规则，`demo_echo` 属于这一类。
+- 用 `z.toJSONSchema` 生成声明时，返回值带不可枚举的 `~standard` 键，不满足规则。展开复制只保留可枚举键，同时剔除模型不需要的 `$schema`：
+
+  ```ts
+  const { $schema: _schema, ...parameters } = z.toJSONSchema(schema);
+  ```
+
+- 换用其他 schema 库生成声明时，同样 MUST 满足上述规则。
 
 ### 事件监听
 

@@ -4,6 +4,7 @@
 
 ### Changed
 
+- `docs/how-it-works.md` 增加工具参数声明小节：`parameters` MUST 是宿主可克隆的无损 JSON，`z.toJSONSchema` 的输出需展开复制以剔除不可枚举的 `~standard` 键
 - `README.md` 面向插件用户，只写简介与功能列表，开头带 npm 版本徽标
 - 宪章升到 v2.1.0：文档分为用户文档与技术文档，`README.md` 为唯一用户文档，不计入单一归属；原则 III 增加 README 规则
 - 模板转化的发布设置增加一步：把 `package.json` 的 `repository` 设为新插件的仓库 URL
